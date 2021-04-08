@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "567868456667",
+    "project_id": "onlinenumbaseball",
+    "storage_bucket": "onlinenumbaseball.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567868456667:android:dba62fddd09217823b16fe",
+        "android_client_info": {
+          "package_name": "pnu.termproject.onlinenumbaseball"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "567868456667-8h4qvlqhp7phjqhlmft9e7ag1v3bqi4m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "pnu.termproject.onlinenumbaseball",
+            "certificate_hash": "7a05f86bd4487e931a3765bc61aa1da48b042d82"
+          }
+        },
+        {
+          "client_id": "567868456667-jn0d31tdphs482556po648m0at7tfcrk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8X7MvC4_lqhXrIBmNJD_DrGFa_Nmbb0w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "567868456667-jn0d31tdphs482556po648m0at7tfcrk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
