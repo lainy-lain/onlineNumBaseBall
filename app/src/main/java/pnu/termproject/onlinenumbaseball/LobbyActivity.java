@@ -119,4 +119,11 @@ public class LobbyActivity extends AppCompatActivity implements View.OnClickList
         msgDialog.show();
     }
 
+    @Override
+    public void onBackPressed(){ // 뒤로가기 버튼이 눌렸을 때
+        FirebaseAuth.getInstance().signOut(); // Firebase에서 로그아웃. Google에선 로그아웃되지 않음.
+        Toast.makeText(LobbyActivity.this, "로그인 정보가 저장됩니다", Toast.LENGTH_SHORT).show(); // 토스트 문자 짧게 출력
+        super.onBackPressed();
+    }
+
 }
