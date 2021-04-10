@@ -156,22 +156,24 @@
 
             <Button
                 android:id="@+id/logout_btn"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:text="@string/logout"
-                style="?android:attr/buttonBarButtonStyle"
+                android:textColor="#FFFFFF"
                 app:backgroundTint="#3F51B5" />
 
             <Button
                 android:id="@+id/revoke_btn"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:text="@string/revoke"
-                style="?android:attr/buttonBarButtonStyle"
+                android:textColor="#FFFFFF"
                 app:backgroundTint="#673AB7" />
         </LinearLayout>
 
