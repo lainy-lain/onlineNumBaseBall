@@ -246,13 +246,16 @@ public class Setting extends AppCompatActivity {
                     isLoaded[3] = true;
                     first = false;
                     willBeAdd[3].setVisibility(INVISIBLE);
-                    Button[] btn_others = new Button[30];
-                    for (int i = 0; i < 3; i++) {
+                    Button[] btn_others = new Button[125];
+                    for (int i = 0; i < 12; i++) {
                         for (int j = 0; j < 10; j++) {
                             btn_others[i*10 + j] = (Button)((TableRow)others.getChildAt(i)).getChildAt(j);
                         }
                     }
-                    for (int i = 0; i < 30; i++) {
+                    for (int i = 0; i < 5; i++) {
+                        btn_others[120 + i] = (Button)((TableRow)others.getChildAt(12)).getChildAt(i);
+                    }
+                    for (int i = 0; i < 125; i++) {
                         btn_others[i].setOnClickListener(v14 -> {
                             if (bgOrText.isChecked()) {
                                 ((Button)currentView[0]).setTextColor(v14.getBackgroundTintList());

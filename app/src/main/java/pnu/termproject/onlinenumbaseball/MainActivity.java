@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             startActivityForResult(intent, REQ_SIGN_GOOGLE); // 이것의 Result가 onActivityResult로 전달됨
         });
 
+        Button multi_btn = findViewById(R.id.multi_btn);
         Intent intent = getIntent();
         String nickName = intent.getStringExtra("nickName"); // MainActivity로부터 닉네임을 전달받음
         String photoUrl = intent.getStringExtra("photoUrl"); // MainActivity로부터 profile URL 전달받음
@@ -95,7 +96,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         Button ranking_btn = findViewById(R.id.rank_btn);
         Button setting_btn = findViewById(R.id.set_btn);
         Button single_btn = findViewById(R.id.single_btn);
-        Button multi_btn = findViewById(R.id.multi_btn);
         RadioGroup ballCount = findViewById(R.id.ball_count);
 
         play_btn.setOnClickListener(new View.OnClickListener() {
@@ -105,7 +105,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     ObjectAnimator.ofFloat(single_btn, "translationY", v.getHeight()).start();
                     ObjectAnimator.ofFloat(multi_btn, "translationY", v.getHeight() * 2).start();
                     single_btn.setEnabled(true);
-                    multi_btn.setEnabled(true);
+                    if (loginSuccess) {
+                        multi_btn.setEnabled(true);
+                    }
                 }
                 else {
                     ObjectAnimator.ofFloat(single_btn, "translationY", 0).start();

@@ -13,7 +13,7 @@
         android:id="@+id/bg_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="5dp"
+        android:padding="10dp"
         android:showText="true"
         android:text="@string/bgTextGuide"
         android:textAllCaps="false"
@@ -90,7 +90,7 @@
 
             <LinearLayout
                 android:id="@+id/colorKind"
-                android:layout_width="300dp"
+                android:layout_width="320dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical"
