@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/others"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:visibility="visible">
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/colorffffff"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffffff"
+            app:backgroundTint="#ffffff" />
+
+        <Button
+            android:id="@+id/colorffffcc"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffffcc"
+            app:backgroundTint="#ffffcc" />
+
+        <Button
+            android:id="@+id/colorffff99"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffff99"
+            app:backgroundTint="#ffff99" />
+
+        <Button
+            android:id="@+id/colorffff66"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffff66"
+            app:backgroundTint="#ffff66" />
+
+        <Button
+            android:id="@+id/colorffff33"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffff33"
+            app:backgroundTint="#ffff33" />
+
+        <Button
+            android:id="@+id/colorffcc33"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffcc33"
+            app:backgroundTint="#ffcc33" />
+
+        <Button
+            android:id="@+id/colorffcc66"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffcc66"
+            app:backgroundTint="#ffcc66" />
+
+        <Button
+            android:id="@+id/colorffcc99"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffcc99"
+            app:backgroundTint="#ffcc99" />
+
+        <Button
+            android:id="@+id/colorffcccc"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffcccc"
+            app:backgroundTint="#ffcccc" />
+
+        <Button
+            android:id="@+id/colorffccff"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ffccff"
+            app:backgroundTint="#ffccff" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/colorff99ff"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff99ff"
+            app:backgroundTint="#ff99ff" />
+
+        <Button
+            android:id="@+id/colorff99cc"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff99cc"
+            app:backgroundTint="#ff99cc" />
+
+        <Button
+            android:id="@+id/colorff9999"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff9999"
+            app:backgroundTint="#ff9999" />
+
+        <Button
+            android:id="@+id/colorff9966"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff9966"
+            app:backgroundTint="#ff9966" />
+
+        <Button
+            android:id="@+id/colorff9933"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff9933"
+            app:backgroundTint="#ff9933" />
+
+        <Button
+            android:id="@+id/colorff6633"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff6633"
+            app:backgroundTint="#ff6633" />
+
+        <Button
+            android:id="@+id/colorff6666"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff6666"
+            app:backgroundTint="#ff6666" />
+
+        <Button
+            android:id="@+id/colorff6699"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff6699"
+            app:backgroundTint="#ff6699" />
+
+        <Button
+            android:id="@+id/colorff66cc"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff66cc"
+            app:backgroundTint="#ff66cc" />
+
+        <Button
+            android:id="@+id/colorff66ff"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff66ff"
+            app:backgroundTint="#ff66ff" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/colorff33ff"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff33ff"
+            app:backgroundTint="#ff33ff" />
+
+        <Button
+            android:id="@+id/colorff33cc"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff33cc"
+            app:backgroundTint="#ff33cc" />
+
+        <Button
+            android:id="@+id/colorff3399"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff3399"
+            app:backgroundTint="#ff3399" />
+
+        <Button
+            android:id="@+id/colorff3366"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff3366"
+            app:backgroundTint="#ff3366" />
+
+        <Button
+            android:id="@+id/colorff3333"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#ff3333"
+            app:backgroundTint="#ff3333" />
+
+        <Button
+            android:id="@+id/colorcc3333"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#cc3333"
+            app:backgroundTint="#cc3333" />
+
+        <Button
+            android:id="@+id/colorcc3366"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#cc3366"
+            app:backgroundTint="#cc3366" />
+
+        <Button
+            android:id="@+id/colorcc3399"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#cc3399"
+            app:backgroundTint="#cc3399" />
+
+        <Button
+            android:id="@+id/colorcc33cc"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#cc33cc"
+            app:backgroundTint="#cc33cc" />
+
+        <Button
+            android:id="@+id/colorcc33ff"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/blank"
+            android:textColor="#cc33ff"
+            app:backgroundTint="#cc33ff" />
+    </TableRow>
+</TableLayout>

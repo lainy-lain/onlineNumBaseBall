@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">onlineNumBaseball</string>
+    <string name="toRanking">순위보기</string>
+    <string name="toSetting">설정하기</string>
+    <string name="toSingle">혼자하기</string>
+    <string name="toMulti">같이하기</string>
+    <string name="guideText">공의 개수를 선택하고\n 게임시작 버튼을 눌러주세요</string>
+    <string name="toPlay">게임시작</string>
+    <string name="_3">3</string>
+    <string name="_4">4</string>
+    <string name="_5">5</string>
+    <string name="blank"> </string>
+    <string name="reds">reds</string>
+    <string name="greens">greens</string>
+    <string name="blues">blues</string>
+    <string name="others">others</string>
+    <string name="yellows">yellows</string>
+    <string name="cyans">cyans</string>
+    <string name="magentas">magentas</string>
+    <string name="bgTextGuide">꺼짐: 배경 색 변경\n켜짐: 글자 색 변경</string>
+    <string name="nickname">닉네임</string>
+    <string name="logout">로그아웃</string>
+    <string name="revoke">탈퇴하기</string>
 </resources>
