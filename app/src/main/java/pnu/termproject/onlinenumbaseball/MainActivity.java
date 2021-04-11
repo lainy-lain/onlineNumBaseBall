@@ -43,10 +43,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     public GoogleApiClient googleApiClient; // Google API Client 객체
     private static final int REQ_SIGN_GOOGLE = 100; // 구글 로그인 결과 코드
 
+    private boolean loginSuccess;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        RadioGroup ballCount = findViewById(R.id.ball_count);
+        Button play_btn = findViewById(R.id.play_btn);
+        Button single_btn = findViewById(R.id.single_btn);
+        Button multi_btn = findViewById(R.id.multi_btn);
+        Button ranking_btn = findViewById(R.id.rank_btn);
+        Button setting_btn = findViewById(R.id.set_btn);
 
         // 로그인(Sign in) 버튼에 대한 기본적인 옵션 설정
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -70,19 +79,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             startActivityForResult(intent, REQ_SIGN_GOOGLE); // 이것의 Result가 onActivityResult로 전달됨
         });
 
-        Button multi_btn = findViewById(R.id.multi_btn);
         Intent intent = getIntent();
         String nickName = intent.getStringExtra("nickName"); // MainActivity로부터 닉네임을 전달받음
         String photoUrl = intent.getStringExtra("photoUrl"); // MainActivity로부터 profile URL 전달받음
-        boolean loginSuccess = intent.getBooleanExtra("success", false);
+        loginSuccess = intent.getBooleanExtra("success", false);
         if (loginSuccess) {
             btn_signin_google.setVisibility(INVISIBLE);
             findViewById(R.id.login_manage).setVisibility(VISIBLE);
         }
-
         tv_nickname = findViewById(R.id.tv_nickname);
         tv_nickname.setText(nickName); // 닉네임 text를 Text view에 세팅
-
         iv_profile = findViewById(R.id.iv_profile);
         // Image Load를 도와주는 Glide 이용
         Glide.with(this).load(photoUrl).into(iv_profile); // profile URL을 Image View에 세팅
@@ -91,12 +97,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         Button revoke_btn = findViewById(R.id.revoke_btn);
         logout_btn.setOnClickListener(v -> signOut());
         revoke_btn.setOnClickListener(v -> revokeAccess());
-
-        Button play_btn = findViewById(R.id.play_btn);
-        Button ranking_btn = findViewById(R.id.rank_btn);
-        Button setting_btn = findViewById(R.id.set_btn);
-        Button single_btn = findViewById(R.id.single_btn);
-        RadioGroup ballCount = findViewById(R.id.ball_count);
 
         play_btn.setOnClickListener(new View.OnClickListener() {
             boolean state = false;
@@ -166,8 +166,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
     @Override
     public void onBackPressed(){ // 뒤로가기 버튼이 눌렸을 때
-        FirebaseAuth.getInstance().signOut(); // Firebase에서 로그아웃. Google에선 로그아웃되지 않음.
-        Toast.makeText(MainActivity.this, "로그인 정보가 저장됩니다", Toast.LENGTH_SHORT).show(); // 토스트 문자 짧게 출력
+        if (loginSuccess) {
+            FirebaseAuth.getInstance().signOut(); // Firebase에서 로그아웃. Google에선 로그아웃되지 않음.
+            Toast.makeText(MainActivity.this, "로그인 정보가 저장됩니다", Toast.LENGTH_SHORT).show(); // 토스트 문자 짧게 출력
+        }
         super.onBackPressed();
     }
 
