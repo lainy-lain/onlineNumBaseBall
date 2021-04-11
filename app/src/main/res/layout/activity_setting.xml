@@ -78,6 +78,15 @@
                 android:text="@string/toSetting"
                 android:textSize="12sp"
                 app:backgroundTint="#03A9F4" />
+
+            <Button
+                android:id="@+id/set_bgbtn"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:text="@string/background"
+                android:textColor="@color/black"
+                android:textSize="12sp"
+                app:backgroundTint="#FFFFFF" />
         </LinearLayout>
 
         <LinearLayout
