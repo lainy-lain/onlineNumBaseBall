@@ -27,7 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-public class Setting extends AppCompatActivity {
+public class SettingActivity extends AppCompatActivity {
     private View currentView;
     private ScrollView[] willBeAdd = new ScrollView[4];
     private boolean[] isLoaded = {false, false, false, false};

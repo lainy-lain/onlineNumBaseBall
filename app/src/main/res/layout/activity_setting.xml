@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:scrollbarFadeDuration="0"
-    tools:context=".Setting">
+    tools:context=".SettingActivity">
 
     <Switch
         android:id="@+id/bg_text"
