@@ -117,12 +117,33 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         });
 
+        //수정한 부분입니다! 2021-04-13 by 해원
+        final int[] ballNumber = new int[1];
+        int[] radio_Id = {R.id.three_ball, R.id.four_ball, R.id.five_ball};
+        ballCount.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                play_btn.setEnabled(true);
+                for(int j = 0; j < 3; j++){
+                    if(i == radio_Id[j]) {
+                        ballNumber[0] = 3 + j;
+                    }
+                }
+            }
+        });
+
+        single_btn.setOnClickListener(v -> {
+            Intent toGame = new Intent(getApplicationContext(), Game.class);
+            toGame.putExtra("ballNumber", ballNumber[0]);
+            startActivity(toGame);
+        });
+        //수정한 부분의 끝입니다!
+
+
         setting_btn.setOnClickListener(v -> {
             Intent toSetting = new Intent(getApplicationContext(), Setting.class);
             startActivity(toSetting);
         });
-
-        ballCount.setOnCheckedChangeListener((group, checkedId) -> play_btn.setEnabled(true));
     }
 
     @Override
