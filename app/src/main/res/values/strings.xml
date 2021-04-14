@@ -22,4 +22,10 @@
     <string name="logout">로그아웃</string>
     <string name="revoke">탈퇴하기</string>
     <string name="background">배경</string>
+    <string name="confirm">적용하기</string>
+    <string name="cancel">취소하기</string>
+    <string name="initialize">초기화</string>
+    <string name="basic">기본</string>
+    <string name="round">둥글게</string>
+    <string name="rround">많이 둥글게</string>
 </resources>
