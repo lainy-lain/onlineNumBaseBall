@@ -21,6 +21,105 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
+        android:id="@+id/set_radius"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <RadioGroup
+            android:id="@+id/radius_select"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp">
+
+            <RadioButton
+                android:id="@+id/basic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/basic" />
+
+            <RadioButton
+                android:id="@+id/round"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/round" />
+
+            <RadioButton
+                android:id="@+id/rround"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/rround" />
+        </RadioGroup>
+
+        <LinearLayout
+            android:id="@+id/radius_example"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <Button
+                android:id="@+id/basic_btn"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                app:backgroundTint="#E91E63" />
+
+            <Button
+                android:id="@+id/round_btn"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                app:backgroundTint="#FF5722"
+                app:cornerRadius="10dp" />
+
+            <Button
+                android:id="@+id/rround_btn"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:text="@string/blank"
+                app:backgroundTint="#FFC107"
+                app:cornerRadius="20dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/set_buttons"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm"
+            app:backgroundTint="#3F51B5" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            app:backgroundTint="#673AB7" />
+
+        <Button
+            android:id="@+id/initialize"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/initialize"
+            app:backgroundTint="#9C27B0" />
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/btn_color"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
