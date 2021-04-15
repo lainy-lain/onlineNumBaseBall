@@ -2,12 +2,16 @@ package pnu.termproject.onlinenumbaseball;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -120,14 +124,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         //수정한 부분입니다! 2021-04-13 by 해원
         final int[] ballNumber = new int[1];
         int[] radio_Id = {R.id.three_ball, R.id.four_ball, R.id.five_ball};
-        ballCount.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                play_btn.setEnabled(true);
-                for(int j = 0; j < 3; j++){
-                    if(i == radio_Id[j]) {
-                        ballNumber[0] = 3 + j;
-                    }
+        ballCount.setOnCheckedChangeListener((radioGroup, i) -> {
+            play_btn.setEnabled(true);
+            for(int j = 0; j < 3; j++){
+                if(i == radio_Id[j]) {
+                    ballNumber[0] = 3 + j;
                 }
             }
         });
@@ -142,10 +143,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         setting_btn.setOnClickListener(v -> {
             Intent toSetting = new Intent(getApplicationContext(), Setting.class);
-            startActivity(toSetting);
+            startActivityForResult(toSetting, 0);
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) { // Google Login Activity 의 결과를 받는 곳.
         super.onActivityResult(requestCode, resultCode, data);
@@ -156,6 +158,15 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             if (result.isSuccess()){ // 인증 결과가 성공적인 경우
                 GoogleSignInAccount account = result.getSignInAccount(); // account 객체는 구글 계정 정보를 모두 담게 됨.
                 resultLogin(account); // 로그인 결과값을 출력하는 메소드
+            }
+        }
+
+        if (requestCode == 0) { //색깔 바꾼 거 즉시 적용하는 부분
+            if (resultCode == RESULT_OK) {
+                 ColorStateList btn1bg = ColorStateList.valueOf(data.getExtras().getInt("btn1bg", 0xFFEB3B));
+                 ColorStateList btn1tx = ColorStateList.valueOf(data.getExtras().getInt("btn1tx", 0));
+                 findViewById(R.id.play_btn).setBackgroundTintList(btn1bg);
+                 ((Button)findViewById(R.id.play_btn)).setTextColor(btn1tx);
             }
         }
     }
