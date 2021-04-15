@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -46,7 +47,7 @@ public class Setting extends AppCompatActivity {
                 findViewById(R.id.play_setbtn), findViewById(R.id.single_setbtn), findViewById(R.id.multi_setbtn)
                 , findViewById(R.id.rank_setbtn), findViewById(R.id.set_setbtn), findViewById(R.id.set_bgbtn)
         };
-        set_bgbtn = findViewById(R.id.set_bgbtn);
+        set_bgbtn = buttons[5];
         colorKind = findViewById(R.id.colorKind);
         Button[] colorKindButtons = {
                 findViewById(R.id.red), findViewById(R.id.green), findViewById(R.id.blue)
@@ -67,6 +68,7 @@ public class Setting extends AppCompatActivity {
         willBeAdd[1] = findViewById(R.id.forC);
         willBeAdd[2] = findViewById(R.id.forM);
         willBeAdd[3] = findViewById(R.id.forO);
+        Button[] set_btns = {findViewById(R.id.confirm), findViewById(R.id.cancel), findViewById(R.id.initialize)};
 
         for (int i = 0; i < 6; i++) {
             buttons[i].setOnClickListener(v -> {
@@ -128,6 +130,19 @@ public class Setting extends AppCompatActivity {
                     willBeAdd[3].setVisibility(INVISIBLE);
                 }
             }
+        });
+
+        SharedPreferences sp = this.getSharedPreferences("setting", MODE_PRIVATE);
+        SharedPreferences.Editor spedit = sp.edit();
+        set_btns[0].setOnClickListener(v -> {
+            // 게임시작 버튼만 일단 되는지 테스트
+            spedit.putInt("btn1bg", buttons[0].getBackgroundTintList().getDefaultColor());
+            spedit.putInt("btn1tx", buttons[0].getTextColors().getDefaultColor());
+            spedit.apply();
+            Intent intent = new Intent();
+            intent.putExtra("btn1bg", buttons[0].getBackgroundTintList().getDefaultColor());
+            intent.putExtra("btn1tx", buttons[0].getTextColors().getDefaultColor());
+            setResult(RESULT_OK, intent);
         });
     }
 
