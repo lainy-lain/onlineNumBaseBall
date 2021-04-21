@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 };
                 View[] views = {
                         findViewById(R.id.play_btn), findViewById(R.id.single_btn), findViewById(R.id.multi_btn),
-                        findViewById(R.id.rank_btn), findViewById(R.id.set_btn), findViewById(R.id.main_root),
+                        findViewById(R.id.rank_btn), findViewById(R.id.set_btn),
                         findViewById(R.id.tv_nickname), findViewById(R.id.guide),
                         findViewById(R.id.three_ball), findViewById(R.id.four_ball), findViewById(R.id.five_ball)
                 };
@@ -227,12 +227,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 ((Button)views[3]).setTextColor(btnColors[9]);
                 views[4].setBackgroundTintList(btnColors[4]);
                 ((Button)views[4]).setTextColor(btnColors[10]);
-                views[5].setBackgroundTintList(btnColors[5]);
+                views[5].getRootView().setBackgroundTintList(btnColors[5]);
+                ((TextView)views[5]).setTextColor(btnColors[11]);
                 ((TextView)views[6]).setTextColor(btnColors[11]);
-                ((TextView)views[7]).setTextColor(btnColors[11]);
+                ((RadioButton)views[7]).setTextColor(btnColors[11]);
                 ((RadioButton)views[8]).setTextColor(btnColors[11]);
                 ((RadioButton)views[9]).setTextColor(btnColors[11]);
-                ((RadioButton)views[10]).setTextColor(btnColors[11]);
             }
         }
     }
