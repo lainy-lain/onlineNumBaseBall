@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TableLayout;
@@ -132,16 +133,38 @@ public class Setting extends AppCompatActivity {
             }
         });
 
-        SharedPreferences sp = this.getSharedPreferences("setting", MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
         SharedPreferences.Editor spedit = sp.edit();
         set_btns[0].setOnClickListener(v -> {
             // 게임시작 버튼만 일단 되는지 테스트
+            spedit.putBoolean("saved", true);
             spedit.putInt("btn1bg", buttons[0].getBackgroundTintList().getDefaultColor());
             spedit.putInt("btn1tx", buttons[0].getTextColors().getDefaultColor());
+            spedit.putInt("btn2bg", buttons[1].getBackgroundTintList().getDefaultColor());
+            spedit.putInt("btn2tx", buttons[1].getTextColors().getDefaultColor());
+            spedit.putInt("btn3bg", buttons[2].getBackgroundTintList().getDefaultColor());
+            spedit.putInt("btn3tx", buttons[2].getTextColors().getDefaultColor());
+            spedit.putInt("btn4bg", buttons[3].getBackgroundTintList().getDefaultColor());
+            spedit.putInt("btn4tx", buttons[3].getTextColors().getDefaultColor());
+            spedit.putInt("btn5bg", buttons[4].getBackgroundTintList().getDefaultColor());
+            spedit.putInt("btn5tx", buttons[4].getTextColors().getDefaultColor());
+            spedit.putInt("btnbgbg", buttons[5].getBackgroundTintList().getDefaultColor());
+            spedit.putInt("btnbgtx", buttons[5].getTextColors().getDefaultColor());
             spedit.apply();
+
             Intent intent = new Intent();
             intent.putExtra("btn1bg", buttons[0].getBackgroundTintList().getDefaultColor());
             intent.putExtra("btn1tx", buttons[0].getTextColors().getDefaultColor());
+            intent.putExtra("btn2bg", buttons[1].getBackgroundTintList().getDefaultColor());
+            intent.putExtra("btn2tx", buttons[1].getTextColors().getDefaultColor());
+            intent.putExtra("btn3bg", buttons[2].getBackgroundTintList().getDefaultColor());
+            intent.putExtra("btn3tx", buttons[2].getTextColors().getDefaultColor());
+            intent.putExtra("btn4bg", buttons[3].getBackgroundTintList().getDefaultColor());
+            intent.putExtra("btn4tx", buttons[3].getTextColors().getDefaultColor());
+            intent.putExtra("btn5bg", buttons[4].getBackgroundTintList().getDefaultColor());
+            intent.putExtra("btn5tx", buttons[4].getTextColors().getDefaultColor());
+            intent.putExtra("btnbgbg", buttons[5].getBackgroundTintList().getDefaultColor());
+            intent.putExtra("btnbgtx", buttons[5].getTextColors().getDefaultColor());
             setResult(RESULT_OK, intent);
         });
     }
@@ -227,6 +250,9 @@ public class Setting extends AppCompatActivity {
             if (currentView == set_bgbtn) {
                 if (bgOrText.isChecked()) {
                     bgOrText.setTextColor(v.getBackgroundTintList());
+                    ((RadioButton)findViewById(R.id.basic)).setTextColor(v.getBackgroundTintList());
+                    ((RadioButton)findViewById(R.id.round)).setTextColor(v.getBackgroundTintList());
+                    ((RadioButton)findViewById(R.id.rround)).setTextColor(v.getBackgroundTintList());
                 } else {
                     (currentView.getRootView()).setBackgroundTintList(v.getBackgroundTintList());
                 }
