@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -71,6 +72,32 @@ public class Setting extends AppCompatActivity {
         willBeAdd[3] = findViewById(R.id.forO);
         Button[] set_btns = {findViewById(R.id.confirm), findViewById(R.id.cancel), findViewById(R.id.initialize)};
 
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        if (sp.getBoolean("saved", false)) {
+            ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFEB3B)),
+                    ColorStateList.valueOf(sp.getInt("btn2bg", 0xCDDC39)),
+                    ColorStateList.valueOf(sp.getInt("btn3bg", 0x8BC34A)),
+                    ColorStateList.valueOf(sp.getInt("btn4bg", 0x00BCD4)),
+                    ColorStateList.valueOf(sp.getInt("btn5bg", 0x03AF94)),
+                    ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFF)),
+                    ColorStateList.valueOf(sp.getInt("btn1tx", 0)),
+                    ColorStateList.valueOf(sp.getInt("btn2tx", 0)),
+                    ColorStateList.valueOf(sp.getInt("btn3tx", 0)),
+                    ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFF)),
+                    ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFF)),
+                    ColorStateList.valueOf(sp.getInt("btnbgtx", 0))
+            };
+            for (int i = 0; i < 6; i++) {
+                buttons[i].setBackgroundTintList(colors[i]);
+                buttons[i].setTextColor(colors[i + 6]);
+            }
+            buttons[5].getRootView().setBackgroundTintList(colors[5]);
+            bgOrText.setTextColor(colors[11]);
+            ((RadioButton)findViewById(R.id.basic)).setTextColor(colors[11]);
+            ((RadioButton)findViewById(R.id.round)).setTextColor(colors[11]);
+            ((RadioButton)findViewById(R.id.rround)).setTextColor(colors[11]);
+        }
+
         for (int i = 0; i < 6; i++) {
             buttons[i].setOnClickListener(v -> {
                 colorKind.setY(v.getY());
@@ -133,7 +160,7 @@ public class Setting extends AppCompatActivity {
             }
         });
 
-        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        sp = getSharedPreferences("setting", MODE_PRIVATE);
         SharedPreferences.Editor spedit = sp.edit();
         set_btns[0].setOnClickListener(v -> {
             // 게임시작 버튼만 일단 되는지 테스트

@@ -159,6 +159,7 @@
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="@string/toMulti"
+                android:textColor="@color/white"
                 android:textSize="12sp"
                 app:backgroundTint="#8BC34A" />
 
@@ -167,6 +168,7 @@
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="@string/toRanking"
+                android:textColor="@color/white"
                 android:textSize="12sp"
                 app:backgroundTint="#00BCD4" />
 
@@ -175,6 +177,7 @@
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:text="@string/toSetting"
+                android:textColor="@color/white"
                 android:textSize="12sp"
                 app:backgroundTint="#03A9F4" />
 

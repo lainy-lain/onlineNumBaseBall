@@ -99,19 +99,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Image Load를 도와주는 Glide 이용
         Glide.with(this).load(photoUrl).into(iv_profile); // profile URL을 Image View에 세팅
 
-        SharedPreferences sp = this.getSharedPreferences("setting", MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
         if (sp.getBoolean("saved", false)) {
-            ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn2bg", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn3bg", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn4bg", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn5bg", 0)),
-                    ColorStateList.valueOf(sp.getInt("btnbgbg", 0)),
+            ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFEB3B)),
+                    ColorStateList.valueOf(sp.getInt("btn2bg", 0xCDDC39)),
+                    ColorStateList.valueOf(sp.getInt("btn3bg", 0x8BC34A)),
+                    ColorStateList.valueOf(sp.getInt("btn4bg", 0x00BCD4)),
+                    ColorStateList.valueOf(sp.getInt("btn5bg", 0x03AF94)),
+                    ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFF)),
                     ColorStateList.valueOf(sp.getInt("btn1tx", 0)),
                     ColorStateList.valueOf(sp.getInt("btn2tx", 0)),
                     ColorStateList.valueOf(sp.getInt("btn3tx", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn4tx", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn5tx", 0)),
+                    ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFF)),
+                    ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFF)),
                     ColorStateList.valueOf(sp.getInt("btnbgtx", 0))
             };
             play_btn.setBackgroundTintList(colors[0]);
@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             rank_btn.setTextColor(colors[9]);
             set_btn.setBackgroundTintList(colors[4]);
             set_btn.setTextColor(colors[10]);
-            findViewById(R.id.main_root).setBackgroundTintList(colors[5]);
+            set_btn.getRootView().setBackgroundTintList(colors[5]);
             tv_nickname.setTextColor(colors[11]);
             ((TextView)findViewById(R.id.guide)).setTextColor(colors[11]);
             ((RadioButton)findViewById(R.id.three_ball)).setTextColor(colors[11]);
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         ColorStateList.valueOf(data.getExtras().getInt("btnbgbg", 0xFFFFFF)),
                         ColorStateList.valueOf(data.getExtras().getInt("btn1tx", 0)),
                         ColorStateList.valueOf(data.getExtras().getInt("btn2tx", 0)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn3tx", 0)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn3tx", 0xFFFFFF)),
                         ColorStateList.valueOf(data.getExtras().getInt("btn4tx", 0xFFFFFF)),
                         ColorStateList.valueOf(data.getExtras().getInt("btn5tx", 0xFFFFFF)),
                         ColorStateList.valueOf(data.getExtras().getInt("btnbgtx", 0))
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         findViewById(R.id.three_ball), findViewById(R.id.four_ball), findViewById(R.id.five_ball)
                 };
                 views[0].setBackgroundTintList(btnColors[0]);
-                ((Button)views[0]).setTextColor(6);
+                ((Button)views[0]).setTextColor(btnColors[6]);
                 views[1].setBackgroundTintList(btnColors[1]);
                 ((Button)views[1]).setTextColor(btnColors[7]);
                 views[2].setBackgroundTintList(btnColors[2]);
