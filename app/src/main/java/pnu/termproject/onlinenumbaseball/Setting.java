@@ -70,33 +70,32 @@ public class Setting extends AppCompatActivity {
         willBeAdd[1] = findViewById(R.id.forC);
         willBeAdd[2] = findViewById(R.id.forM);
         willBeAdd[3] = findViewById(R.id.forO);
-        Button[] set_btns = {findViewById(R.id.confirm), findViewById(R.id.cancel), findViewById(R.id.initialize)};
+        Button[] set_btns = {findViewById(R.id.confirm), findViewById(R.id.initialize)};
+        RadioButton[] radiuses = {findViewById(R.id.basic), findViewById(R.id.round), findViewById(R.id.rround)};
 
         SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
-        if (sp.getBoolean("saved", false)) {
-            ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFEB3B)),
-                    ColorStateList.valueOf(sp.getInt("btn2bg", 0xCDDC39)),
-                    ColorStateList.valueOf(sp.getInt("btn3bg", 0x8BC34A)),
-                    ColorStateList.valueOf(sp.getInt("btn4bg", 0x00BCD4)),
-                    ColorStateList.valueOf(sp.getInt("btn5bg", 0x03AF94)),
-                    ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFF)),
-                    ColorStateList.valueOf(sp.getInt("btn1tx", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn2tx", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn3tx", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFF)),
-                    ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFF)),
-                    ColorStateList.valueOf(sp.getInt("btnbgtx", 0))
-            };
-            for (int i = 0; i < 6; i++) {
-                buttons[i].setBackgroundTintList(colors[i]);
-                buttons[i].setTextColor(colors[i + 6]);
-            }
-            buttons[5].getRootView().setBackgroundTintList(colors[5]);
-            bgOrText.setTextColor(colors[11]);
-            ((RadioButton)findViewById(R.id.basic)).setTextColor(colors[11]);
-            ((RadioButton)findViewById(R.id.round)).setTextColor(colors[11]);
-            ((RadioButton)findViewById(R.id.rround)).setTextColor(colors[11]);
+        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
+                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
+                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
+                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        for (int i = 0; i < 6; i++) {
+            buttons[i].setBackgroundTintList(colors[i]);
+            buttons[i].setTextColor(colors[i + 6]);
         }
+        buttons[5].getRootView().setBackgroundTintList(colors[5]);
+        bgOrText.setTextColor(colors[11]);
+        radiuses[0].setTextColor(colors[11]);
+        radiuses[1].setTextColor(colors[11]);
+        radiuses[2].setTextColor(colors[11]);
 
         for (int i = 0; i < 6; i++) {
             buttons[i].setOnClickListener(v -> {
@@ -163,8 +162,6 @@ public class Setting extends AppCompatActivity {
         sp = getSharedPreferences("setting", MODE_PRIVATE);
         SharedPreferences.Editor spedit = sp.edit();
         set_btns[0].setOnClickListener(v -> {
-            // 게임시작 버튼만 일단 되는지 테스트
-            spedit.putBoolean("saved", true);
             spedit.putInt("btn1bg", buttons[0].getBackgroundTintList().getDefaultColor());
             spedit.putInt("btn1tx", buttons[0].getTextColors().getDefaultColor());
             spedit.putInt("btn2bg", buttons[1].getBackgroundTintList().getDefaultColor());
@@ -192,6 +189,43 @@ public class Setting extends AppCompatActivity {
             intent.putExtra("btn5tx", buttons[4].getTextColors().getDefaultColor());
             intent.putExtra("btnbgbg", buttons[5].getBackgroundTintList().getDefaultColor());
             intent.putExtra("btnbgtx", buttons[5].getTextColors().getDefaultColor());
+            setResult(RESULT_OK, intent);
+        });
+
+        set_btns[1].setOnClickListener(v -> {
+            spedit.clear();
+            spedit.apply();
+            buttons[0].setBackgroundTintList(ColorStateList.valueOf(0xFFFFEB3B));
+            buttons[1].setBackgroundTintList(ColorStateList.valueOf(0xFFCDDC39));
+            buttons[2].setBackgroundTintList(ColorStateList.valueOf(0xFF8BC34A));
+            buttons[3].setBackgroundTintList(ColorStateList.valueOf(0xFF00BCD4));
+            buttons[4].setBackgroundTintList(ColorStateList.valueOf(0xFF03A9F4));
+            buttons[5].setBackgroundTintList(ColorStateList.valueOf(0xFFFFFFFF));
+            buttons[0].setTextColor(ColorStateList.valueOf(0xFF000000));
+            buttons[1].setTextColor(ColorStateList.valueOf(0xFF000000));
+            buttons[2].setTextColor(ColorStateList.valueOf(0xFFFFFFFF));
+            buttons[3].setTextColor(ColorStateList.valueOf(0xFFFFFFFF));
+            buttons[4].setTextColor(ColorStateList.valueOf(0xFFFFFFFF));
+            buttons[5].setTextColor(ColorStateList.valueOf(0xFF000000));
+            buttons[5].getRootView().setBackgroundTintList(ColorStateList.valueOf(0xFFFFFFFF));
+            bgOrText.setTextColor(ColorStateList.valueOf(0xFF000000));
+            radiuses[0].setTextColor(ColorStateList.valueOf(0xFF000000));
+            radiuses[1].setTextColor(ColorStateList.valueOf(0xFF000000));
+            radiuses[2].setTextColor(ColorStateList.valueOf(0xFF000000));
+
+            Intent intent = new Intent();
+            intent.putExtra("btn1bg", 0xFFFFEB3B);
+            intent.putExtra("btn1tx", 0xFF000000);
+            intent.putExtra("btn2bg", 0xFFCDDC39);
+            intent.putExtra("btn2tx", 0xFF000000);
+            intent.putExtra("btn3bg", 0xFF8BC34A);
+            intent.putExtra("btn3tx", 0xFFFFFFFF);
+            intent.putExtra("btn4bg", 0xFF00BCD4);
+            intent.putExtra("btn4tx", 0xFFFFFFFF);
+            intent.putExtra("btn5bg", 0xFF03A9F4);
+            intent.putExtra("btn5tx", 0xFFFFFFFF);
+            intent.putExtra("btnbgbg", 0xFFFFFFFF);
+            intent.putExtra("btnbgtx", 0xFF000000);
             setResult(RESULT_OK, intent);
         });
     }

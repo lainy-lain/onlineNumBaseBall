@@ -67,14 +67,14 @@
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:text="@string/blank"
-                app:backgroundTint="#E91E63" />
+                app:backgroundTint="#9C27B0" />
 
             <Button
                 android:id="@+id/round_btn"
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:text="@string/blank"
-                app:backgroundTint="#FF5722"
+                app:backgroundTint="#E91E63"
                 app:cornerRadius="10dp" />
 
             <Button
@@ -82,7 +82,7 @@
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:text="@string/blank"
-                app:backgroundTint="#FFC107"
+                app:backgroundTint="#FF5722"
                 app:cornerRadius="20dp" />
         </LinearLayout>
 
@@ -105,18 +105,11 @@
             app:backgroundTint="#3F51B5" />
 
         <Button
-            android:id="@+id/cancel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            app:backgroundTint="#673AB7" />
-
-        <Button
             android:id="@+id/initialize"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/initialize"
-            app:backgroundTint="#9C27B0" />
+            app:backgroundTint="#673AB7" />
     </LinearLayout>
 
     <LinearLayout
