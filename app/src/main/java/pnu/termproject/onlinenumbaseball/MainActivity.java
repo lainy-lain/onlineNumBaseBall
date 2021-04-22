@@ -100,37 +100,35 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         Glide.with(this).load(photoUrl).into(iv_profile); // profile URL을 Image View에 세팅
 
         SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
-        if (sp.getBoolean("saved", false)) {
-            ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFEB3B)),
-                    ColorStateList.valueOf(sp.getInt("btn2bg", 0xCDDC39)),
-                    ColorStateList.valueOf(sp.getInt("btn3bg", 0x8BC34A)),
-                    ColorStateList.valueOf(sp.getInt("btn4bg", 0x00BCD4)),
-                    ColorStateList.valueOf(sp.getInt("btn5bg", 0x03AF94)),
-                    ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFF)),
-                    ColorStateList.valueOf(sp.getInt("btn1tx", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn2tx", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn3tx", 0)),
-                    ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFF)),
-                    ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFF)),
-                    ColorStateList.valueOf(sp.getInt("btnbgtx", 0))
-            };
-            play_btn.setBackgroundTintList(colors[0]);
-            play_btn.setTextColor(colors[6]);
-            single_btn.setBackgroundTintList(colors[1]);
-            single_btn.setTextColor(colors[7]);
-            multi_btn.setBackgroundTintList(colors[2]);
-            multi_btn.setTextColor(colors[8]);
-            rank_btn.setBackgroundTintList(colors[3]);
-            rank_btn.setTextColor(colors[9]);
-            set_btn.setBackgroundTintList(colors[4]);
-            set_btn.setTextColor(colors[10]);
-            set_btn.getRootView().setBackgroundTintList(colors[5]);
-            tv_nickname.setTextColor(colors[11]);
-            ((TextView)findViewById(R.id.guide)).setTextColor(colors[11]);
-            ((RadioButton)findViewById(R.id.three_ball)).setTextColor(colors[11]);
-            ((RadioButton)findViewById(R.id.four_ball)).setTextColor(colors[11]);
-            ((RadioButton)findViewById(R.id.five_ball)).setTextColor(colors[11]);
-        }
+        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
+                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
+                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
+                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        play_btn.setBackgroundTintList(colors[0]);
+        play_btn.setTextColor(colors[6]);
+        single_btn.setBackgroundTintList(colors[1]);
+        single_btn.setTextColor(colors[7]);
+        multi_btn.setBackgroundTintList(colors[2]);
+        multi_btn.setTextColor(colors[8]);
+        rank_btn.setBackgroundTintList(colors[3]);
+        rank_btn.setTextColor(colors[9]);
+        set_btn.setBackgroundTintList(colors[4]);
+        set_btn.setTextColor(colors[10]);
+        set_btn.getRootView().setBackgroundTintList(colors[5]);
+        tv_nickname.setTextColor(colors[11]);
+        ((TextView)findViewById(R.id.guide)).setTextColor(colors[11]);
+        ((RadioButton)findViewById(R.id.three_ball)).setTextColor(colors[11]);
+        ((RadioButton)findViewById(R.id.four_ball)).setTextColor(colors[11]);
+        ((RadioButton)findViewById(R.id.five_ball)).setTextColor(colors[11]);
 
         Button logout_btn = findViewById(R.id.logout_btn);
         Button revoke_btn = findViewById(R.id.revoke_btn);
@@ -175,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         });
         //수정한 부분의 끝입니다!
 
-
         set_btn.setOnClickListener(v -> {
             Intent toSetting = new Intent(getApplicationContext(), Setting.class);
             startActivityForResult(toSetting, 0);
@@ -198,18 +195,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         if (requestCode == 0) { //색깔 바꾼 거 즉시 적용하는 부분
             if (resultCode == RESULT_OK) {
-                ColorStateList[] btnColors = {ColorStateList.valueOf(data.getExtras().getInt("btn1bg", 0xFFEB3B)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn2bg", 0xCDDC39)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn3bg", 0x8BC34A)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn4bg", 0x00BCD4)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn5bg", 0x03AF94)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btnbgbg", 0xFFFFFF)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn1tx", 0)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn2tx", 0)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn3tx", 0xFFFFFF)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn4tx", 0xFFFFFF)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn5tx", 0xFFFFFF)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btnbgtx", 0))
+                ColorStateList[] btnColors = {ColorStateList.valueOf(data.getExtras().getInt("btn1bg", 0xFFFFEB3B)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn2bg", 0xFFCDDC39)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn3bg", 0xFF8BC34A)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn4bg", 0xFF00BCD4)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn5bg", 0xFF03A9F4)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btnbgbg", 0xFF000000)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn1tx", 0xFF000000)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn2tx", 0xFF000000)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn3tx", 0xFFFFFFFF)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn4tx", 0xFFFFFFFF)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btn5tx", 0xFFFFFFFF)),
+                        ColorStateList.valueOf(data.getExtras().getInt("btnbgtx", 0xFFFFFFFF))
                 };
                 View[] views = {
                         findViewById(R.id.play_btn), findViewById(R.id.single_btn), findViewById(R.id.multi_btn),
@@ -248,11 +245,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         intent.putExtra("photoUrl", String.valueOf(account.getPhotoUrl())); // intent로 photoUrl을 전달. String으로 변환해서 전달해야 함.
                         intent.putExtra("success", true);
 
-                        startActivity(intent);
+                        startActivityForResult(intent, 0);
                     }
                     else { // 로그인 실패했으면
                         Toast.makeText(MainActivity.this, "로그인 실패", Toast.LENGTH_SHORT).show(); // 토스트 문자 짧게 출력
-                        // 추가적으로 실패했을때 handle할거 있으면 여기 밑에다 추가하면 됨
+                        // 추가적으로 실패했을때 handle 할 거 있으면 여기 밑에다 추가하면 됨
                     }
                 });
     }
@@ -267,6 +264,21 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (loginSuccess) {
             FirebaseAuth.getInstance().signOut(); // Firebase에서 로그아웃. Google에선 로그아웃되지 않음.
             Toast.makeText(MainActivity.this, "로그인 정보가 저장됩니다", Toast.LENGTH_SHORT).show(); // 토스트 문자 짧게 출력
+            Intent intent = new Intent();
+            SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+            intent.putExtra("btn1bg", sp.getInt("btn1bg", 0xFFFFEB3B));
+            intent.putExtra("btn1tx", sp.getInt("btn1tx", 0xFF000000));
+            intent.putExtra("btn2bg", sp.getInt("btn2bg", 0xFFCDDC39));
+            intent.putExtra("btn2tx", sp.getInt("btn2tx", 0xFF000000));
+            intent.putExtra("btn3bg", sp.getInt("btn3bg", 0xFF8BC34A));
+            intent.putExtra("btn3tx", sp.getInt("btn3tx", 0xFFFFFFFF));
+            intent.putExtra("btn4bg", sp.getInt("btn4bg", 0xFF00BCD4));
+            intent.putExtra("btn4tx", sp.getInt("btn4tx", 0xFFFFFFFF));
+            intent.putExtra("btn5bg", sp.getInt("btn5bg", 0xFF03A9F4));
+            intent.putExtra("btn5tx", sp.getInt("btn5tx", 0xFFFFFFFF));
+            intent.putExtra("btnbgbg", sp.getInt("btnbgbg", 0xFFFFFFFF));
+            intent.putExtra("btnbgtx", sp.getInt("btnbgtx", 0xFF000000));
+            setResult(RESULT_OK, intent);
         }
         super.onBackPressed();
     }
