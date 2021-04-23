@@ -118,7 +118,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         });
 
         setting_btn.setOnClickListener(v -> {
-            Intent toSetting = new Intent(getApplicationContext(), SettingActivity.class);
+            Intent toSetting = new Intent(getApplicationContext(), Setting.class);
             startActivity(toSetting);
         });
 
