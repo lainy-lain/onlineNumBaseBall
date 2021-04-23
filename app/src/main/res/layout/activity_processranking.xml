@@ -6,4 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ProcessRankingActivity">
 
+    <!--    아무것도 띄우지 않는 액티비티의 XML입니다. -->
+
 </androidx.constraintlayout.widget.ConstraintLayout>
