@@ -30,6 +30,8 @@ public class Game extends AppCompatActivity{
     private int strike, ball, turn;
     private ListView result_list;
 
+    private long startTime, endTime, clearTime; // 클리어 시간 측정을 위한 변수
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,6 +88,8 @@ public class Game extends AppCompatActivity{
         }
         answer.setText(ansString);
 
+        startTime = System.currentTimeMillis(); // 시간 측정 시작
+
         //라디오 버튼(몇번째 공을 선택했는지 구별)을 눌렀을때의 동작을 구현하는 코드
         rg_number.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -138,14 +142,29 @@ public class Game extends AppCompatActivity{
 
                 if(ball_number == strike) {
                     //종료하는 코드
-                    String finalMessage = "축하합니다!\n" + String.valueOf(turn) +"회 만에 정답을 맞추셨습니다!";
-                    Toast.makeText(getApplicationContext(), finalMessage, Toast.LENGTH_LONG).show();
+                    endTime = System.currentTimeMillis(); // 시간 측정 종료
+                    clearTime = (endTime - startTime) / 1000;
+
+                    String finalMessage = "축하합니다!\n" + String.valueOf(clearTime / 60) + "분 " + String.valueOf(clearTime % 60) + "초의 시간동안\n"
+                            +String.valueOf(turn) +"회 만에 정답을 맞추셨습니다!";
+                    //Toast.makeText(getApplicationContext(), finalMessage, Toast.LENGTH_LONG).show();
+
+                    // 랭킹 업데이트 & 결과 출력해주는 Activity로 전환
+                    Intent intent2 = new Intent(getApplicationContext(), SingleRankingUpdateActivity.class);
+                    intent2.putExtra("clear-time", clearTime);
+                    intent2.putExtra("clear-turn", turn);
+                    startActivity(intent2);
+                    finish();
+
+                    /*
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             finish();
                         }
                     }, 1400);
+
+                     */
                }
                 else {
                     //다음 회를 준비하기 위한 코드

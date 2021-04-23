@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="pnu.termproject.onlinenumbaseball">
+
     <!-- 인터넷 사용 권한 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -11,8 +12,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.OnlineNumBaseball">
-        <activity android:name=".LeaderBoardActivity"></activity>
-        <activity android:name=".ProcessRankingActivity" />
+
+
+        <activity android:name=".LeaderBoardActivity" />
+        <activity android:name=".SingleRankingUpdateActivity" />
         <activity android:name=".Setting" />
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -21,7 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Game"></activity>
+        <activity android:name=".Game" />
     </application>
 
 </manifest>

@@ -7,6 +7,7 @@ public class User {
     private double meanTime;
     private double meanTurn;
     private double ability; // sum of meanTime and meanTurn
+    private long playCount = 1;
 
     public User() {
 
@@ -65,6 +66,15 @@ public class User {
     public void setAbility(double ability) {
         this.ability = ability;
     }
+
+    public long getPlayCount() {
+        return playCount;
+    }
+
+    public void setPlayCount(long playCount) {
+        this.playCount = playCount;
+    }
+
     /***********************************************/
 
     @Override
@@ -76,6 +86,7 @@ public class User {
                 ", meanTime='" + meanTime + '\'' +
                 ", meanTurn='" + meanTurn + '\'' +
                 ", ability='" + ability + '\'' +
+                ", playCount='" + playCount + '\'' +
                 '}';
     }
 }

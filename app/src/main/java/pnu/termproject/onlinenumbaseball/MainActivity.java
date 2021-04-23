@@ -127,13 +127,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ((RadioButton)findViewById(R.id.four_ball)).setTextColor(colors[11]);
         ((RadioButton)findViewById(R.id.five_ball)).setTextColor(colors[11]);
 
+
+        // logout, 탈퇴, 랭킹 버튼 눌렀을때 어떤 method를 수행할지를 설정하는 부분 (setOnClickListener)
         Button logout_btn = findViewById(R.id.logout_btn);
         Button revoke_btn = findViewById(R.id.revoke_btn);
-        Button rank_btn = findViewById(R.id.rank_btn);
         logout_btn.setOnClickListener(v -> signOut());
         revoke_btn.setOnClickListener(v -> revokeAccess());
         rank_btn.setOnClickListener(v -> gotoRanking());
-
 
 
         play_btn.setOnClickListener(new View.OnClickListener() {
