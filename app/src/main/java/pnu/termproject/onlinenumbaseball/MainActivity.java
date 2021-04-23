@@ -32,10 +32,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 
@@ -132,8 +129,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         Button logout_btn = findViewById(R.id.logout_btn);
         Button revoke_btn = findViewById(R.id.revoke_btn);
+        Button rank_btn = findViewById(R.id.rank_btn);
         logout_btn.setOnClickListener(v -> signOut());
         revoke_btn.setOnClickListener(v -> revokeAccess());
+        rank_btn.setOnClickListener(v -> gotoRanking());
+
+
 
         play_btn.setOnClickListener(new View.OnClickListener() {
             boolean state = false;
@@ -322,5 +323,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         AlertDialog msgDialog = msgBuilder.create();
         msgDialog.show();
         finish();
+    }
+
+    private void gotoRanking(){
+        Intent intent = new Intent(this, LeaderBoardActivity.class);
+        startActivity(intent);
     }
 }
