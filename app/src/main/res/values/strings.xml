@@ -27,5 +27,5 @@
     <string name="initialize">초기화</string>
     <string name="basic">기본</string>
     <string name="round">둥글게</string>
-    <string name="rround">많이 둥글게</string>
+    <string name="rround">더 둥글게</string>
 </resources>
