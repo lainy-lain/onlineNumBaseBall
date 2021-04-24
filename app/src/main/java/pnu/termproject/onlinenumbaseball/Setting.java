@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TableLayout;
@@ -25,6 +26,8 @@ import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.firebase.auth.FirebaseAuth;
 
 import static android.view.View.INVISIBLE;
@@ -96,6 +99,18 @@ public class Setting extends AppCompatActivity {
         radiuses[0].setTextColor(colors[11]);
         radiuses[1].setTextColor(colors[11]);
         radiuses[2].setTextColor(colors[11]);
+        int radiusChecked = sp.getInt("radius", 0);
+        int radius = (radiusChecked + 1) * 8;
+        for (int i = 0; i < 7; i++) {
+            if (i < 2) {
+                ((MaterialButton)set_btns[i]).setCornerRadius(radius);
+            }
+            if (i < 6) {
+                ((MaterialButton)buttons[i]).setCornerRadius(radius);
+            }
+            ((MaterialButton)colorKindButtons[i]).setCornerRadius(radius);
+        }
+        radiuses[radiusChecked].setChecked(true);
 
         for (int i = 0; i < 6; i++) {
             buttons[i].setOnClickListener(v -> {
@@ -159,8 +174,30 @@ public class Setting extends AppCompatActivity {
             }
         });
 
-        sp = getSharedPreferences("setting", MODE_PRIVATE);
         SharedPreferences.Editor spedit = sp.edit();
+        ((RadioGroup)findViewById(R.id.radius_select)).setOnCheckedChangeListener(((group, checkedId) -> {
+            int i;
+            int cornerRadius;
+            if (checkedId == R.id.basic) {
+                cornerRadius = 8;
+            }
+            else if (checkedId == R.id.round) {
+                cornerRadius = 16;
+            }
+            else {
+                cornerRadius = 24;
+            }
+            for (i = 0; i < 7; i++) {
+                if (i < 2) {
+                    ((MaterialButton)set_btns[i]).setCornerRadius(cornerRadius);
+                }
+                if (i < 6) {
+                    ((MaterialButton)buttons[i]).setCornerRadius(cornerRadius);
+                }
+                ((MaterialButton)colorKindButtons[i]).setCornerRadius(cornerRadius);
+            }
+        }));
+
         set_btns[0].setOnClickListener(v -> {
             spedit.putInt("btn1bg", buttons[0].getBackgroundTintList().getDefaultColor());
             spedit.putInt("btn1tx", buttons[0].getTextColors().getDefaultColor());
@@ -174,6 +211,13 @@ public class Setting extends AppCompatActivity {
             spedit.putInt("btn5tx", buttons[4].getTextColors().getDefaultColor());
             spedit.putInt("btnbgbg", buttons[5].getBackgroundTintList().getDefaultColor());
             spedit.putInt("btnbgtx", buttons[5].getTextColors().getDefaultColor());
+            int i;
+            for (i = 0; i < 3; i++) {
+                if (radiuses[i].isChecked()) {
+                    break;
+                }
+            }
+            spedit.putInt("radius", i);
             spedit.apply();
 
             Intent intent = new Intent();
@@ -189,6 +233,7 @@ public class Setting extends AppCompatActivity {
             intent.putExtra("btn5tx", buttons[4].getTextColors().getDefaultColor());
             intent.putExtra("btnbgbg", buttons[5].getBackgroundTintList().getDefaultColor());
             intent.putExtra("btnbgtx", buttons[5].getTextColors().getDefaultColor());
+            intent.putExtra("radius", i);
             setResult(RESULT_OK, intent);
         });
 
@@ -212,6 +257,7 @@ public class Setting extends AppCompatActivity {
             radiuses[0].setTextColor(ColorStateList.valueOf(0xFF000000));
             radiuses[1].setTextColor(ColorStateList.valueOf(0xFF000000));
             radiuses[2].setTextColor(ColorStateList.valueOf(0xFF000000));
+            radiuses[0].setChecked(true);
 
             Intent intent = new Intent();
             intent.putExtra("btn1bg", 0xFFFFEB3B);
@@ -226,6 +272,7 @@ public class Setting extends AppCompatActivity {
             intent.putExtra("btn5tx", 0xFFFFFFFF);
             intent.putExtra("btnbgbg", 0xFFFFFFFF);
             intent.putExtra("btnbgtx", 0xFF000000);
+            intent.putExtra("radius", 0);
             setResult(RESULT_OK, intent);
         });
     }
