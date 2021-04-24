@@ -34,6 +34,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
                 ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
                 ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
                 ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
                 ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
                 ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
@@ -129,6 +130,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ((RadioButton)findViewById(R.id.three_ball)).setTextColor(colors[11]);
         ((RadioButton)findViewById(R.id.four_ball)).setTextColor(colors[11]);
         ((RadioButton)findViewById(R.id.five_ball)).setTextColor(colors[11]);
+        int radiusChecked = sp.getInt("radius", 0);
+        int cornerRadius = (radiusChecked + 1) * 8;
+        ((MaterialButton)play_btn).setCornerRadius(cornerRadius);
+        ((MaterialButton)single_btn).setCornerRadius(cornerRadius);
+        ((MaterialButton)multi_btn).setCornerRadius(cornerRadius);
+        ((MaterialButton)rank_btn).setCornerRadius(cornerRadius);
+        ((MaterialButton)set_btn).setCornerRadius(cornerRadius);
 
         Button logout_btn = findViewById(R.id.logout_btn);
         Button revoke_btn = findViewById(R.id.revoke_btn);
@@ -230,6 +238,13 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 ((RadioButton)views[7]).setTextColor(btnColors[11]);
                 ((RadioButton)views[8]).setTextColor(btnColors[11]);
                 ((RadioButton)views[9]).setTextColor(btnColors[11]);
+                int radiusChecked = data.getExtras().getInt("radius", 0);
+                int cornerRadius = (radiusChecked + 1) * 8;
+                ((MaterialButton)views[0]).setCornerRadius(cornerRadius);
+                ((MaterialButton)views[1]).setCornerRadius(cornerRadius);
+                ((MaterialButton)views[2]).setCornerRadius(cornerRadius);
+                ((MaterialButton)views[3]).setCornerRadius(cornerRadius);
+                ((MaterialButton)views[4]).setCornerRadius(cornerRadius);
             }
         }
     }
