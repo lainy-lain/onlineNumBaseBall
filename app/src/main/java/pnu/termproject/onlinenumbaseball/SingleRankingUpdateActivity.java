@@ -32,8 +32,10 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private long clearTime;
     private int clearTurn;
+    private int nBall;
     private TextView tv_avgTime;
     private TextView tv_avgTurn;
+    private String mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,7 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
         Intent intent = getIntent();
         clearTime = intent.getLongExtra("clear-time", 0);
         clearTurn = intent.getIntExtra("clear-turn", 0);
+        nBall = intent.getIntExtra("ball-number", 0);
 
         // 전역변수 값 할당
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
@@ -70,9 +73,22 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
     }
 
     private void updateUser(){
-        String mode = "users";
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mode);
+        switch (nBall){
+            case 3:
+                mode = "users_3b";
+                break;
+            case 4:
+                mode = "users_4b";
+                break;
+            case 5:
+                mode = "users_5b";
+                break;
+            default:
+                mode = "incorrect";
+                break;
+        }
 
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mode);
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -129,7 +145,7 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
     }
 
     private void updateDBwithClass(User user){
-        mDatabase.child("users").child(currentUser.getUid()).setValue(user)
+        mDatabase.child(mode).child(currentUser.getUid()).setValue(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {

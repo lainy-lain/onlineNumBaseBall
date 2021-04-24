@@ -153,6 +153,7 @@ public class Game extends AppCompatActivity{
                     Intent intent2 = new Intent(getApplicationContext(), SingleRankingUpdateActivity.class);
                     intent2.putExtra("clear-time", clearTime);
                     intent2.putExtra("clear-turn", turn);
+                    intent2.putExtra("ball-number", ball_number);
                     startActivity(intent2);
                     finish();
 

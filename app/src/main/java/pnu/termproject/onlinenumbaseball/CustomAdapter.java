@@ -41,7 +41,11 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
                 .load(arrayList.get(position).getUserProfile())
                 .into(holder.iv_profile);
         holder.tv_userName.setText(arrayList.get(position).getUserName());
-        holder.tv_meanTime.setText("평균 클리어 시간(분) : " + String.valueOf(arrayList.get(position).getMeanTime()));
+
+        long meanTime = (long)arrayList.get(position).getMeanTime();
+        String str_meanTime =  "평균 클리어 시간 : " + String.valueOf(meanTime / 60) + "분 " +
+                String.valueOf(meanTime % 60) + "초";
+        holder.tv_meanTime.setText(str_meanTime);
         holder.tv_meanTurn.setText("평균 클리어 턴 수 : " + String.valueOf(arrayList.get(position).getMeanTurn()));
     }
 
