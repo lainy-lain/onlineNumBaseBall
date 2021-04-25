@@ -13,10 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OnlineNumBaseball">
 
-
         <activity android:name=".LeaderBoardActivity" />
         <activity android:name=".SingleRankingUpdateActivity" />
         <activity android:name=".Setting" />
+
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,6 +24,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".Game" />
     </application>
 
