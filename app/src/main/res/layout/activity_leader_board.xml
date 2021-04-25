@@ -45,30 +45,31 @@
                 android:id="@+id/tv_lbMode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
                 android:text="nBallRank"
                 android:textSize="20sp"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_ranking"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="350dp"
                 android:layout_marginTop="5dp"/>
-            <!--layout_height : 350, 70dp-->
+            <!--layout_height : 350, 85dp-->
 
             <TextView
                 android:id="@+id/tv_myRankInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
+                android:layout_marginLeft="10dp"
                 android:text="My Information"
                 android:textSize="20sp"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView_myInfo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+                android:layout_height="85dp"
+                android:layout_marginTop="5dp"/>
 
         </LinearLayout>
 
