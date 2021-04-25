@@ -13,16 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
-public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomViewHolder> {
+public class MyInfoAdapter extends RecyclerView.Adapter<MyInfoAdapter.CustomViewHolder> {
 
     private ArrayList<User> arrayList;
     private Context context;
 
-    public CustomAdapter(ArrayList<User> arrayList, Context context) {
+    public MyInfoAdapter(ArrayList<User> arrayList, Context context) {
         this.arrayList = arrayList;
         this.context = context;
     }
@@ -30,7 +28,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
     @NonNull
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_myinfo, parent, false);
         CustomViewHolder holder = new CustomViewHolder(view);
 
         return holder;

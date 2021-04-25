@@ -89,7 +89,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
 
         // 내 정보를 표시하기 위한 부분. 로그인 돼있는 경우와 안돼있는 경우를 구분함.
         // ******************** BEGIN **********************
-        adapter_myInfo = new CustomAdapter(arrayList_myInfo, this);
+        adapter_myInfo = new MyInfoAdapter(arrayList_myInfo, this);
         recyclerView_myInfo.setAdapter(adapter_myInfo);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser(); // 로그인 안돼있으면 null이다
@@ -141,7 +141,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
 
 
         // 전체 Ranking을 보여주기 위한 코드
-        adapter_ranking = new CustomAdapter(arrayList_ranking, this);
+        adapter_ranking = new RankingAdapter(arrayList_ranking, this);
         recyclerView_ranking.setAdapter(adapter_ranking);
 
         Query query = databaseReference.orderByChild("ability");

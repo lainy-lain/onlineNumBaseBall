@@ -39,7 +39,13 @@ import com.google.android.material.button.MaterialButton;
 
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private TextView tv_nickname; // 닉네임을 나타내는 Text
@@ -323,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .setTitle("정말로 탈퇴하시겠습니까?")
                 .setMessage("탈퇴 후 데이터 복구는 불가능합니다")
                 .setPositiveButton("탈퇴", (dialog, which) -> { // 탈퇴 버튼을 눌렀을 경우
+                    deleteData(); // DB에서 값 지우기
                     FirebaseAuth.getInstance().getCurrentUser().delete(); // 탈퇴 처리
 
                     // Google에서 로그아웃. 이게 있어야 재로그인할때 계정을 선택할 수 있음.
@@ -341,7 +348,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         AlertDialog msgDialog = msgBuilder.create();
         msgDialog.show();
-        finish();
+        //finish();
+    }
+
+    private void deleteData(){
+        String[] modes = {"users_3b", "users_4b", "users_5b"};
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference reference = FirebaseDatabase.getInstance().getReference();
+
+        for (final String str : modes){
+            reference.child(str).child(currentUser.getUid()).setValue(null); // 데이터 삭제
+        }
     }
 
     private void gotoRanking(){
