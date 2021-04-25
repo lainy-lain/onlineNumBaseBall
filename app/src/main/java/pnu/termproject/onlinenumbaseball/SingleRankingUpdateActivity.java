@@ -49,15 +49,18 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
         nBall = intent.getIntExtra("ball-number", 0);
 
         // 전역변수 값 할당
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
-        // 이것들은 DB에 저장된 값들을 화면에 표시해주기 위한 textView이다.
-        // 그렇기 때문에, setText는 여기(onCreate)가 아니라, updateDBwithClass() 안에서 DB 업데이트하면서 해줌.
-        tv_avgTime = findViewById(R.id.tv_avgTime);
-        tv_avgTurn = findViewById(R.id.tv_avgTurn);
+        tv_avgTime = findViewById(R.id.tv_avgTime); // 이것들은 DB에 저장된 값들을 화면에 표시해주기 위한 textView이다.
+        tv_avgTurn = findViewById(R.id.tv_avgTurn); // 그렇기 때문에, setText는 여기(onCreate)가 아니라, updateDBwithClass() 안에서 DB 업데이트하면서 해줌.
 
-        updateUser(); // 유저 DB 정보 업데이트
-        //Toast.makeText(getApplicationContext(), "Come in", Toast.LENGTH_SHORT).show(); // DEBUG
+        currentUser = FirebaseAuth.getInstance().getCurrentUser(); // 로그인 안돼있으면 null이다.
+        if (currentUser != null){ // 로그인 되어있는 경우
+            mDatabase = FirebaseDatabase.getInstance().getReference();
+            updateUser(); // 유저 DB 정보 업데이트
+        }
+        else{ // 로그인 안돼있는 경우
+            tv_avgTime.setText("로그인이 필요한 기능입니다");
+            tv_avgTurn.setText("로그인이 필요한 기능입니다");
+        }
 
         // 지역변수 정의 및 값 할당 (플레이 정보 표시를 위한 지역 변수)
         TextView tv_clearTime = findViewById(R.id.tv_clearTime);
@@ -69,7 +72,6 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
         tv_clearTurn.setText(String.valueOf(clearTurn));
 
         btn_gotoLobby.setOnClickListener(v -> finish());
-
     }
 
     private void updateUser(){
@@ -144,6 +146,7 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
         updateDBwithClass(user);
     }
 
+    @SuppressLint("DefaultLocale")
     private void updateDBwithClass(User user){
         mDatabase.child(mode).child(currentUser.getUid()).setValue(user)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -161,12 +164,12 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
 
         String meanTimeStr = String.valueOf((long)user.getMeanTime() / 60) + "분 " + String.valueOf((long)user.getMeanTime() % 60) + "초";
         tv_avgTime.setText(meanTimeStr);
-        tv_avgTurn.setText(String.valueOf(user.getMeanTurn()));
+        tv_avgTurn.setText(String.format("%.2f", user.getMeanTurn()));
     }
 
     @Override
     public void onBackPressed(){
-        finish();
         super.onBackPressed();
+        finish();
     }
 }

@@ -1,5 +1,6 @@
 package pnu.termproject.onlinenumbaseball;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,8 +46,10 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.CustomView
         long meanTime = (long)arrayList.get(position).getMeanTime();
         String str_meanTime =  "평균 클리어 시간 : " + String.valueOf(meanTime / 60) + "분 " +
                 String.valueOf(meanTime % 60) + "초";
+        @SuppressLint("DefaultLocale")
+        String str_meanTurn = String.format("평균 클리어 턴 수 : %.2f", arrayList.get(position).getMeanTurn());
         holder.tv_meanTime.setText(str_meanTime);
-        holder.tv_meanTurn.setText("평균 클리어 턴 수 : " + String.valueOf(arrayList.get(position).getMeanTurn()));
+        holder.tv_meanTurn.setText(str_meanTurn);
     }
 
     @Override
