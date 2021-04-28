@@ -28,4 +28,12 @@
     <string name="basic">기본</string>
     <string name="round">둥글게</string>
     <string name="rround">더 둥글게</string>
+    <string name="_3b_rank">3B Rank</string>
+    <string name="_4b_rank">4B Rank</string>
+    <string name="_5b_rank">5B Rank</string>
+    <string name="nballrank">nBallRank</string>
+    <string name="my_information">My Information</string>
+    <string name="username">username</string>
+    <string name="mean_time">평균 클리어 시간</string>
+    <string name="mean_turn">평균 클리어 턴 수</string>
 </resources>
