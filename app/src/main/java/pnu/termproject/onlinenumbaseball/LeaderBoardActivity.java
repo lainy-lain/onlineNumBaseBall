@@ -1,14 +1,21 @@
 package pnu.termproject.onlinenumbaseball;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -34,6 +41,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
     private TextView tv_lbMode;
     private FirebaseUser currentUser;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,12 +62,43 @@ public class LeaderBoardActivity extends AppCompatActivity {
         Button btn_4Brank = findViewById(R.id.btn_4Brank);
         Button btn_5Brank = findViewById(R.id.btn_5Brank);
         tv_lbMode = findViewById(R.id.tv_lbMode);
+        TextView tv_myRankInfo = findViewById(R.id.tv_myRankInfo);
 
         btn_3Brank.setOnClickListener(v -> getRanking(3));
         btn_4Brank.setOnClickListener(v -> getRanking(4));
         btn_5Brank.setOnClickListener(v -> getRanking(5));
 
         getRanking(3); // 기본적으로 '3 Ball'의 Ranking을 보여줌.
+
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
+                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
+                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        btn_3Brank.setBackgroundTintList(colors[0]);
+        btn_3Brank.setTextColor(colors[3]);
+        btn_4Brank.setBackgroundTintList(colors[1]);
+        btn_4Brank.setTextColor(colors[4]);
+        btn_5Brank.setBackgroundTintList(colors[2]);
+        btn_5Brank.setTextColor(colors[5]);
+        int bgColor = sp.getInt("btnbgbg", 0xFFFFFFFF);
+        recyclerView_ranking.setBackgroundColor(bgColor);
+        recyclerView_myInfo.setBackgroundColor(bgColor);
+        tv_lbMode.setBackgroundColor(bgColor);
+        tv_myRankInfo.setBackgroundColor(bgColor);
+        tv_lbMode.setTextColor(colors[7]);
+        tv_myRankInfo.setTextColor(colors[7]);
+        tv_lbMode.getRootView().setBackgroundTintList(colors[6]);
+        int radiusChecked = sp.getInt("radius", 0);
+        int cornerRadius = (radiusChecked + 1) * 8;
+        ((MaterialButton)btn_3Brank).setCornerRadius(cornerRadius);
+        ((MaterialButton)btn_4Brank).setCornerRadius(cornerRadius);
+        ((MaterialButton)btn_5Brank).setCornerRadius(cornerRadius);
     }
 
     private void getRanking(int nBall){
@@ -89,7 +128,9 @@ public class LeaderBoardActivity extends AppCompatActivity {
 
         // 내 정보를 표시하기 위한 부분. 로그인 돼있는 경우와 안돼있는 경우를 구분함.
         // ******************** BEGIN **********************
-        adapter_myInfo = new MyInfoAdapter(arrayList_myInfo, this);
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        ColorStateList tx = ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000));
+        adapter_myInfo = new MyInfoAdapter(arrayList_myInfo, this, tx);
         recyclerView_myInfo.setAdapter(adapter_myInfo);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser(); // 로그인 안돼있으면 null이다
@@ -141,7 +182,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
 
 
         // 전체 Ranking을 보여주기 위한 코드
-        adapter_ranking = new RankingAdapter(arrayList_ranking, this);
+        adapter_ranking = new RankingAdapter(arrayList_ranking, this, tx);
         recyclerView_ranking.setAdapter(adapter_ranking);
 
         Query query = databaseReference.orderByChild("ability");
