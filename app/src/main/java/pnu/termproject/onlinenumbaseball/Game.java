@@ -1,15 +1,20 @@
 package pnu.termproject.onlinenumbaseball;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -19,6 +24,8 @@ import android.widget.RadioGroup;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +37,12 @@ public class Game extends AppCompatActivity{
     private RadioButton rb_select;
     private RadioButton[] radio_btn = new RadioButton[5];
     private Button[] btn_num = new Button[10];
-    private Button btn_result, btn_clear, btn_memo;
+    private Button btn_result, btn_cancel, btn_memo, btn_clear;
     private TextView tv_turn;
     private Random random = new Random();
     private int strike, ball, turn;
     private ListView result_list;
+    private Button[] memo_color = new Button[6];
 
     private long startTime, endTime, clearTime; // 클리어 시간 측정을 위한 변수
     private long backKeyPressedTime = 0;
@@ -107,6 +115,7 @@ public class Game extends AppCompatActivity{
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,15 +132,80 @@ public class Game extends AppCompatActivity{
         }
         rg_number = findViewById(R.id.rg_number);
         btn_result = findViewById(R.id.btn_result);
+        btn_cancel = findViewById(R.id.btn_cancel);
+        btn_memo = findViewById(R.id.btn_memo);
+        btn_clear = findViewById(R.id.btn_clear);
         tv_turn = findViewById(R.id.turn_text);
         result_list = findViewById(R.id.result_ListView);
+        int[] memo_color_Id = {R.id.button1, R.id.button2, R.id.button3, R.id.button4, R.id.button5, R.id.button6};
+        for (int i = 0; i < 6; i++) {
+            memo_color[i] = findViewById(memo_color_Id[i]);
+        }
 
         rb_select = findViewById(R.id.radioButton1);
         radio_btn[0].setChecked(true);
 
+        // 설정 적용
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
+                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
+                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
+                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        int radiusChecked = sp.getInt("radius", 0);
+        int cornerRadius = (radiusChecked + 1) * 8;
+        tv_turn.setTextColor(colors[11]);
+        tv_turn.getRootView().setBackgroundTintList(colors[5]);
+        for (int i = 0; i < 5; i++) {
+            radio_btn[i].setTextColor(colors[6]);
+        }
+        rg_number.setBackgroundColor(sp.getInt("btn1bg", 0xFFFFEB3B));
+        for (int i = 0; i < 10; i++) {
+            btn_num[i].setTextColor(colors[7]);
+            btn_num[i].setBackgroundTintList(colors[1]);
+            ((MaterialButton)btn_num[i]).setCornerRadius(cornerRadius);
+        }
+        btn_result.setTextColor(colors[8]);
+        btn_result.setBackgroundTintList(colors[2]);
+        ((MaterialButton)btn_result).setCornerRadius(cornerRadius);
+        btn_cancel.setTextColor(colors[9]);
+        btn_cancel.setBackgroundTintList(colors[3]);
+        ((MaterialButton)btn_cancel).setCornerRadius(cornerRadius);
+        btn_memo.setTextColor(colors[10]);
+        btn_memo.setBackgroundTintList(colors[4]);
+        ((MaterialButton)btn_memo).setCornerRadius(cornerRadius);
+        btn_clear.setTextColor(colors[9]);
+        btn_clear.setBackgroundTintList(colors[3]);
+        ((MaterialButton)btn_clear).setCornerRadius(cornerRadius);
+        for (int i = 0; i < 6; i++) {
+            if (i == 5) {
+                memo_color[i].setBackgroundTintList(colors[11]);
+            }
+            else {
+                memo_color[i].setBackgroundTintList(colors[i]);
+            }
+            ((MaterialButton)memo_color[i]).setCornerRadius(cornerRadius);
+        }
+
         //결과를 나타내는 리스트들을 위한 코드
         List<String> data = new ArrayList<>();
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, data);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView tv = view.findViewById(android.R.id.text1);
+                tv.setTextColor(sp.getInt("btnbgtx", 0xFF000000));
+                return view;
+            }
+        };
         result_list.setAdapter(adapter);
 
         //공의 개수에 따라서, 랜덤 변수를 생성하는 부분
@@ -141,7 +215,7 @@ public class Game extends AppCompatActivity{
         int[] num = new int[ball_number]; //사용자가 선택한 정답
         for(int i = 0; i < ball_number; i++) {
             boolean isOverlap = false;
-            while(isOverlap == false) {
+            while(!isOverlap) {
                 ans[i] = random.nextInt(10);
                 isOverlap = true;
                 for(int j = 0; j < i; j++) {
@@ -158,123 +232,109 @@ public class Game extends AppCompatActivity{
         startTime = System.currentTimeMillis(); // 시간 측정 시작
 
         //라디오 버튼(몇번째 공을 선택했는지 구별)을 눌렀을때의 동작을 구현하는 코드
-        rg_number.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                rb_select = findViewById(i);
-            }
-        });
+        rg_number.setOnCheckedChangeListener((radioGroup, i) -> rb_select = findViewById(i));
 
         //숫자 버튼을 눌렀을때의 동작을 구현하는 코드
         for(int i = 0; i < 10; i++)
         {
             int tmp = i;
-            btn_num[tmp].setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    rb_select.setText(String.valueOf(tmp));
-                    for(int i = 0; i < ball_number; i++) {
-                        if(rb_select == radio_btn[i]) {
-                            num[i] = tmp;
-                            if (i < ball_number - 1) {
-                                rb_select = radio_btn[i + 1];
-                                rb_select.setChecked(true);
-                                break;
-                            }
+            btn_num[tmp].setOnClickListener(view -> {
+                rb_select.setText(String.valueOf(tmp));
+                for(int i1 = 0; i1 < ball_number; i1++) {
+                    if(rb_select == radio_btn[i1]) {
+                        num[i1] = tmp;
+                        if (i1 < ball_number - 1) {
+                            rb_select = radio_btn[i1 + 1];
+                            rb_select.setChecked(true);
+                            break;
                         }
                     }
-                    for(int i = 0; i < 10; i++)
-                            btn_num[i].setEnabled(true);
-                    for(int i = 0; i < ball_number; i++)
-                        if(num[i] != -1)
-                            btn_num[num[i]].setEnabled(false);
                 }
+                for(int i1 = 0; i1 < 10; i1++)
+                        btn_num[i1].setEnabled(true);
+                for(int i1 = 0; i1 < ball_number; i1++)
+                    if(num[i1] != -1)
+                        btn_num[num[i1]].setEnabled(false);
             });
         }
 
         //완료 버튼을 눌렀을때의 동작을 구현하는 코드
-        btn_result.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                boolean triger = true;
-                for(int i = 0; i < ball_number; i++){
-                    if(num[i] == -1)
-                        triger = false;
+        btn_result.setOnClickListener(view -> {
+            boolean triger = true;
+            for(int i = 0; i < ball_number; i++){
+                if(num[i] == -1)
+                    triger = false;
+            }
+            if(triger) {
+                //결과를 계산하는 코드
+                strike = 0;
+                ball = 0;
+                for (int i = 0; i < ball_number; i++) {
+                    if (ans[i] == num[i])
+                        strike++;
+                    else {
+                        for (int j = 0; j < ball_number; j++) {
+                            if (ans[i] == num[j])
+                                ball++;
+                        }
+                    }
                 }
-                if(triger == true) {
-                    //결과를 계산하는 코드
-                    strike = 0;
-                    ball = 0;
+
+                //진행상황을 기록하는 코드
+                String result = "";
+                for (int i = 0; i < ball_number; i++)
+                    result += String.valueOf(num[i]);
+                result += "\n" + strike + "S" + " " + ball + "B";
+                data.add(result);
+                adapter.notifyDataSetChanged();
+
+                if (ball_number == strike) {//종료하는 코드
+                    endTime = System.currentTimeMillis(); // 시간 측정 종료
+                    clearTime = (endTime - startTime) / 1000;
+
+                    // 랭킹 업데이트 & 결과 출력해주는 Activity로 전환
+                    Intent intent2 = new Intent(getApplicationContext(), SingleRankingUpdateActivity.class);
+                    intent2.putExtra("clear-time", clearTime);
+                    intent2.putExtra("clear-turn", turn);
+                    intent2.putExtra("ball-number", ball_number);
+                    startActivity(intent2);
+                    finish();
+                } else {//다음 회를 준비하기 위한 코드
+                    turn++;
+                    String turnStr = "Turn : " + turn;
+                    tv_turn.setText(turnStr);
+                    rb_select = radio_btn[0];
+                    rb_select.setChecked(true);
                     for (int i = 0; i < ball_number; i++) {
-                        if (ans[i] == num[i])
-                            strike++;
-                        else {
-                            for (int j = 0; j < ball_number; j++) {
-                                if (ans[i] == num[j])
-                                    ball++;
-                            }
-                        }
+                        num[i] = -1;
+                        radio_btn[i].setText("");
                     }
-
-                    //진행상황을 기록하는 코드
-                    String result = "";
-                    for (int i = 0; i < ball_number; i++)
-                        result += String.valueOf(num[i]);
-                    result += "\n" + String.valueOf(strike) + "S" + " " + String.valueOf(ball) + "B";
-                    data.add(result);
-                    adapter.notifyDataSetChanged();
-
-                    if (ball_number == strike) {//종료하는 코드
-                        endTime = System.currentTimeMillis(); // 시간 측정 종료
-                        clearTime = (endTime - startTime) / 1000;
-
-                        // 랭킹 업데이트 & 결과 출력해주는 Activity로 전환
-                        Intent intent2 = new Intent(getApplicationContext(), SingleRankingUpdateActivity.class);
-                        intent2.putExtra("clear-time", clearTime);
-                        intent2.putExtra("clear-turn", turn);
-                        intent2.putExtra("ball-number", ball_number);
-                        startActivity(intent2);
-                        finish();
-                    } else {//다음 회를 준비하기 위한 코드
-                        turn++;
-                        String turnStr = "Turn : " + String.valueOf(turn);
-                        tv_turn.setText(turnStr);
-                        rb_select = radio_btn[0];
-                        rb_select.setChecked(true);
-                        for (int i = 0; i < ball_number; i++) {
-                            num[i] = -1;
-                            radio_btn[i].setText("");
-                        }
-                        for(int i = 0; i < 10; i++){
-                            btn_num[i].setEnabled(true);
-                        }
+                    for(int i = 0; i < 10; i++){
+                        btn_num[i].setEnabled(true);
                     }
                 }
+            }
+        });
+
+        // 취소 버튼 눌렀을 때
+        btn_cancel.setOnClickListener(v -> {
+            rb_select = radio_btn[0];
+            rb_select.setChecked(true);
+            for (int i = 0; i < ball_number; i++) {
+                num[i] = -1;
+                radio_btn[i].setText("");
+            }
+            for(int i = 0; i < 10; i++){
+                btn_num[i].setEnabled(true);
             }
         });
 
         //아래로는 메모기능을 위한 코드임
         final MyView m = new MyView(this);
-        findViewById(R.id.btn_red).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                color = Color.RED;
-            }
-        });
-        findViewById(R.id.btn_blue).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                color = Color.BLUE;
-            }
-        });
-        findViewById(R.id.btn_black).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                color = Color.BLACK;
-            }
-        });
+        for (int i = 0; i < 6; i++) {
+            memo_color[i].setOnClickListener(v -> color = v.getBackgroundTintList().getDefaultColor());
+        }
 
-        btn_clear = findViewById(R.id.btn_clear);
         drawLinear = findViewById(R.id.draw_linear);
         drawLinear.setVisibility(View.INVISIBLE);
         drawBtnLinear = findViewById(R.id.draw_btn_linear);
@@ -282,36 +342,29 @@ public class Game extends AppCompatActivity{
         inputTable = findViewById(R.id.input_Table);
 
         resultLinear = findViewById(R.id.result_linear);
-        btn_memo = findViewById(R.id.btn_memo);
         final boolean[] memoStatus = {false};
 
-        btn_memo.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                if(memoStatus[0] == false) {
-                    resultLinear.setVisibility(View.INVISIBLE);
-                    tv_turn.setVisibility(View.INVISIBLE);
-                    inputTable.setVisibility(View.INVISIBLE);
-                    drawBtnLinear.setVisibility(View.VISIBLE);
-                    drawLinear.setVisibility(View.VISIBLE);
-                    memoStatus[0] = true;
-                }
-                else {
-                    resultLinear.setVisibility(View.VISIBLE);
-                    tv_turn.setVisibility(View.VISIBLE);
-                    inputTable.setVisibility(View.VISIBLE);
-                    drawBtnLinear.setVisibility(View.INVISIBLE);
-                    drawLinear.setVisibility(View.INVISIBLE);
-                    memoStatus[0] = false;
-                }
+        btn_memo.setOnClickListener(v -> {
+            if(!memoStatus[0]) {
+                resultLinear.setVisibility(View.INVISIBLE);
+                tv_turn.setVisibility(View.INVISIBLE);
+                inputTable.setVisibility(View.INVISIBLE);
+                drawBtnLinear.setVisibility(View.VISIBLE);
+                drawLinear.setVisibility(View.VISIBLE);
+                memoStatus[0] = true;
+            }
+            else {
+                resultLinear.setVisibility(View.VISIBLE);
+                tv_turn.setVisibility(View.VISIBLE);
+                inputTable.setVisibility(View.VISIBLE);
+                drawBtnLinear.setVisibility(View.INVISIBLE);
+                drawLinear.setVisibility(View.INVISIBLE);
+                memoStatus[0] = false;
             }
         });
-        btn_clear.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                points.clear();
-                m.invalidate();
-            }
+        btn_clear.setOnClickListener(v -> {
+            points.clear();
+            m.invalidate();
         });
         drawLinear.addView(m);
     }

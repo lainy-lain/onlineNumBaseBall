@@ -36,4 +36,21 @@
     <string name="username">username</string>
     <string name="mean_time">평균 클리어 시간</string>
     <string name="mean_turn">평균 클리어 턴 수</string>
+    <string name="turn">Turn :</string>
+    <string name="clear">Clear</string>
+    <string name="memo">메모</string>
+    <string name="submit">확인</string>
+    <string name="cancel_short">취소</string>
+    <string name="_0">0</string>
+    <string name="_1">1</string>
+    <string name="_2">2</string>
+    <string name="_6">6</string>
+    <string name="_7">7</string>
+    <string name="_8">8</string>
+    <string name="_9">9</string>
+    <string name="btn1guide">게임 - 선택 숫자\n랭킹 - 3B</string>
+    <string name="btn2guide">게임 - 숫자 버튼\n랭킹 - 4B</string>
+    <string name="btn3guide">게임 - 확인 버튼\n랭킹 - 5B</string>
+    <string name="btn4guide">게임 - 취소 버튼\n</string>
+    <string name="btn5guide">게임 - 메모 버튼\n</string>
 </resources>
