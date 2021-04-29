@@ -31,7 +31,7 @@ public class Game extends AppCompatActivity{
     private RadioButton[] radio_btn = new RadioButton[5];
     private Button[] btn_num = new Button[10];
     private Button btn_result, btn_clear, btn_memo;
-    private TextView answer, tv_turn;
+    private TextView tv_turn;
     private Random random = new Random();
     private int strike, ball, turn;
     private ListView result_list;
@@ -123,7 +123,6 @@ public class Game extends AppCompatActivity{
         }
         rg_number = findViewById(R.id.rg_number);
         btn_result = findViewById(R.id.btn_result);
-        answer = findViewById(R.id.textView7);
         tv_turn = findViewById(R.id.turn_text);
         result_list = findViewById(R.id.result_ListView);
 
@@ -150,7 +149,7 @@ public class Game extends AppCompatActivity{
                         isOverlap = false;
                 }
             }
-            num[i] = 0;
+            num[i] = -1;
         }
         for(int i = ball_number; i < 5; i++)
             radio_btn[i].setVisibility(View.INVISIBLE);
@@ -184,7 +183,11 @@ public class Game extends AppCompatActivity{
                             }
                         }
                     }
-                    
+                    for(int i = 0; i < 10; i++)
+                            btn_num[i].setEnabled(true);
+                    for(int i = 0; i < ball_number; i++)
+                        if(num[i] != -1)
+                            btn_num[num[i]].setEnabled(false);
                 }
             });
         }
@@ -193,44 +196,59 @@ public class Game extends AppCompatActivity{
         btn_result.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //결과를 계산하는 코드
-                strike = 0;
-                ball = 0;
-                for(int i = 0; i < ball_number; i++) {
-                    if(ans[i] == num[i])
-                        strike++;
-                    else {
-                        for(int j = 0; j < ball_number; j++) {
-                            if(ans[i] == num[j])
-                                ball++;
+                boolean triger = true;
+                for(int i = 0; i < ball_number; i++){
+                    if(num[i] == -1)
+                        triger = false;
+                }
+                if(triger == true) {
+                    //결과를 계산하는 코드
+                    strike = 0;
+                    ball = 0;
+                    for (int i = 0; i < ball_number; i++) {
+                        if (ans[i] == num[i])
+                            strike++;
+                        else {
+                            for (int j = 0; j < ball_number; j++) {
+                                if (ans[i] == num[j])
+                                    ball++;
+                            }
                         }
                     }
-                }
 
-                //진행상황을 기록하는 코드
-                String result = String.valueOf(turn) + "회" + "\t\t" + "입력숫자 : ";
-                for(int i = 0; i < ball_number; i++)
-                    result += String.valueOf(num[i]) + " ";
-                result += "\t\t" + "S : " + String.valueOf(strike) + "\t\t" + "B : " + String.valueOf(ball);
-                data.add(result);
-                adapter.notifyDataSetChanged();
+                    //진행상황을 기록하는 코드
+                    String result = "";
+                    for (int i = 0; i < ball_number; i++)
+                        result += String.valueOf(num[i]);
+                    result += "\n" + String.valueOf(strike) + "S" + " " + String.valueOf(ball) + "B";
+                    data.add(result);
+                    adapter.notifyDataSetChanged();
 
-                if(ball_number == strike) {//종료하는 코드
-                    endTime = System.currentTimeMillis(); // 시간 측정 종료
-                    clearTime = (endTime - startTime) / 1000;
+                    if (ball_number == strike) {//종료하는 코드
+                        endTime = System.currentTimeMillis(); // 시간 측정 종료
+                        clearTime = (endTime - startTime) / 1000;
 
-                    // 랭킹 업데이트 & 결과 출력해주는 Activity로 전환
-                    Intent intent2 = new Intent(getApplicationContext(), SingleRankingUpdateActivity.class);
-                    intent2.putExtra("clear-time", clearTime);
-                    intent2.putExtra("clear-turn", turn);
-                    intent2.putExtra("ball-number", ball_number);
-                    startActivity(intent2);
-                    finish();
-               }
-                else {//다음 회를 준비하기 위한 코드
-                    turn++;
-                    String turnStr = "Turn : " + String.valueOf(turn);
-                    tv_turn.setText(turnStr);
+                        // 랭킹 업데이트 & 결과 출력해주는 Activity로 전환
+                        Intent intent2 = new Intent(getApplicationContext(), SingleRankingUpdateActivity.class);
+                        intent2.putExtra("clear-time", clearTime);
+                        intent2.putExtra("clear-turn", turn);
+                        intent2.putExtra("ball-number", ball_number);
+                        startActivity(intent2);
+                        finish();
+                    } else {//다음 회를 준비하기 위한 코드
+                        turn++;
+                        String turnStr = "Turn : " + String.valueOf(turn);
+                        tv_turn.setText(turnStr);
+                        rb_select = radio_btn[0];
+                        rb_select.setChecked(true);
+                        for (int i = 0; i < ball_number; i++) {
+                            num[i] = -1;
+                            radio_btn[i].setText("");
+                        }
+                        for(int i = 0; i < 10; i++){
+                            btn_num[i].setEnabled(true);
+                        }
+                    }
                 }
             }
         });
