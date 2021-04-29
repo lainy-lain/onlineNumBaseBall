@@ -273,7 +273,7 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_weight="0.5"
-                android:text="@string/submit"
+                android:text="@string/confirm_short"
                 app:backgroundTint="#E3A7A7" />
 
         </TableRow>
