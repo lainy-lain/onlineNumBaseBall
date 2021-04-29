@@ -36,7 +36,7 @@
     <string name="username">username</string>
     <string name="mean_time">평균 클리어 시간</string>
     <string name="mean_turn">평균 클리어 턴 수</string>
-    <string name="turn">Turn :</string>
+    <string name="turn">Turn : 1</string>
     <string name="clear">Clear</string>
     <string name="memo">메모</string>
     <string name="submit">확인</string>
