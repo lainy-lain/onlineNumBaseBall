@@ -16,7 +16,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TableLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,13 @@ public class Game extends AppCompatActivity{
     private ListView result_list;
 
     private long startTime, endTime, clearTime; // 클리어 시간 측정을 위한 변수
+    private long backKeyPressedTime = 0;
+    private Toast toast;
+
+    ArrayList<Point> points = new ArrayList<Point>();
+    LinearLayout drawLinear, resultLinear, drawBtnLinear;
+    TableLayout inputTable;
+    int color = Color.BLACK;
 
     //메모 기능을 위한 클래스 2개
     class Point{
@@ -82,9 +91,21 @@ public class Game extends AppCompatActivity{
         }
     }
 
-    ArrayList<Point> points = new ArrayList<Point>();
-    LinearLayout drawLinear, resultLinear, drawBtnLinear, btnLinear1, btnLinear2;
-    int color = Color.BLACK;
+    //뒤로가기 버튼 관련 설정
+    @Override
+    public void onBackPressed(){
+        if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
+            backKeyPressedTime = System.currentTimeMillis();
+            toast = Toast.makeText(this, "뒤로 가기 버튼을 한 번 더 누르시면 처음화면으로 돌아갑니다.", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
+        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지나지 않았으면 배경화면으로 돌아감
+        if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
+            super.onBackPressed();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +122,13 @@ public class Game extends AppCompatActivity{
             btn_num[i] = findViewById(btn_Id[i]);
         }
         rg_number = findViewById(R.id.rg_number);
-        rb_select = findViewById(R.id.radioButton1);
         btn_result = findViewById(R.id.btn_result);
         answer = findViewById(R.id.textView7);
         tv_turn = findViewById(R.id.turn_text);
         result_list = findViewById(R.id.result_ListView);
+
+        rb_select = findViewById(R.id.radioButton1);
+        radio_btn[0].setChecked(true);
 
         //결과를 나타내는 리스트들을 위한 코드
         List<String> data = new ArrayList<>();
@@ -133,17 +156,6 @@ public class Game extends AppCompatActivity{
             radio_btn[i].setVisibility(View.INVISIBLE);
         turn = 1;
 
-        //디버깅을 위해서 임시로 추가한 코드, 추후에 삭제할 예정
-        /*
-        radio_btn[0].setSelected(true);
-        String ansString;
-        ansString = "랜덤 숫자 :";
-        for(int i = 0; i < ball_number; i++) {
-            ansString += " " + String.valueOf(ans[i]);
-        }
-        answer.setText(ansString);
-         */
-
         startTime = System.currentTimeMillis(); // 시간 측정 시작
 
         //라디오 버튼(몇번째 공을 선택했는지 구별)을 눌렀을때의 동작을 구현하는 코드
@@ -163,9 +175,16 @@ public class Game extends AppCompatActivity{
                 public void onClick(View view) {
                     rb_select.setText(String.valueOf(tmp));
                     for(int i = 0; i < ball_number; i++) {
-                        if(rb_select == radio_btn[i])
+                        if(rb_select == radio_btn[i]) {
                             num[i] = tmp;
+                            if (i < ball_number - 1) {
+                                rb_select = radio_btn[i + 1];
+                                rb_select.setChecked(true);
+                                break;
+                            }
+                        }
                     }
+                    
                 }
             });
         }
@@ -242,8 +261,7 @@ public class Game extends AppCompatActivity{
         drawLinear.setVisibility(View.INVISIBLE);
         drawBtnLinear = findViewById(R.id.draw_btn_linear);
         drawBtnLinear.setVisibility(View.INVISIBLE);
-        btnLinear1 = findViewById(R.id.btn_linear1);
-        btnLinear2 = findViewById(R.id.btn_linear2);
+        inputTable = findViewById(R.id.input_Table);
 
         resultLinear = findViewById(R.id.result_linear);
         btn_memo = findViewById(R.id.btn_memo);
@@ -254,22 +272,16 @@ public class Game extends AppCompatActivity{
             public void onClick(View v) {
                 if(memoStatus[0] == false) {
                     resultLinear.setVisibility(View.INVISIBLE);
-                    rg_number.setVisibility(View.INVISIBLE);
-                    btnLinear1.setVisibility(View.INVISIBLE);
-                    btnLinear2.setVisibility(View.INVISIBLE);
-                    btn_result.setVisibility(View.INVISIBLE);
                     tv_turn.setVisibility(View.INVISIBLE);
+                    inputTable.setVisibility(View.INVISIBLE);
                     drawBtnLinear.setVisibility(View.VISIBLE);
                     drawLinear.setVisibility(View.VISIBLE);
                     memoStatus[0] = true;
                 }
                 else {
                     resultLinear.setVisibility(View.VISIBLE);
-                    rg_number.setVisibility(View.VISIBLE);
-                    btnLinear1.setVisibility(View.VISIBLE);
-                    btnLinear2.setVisibility(View.VISIBLE);
-                    btn_result.setVisibility(View.VISIBLE);
                     tv_turn.setVisibility(View.VISIBLE);
+                    inputTable.setVisibility(View.VISIBLE);
                     drawBtnLinear.setVisibility(View.INVISIBLE);
                     drawLinear.setVisibility(View.INVISIBLE);
                     memoStatus[0] = false;
