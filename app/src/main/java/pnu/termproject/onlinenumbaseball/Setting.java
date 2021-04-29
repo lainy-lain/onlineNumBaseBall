@@ -21,6 +21,7 @@ import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -41,6 +42,7 @@ public class Setting extends AppCompatActivity {
     private Switch bgOrText;
     private LinearLayout[] simpleColors = new LinearLayout[3];
     Button set_bgbtn;
+    private TextView[] guides = new TextView[5];
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,11 @@ public class Setting extends AppCompatActivity {
         willBeAdd[3] = findViewById(R.id.forO);
         Button[] set_btns = {findViewById(R.id.confirm), findViewById(R.id.initialize)};
         RadioButton[] radiuses = {findViewById(R.id.basic), findViewById(R.id.round), findViewById(R.id.rround)};
+        guides[0] = findViewById(R.id.btn1guide);
+        guides[1] = findViewById(R.id.btn2guide);
+        guides[2] = findViewById(R.id.btn3guide);
+        guides[3] = findViewById(R.id.btn4guide);
+        guides[4] = findViewById(R.id.btn5guide);
 
         SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
         ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
@@ -111,6 +118,9 @@ public class Setting extends AppCompatActivity {
             ((MaterialButton)colorKindButtons[i]).setCornerRadius(radius);
         }
         radiuses[radiusChecked].setChecked(true);
+        for (int i = 0; i < 5; i++) {
+            guides[i].setTextColor(colors[11]);
+        }
 
         for (int i = 0; i < 6; i++) {
             buttons[i].setOnClickListener(v -> {
@@ -361,6 +371,9 @@ public class Setting extends AppCompatActivity {
                     ((RadioButton)findViewById(R.id.basic)).setTextColor(v.getBackgroundTintList());
                     ((RadioButton)findViewById(R.id.round)).setTextColor(v.getBackgroundTintList());
                     ((RadioButton)findViewById(R.id.rround)).setTextColor(v.getBackgroundTintList());
+                    for (int i = 0; i < 5; i++) {
+                        guides[i].setTextColor(v.getBackgroundTintList());
+                    }
                 } else {
                     (currentView.getRootView()).setBackgroundTintList(v.getBackgroundTintList());
                 }

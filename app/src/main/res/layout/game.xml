@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F49494"
     android:orientation="vertical"
     tools:context=".Game">
 
@@ -15,7 +14,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="8dp"
-        android:text="Turn : 1"
+        android:text="@string/turn"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,40 +24,79 @@
         android:id="@+id/draw_btn_linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
+        android:gravity="center"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <Button
-            android:id="@+id/btn_black"
+        <TableLayout
+            android:id="@+id/memo_colors"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Black"
-            app:backgroundTint="#000000" />
+            android:layout_weight="1">
 
-        <Button
-            android:id="@+id/btn_red"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Red"
-            app:backgroundTint="#FF0000" />
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btn_blue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Blue"
-            app:backgroundTint="#0027FF" />
+                <Button
+                    android:id="@+id/button1"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/blank" />
+
+                <Button
+                    android:id="@+id/button2"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/blank" />
+
+                <Button
+                    android:id="@+id/button3"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/blank" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/button4"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/blank" />
+
+                <Button
+                    android:id="@+id/button5"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/blank" />
+
+                <Button
+                    android:id="@+id/button6"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/blank" />
+
+            </TableRow>
+
+        </TableLayout>
 
         <Button
             android:id="@+id/btn_clear"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Clear" />
+            android:text="@string/clear" />
 
     </LinearLayout>
 
@@ -95,13 +133,14 @@
 
     <Button
         android:id="@+id/btn_memo"
+        style="?android:attr/buttonBarButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="4dp"
         android:layout_marginRight="4dp"
         android:layout_weight="1"
-        android:text="메모"
+        android:text="@string/memo"
         app:backgroundTint="#E3A7A7"
         app:layout_constraintEnd_toEndOf="@+id/draw_btn_linear"
         app:layout_constraintTop_toTopOf="parent" />
@@ -110,74 +149,60 @@
         android:id="@+id/input_Table"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#FFFFFF"
         android:padding="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="right">
+        <RadioGroup
+            android:id="@+id/rg_number"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#F4DADA">
-
-            <RadioGroup
-                android:id="@+id/rg_number"
-                android:layout_width="0dp"
+            <RadioButton
+                android:id="@+id/radioButton1"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
-                <RadioButton
-                    android:id="@+id/radioButton1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+            <RadioButton
+                android:id="@+id/radioButton2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
-                <RadioButton
-                    android:id="@+id/radioButton2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+            <RadioButton
+                android:id="@+id/radioButton3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
-                <RadioButton
-                    android:id="@+id/radioButton3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+            <RadioButton
+                android:id="@+id/radioButton4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
-                <RadioButton
-                    android:id="@+id/radioButton4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
+            <RadioButton
+                android:id="@+id/radioButton5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="24sp"
+                android:textStyle="bold" />
 
-                <RadioButton
-                    android:id="@+id/radioButton5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-
-            </RadioGroup>
-        </TableRow>
+        </RadioGroup>
 
         <TableRow
             android:layout_width="match_parent"
@@ -185,59 +210,70 @@
 
             <Button
                 android:id="@+id/btn_0"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="0"
-                android:textColor="#000000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_0"
+                android:textColor="#000000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_1"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="1"
-                android:textColor="#000000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_1"
+                android:textColor="#000000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_2"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="2"
-                android:textColor="#000000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_2"
+                android:textColor="#000000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_3"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="3"
-                android:textColor="#000000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_3"
+                android:textColor="#000000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_4"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="4"
-                android:textColor="#000000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_4"
+                android:textColor="#000000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_result"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_weight="0.5"
-                android:text="확인"
+                android:text="@string/submit"
                 app:backgroundTint="#E3A7A7" />
 
         </TableRow>
@@ -248,64 +284,72 @@
 
             <Button
                 android:id="@+id/btn_5"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="5"
-                android:textColor="#050000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_5"
+                android:textColor="#050000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_6"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="6"
-                android:textColor="#050000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_6"
+                android:textColor="#050000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_7"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="7"
-                android:textColor="#050000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_7"
+                android:textColor="#050000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_8"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="8"
-                android:textColor="#050000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_8"
+                android:textColor="#050000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
                 android:id="@+id/btn_9"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="9"
-                android:textColor="#050000"
                 android:layout_marginRight="2dp"
-                app:backgroundTint="#FFFFFF" />
+                android:layout_weight="1"
+                android:text="@string/_9"
+                android:textColor="#050000"
+                app:backgroundTint="#FFFFFF"
+                android:layout_marginEnd="2dp" />
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/btn_cancel"
+                style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
-                android:text="←"
+                android:text="@string/cancel_short"
                 app:backgroundTint="#E3A7A7" />
-
         </TableRow>
-
     </TableLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
