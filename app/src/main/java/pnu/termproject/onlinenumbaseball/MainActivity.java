@@ -144,7 +144,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ((MaterialButton)multi_btn).setCornerRadius(cornerRadius);
         ((MaterialButton)rank_btn).setCornerRadius(cornerRadius);
         ((MaterialButton)set_btn).setCornerRadius(cornerRadius);
-
+        ((MaterialButton)(Button)findViewById(R.id.logout_btn)).setCornerRadius(cornerRadius);
+        ((MaterialButton)(Button)findViewById(R.id.revoke_btn)).setCornerRadius(cornerRadius);
 
         // logout, 탈퇴, 랭킹 버튼 눌렀을때 어떤 method를 수행할지를 설정하는 부분 (setOnClickListener)
         Button logout_btn = findViewById(R.id.logout_btn);
@@ -152,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         logout_btn.setOnClickListener(v -> signOut());
         revoke_btn.setOnClickListener(v -> revokeAccess());
         rank_btn.setOnClickListener(v -> gotoRanking());
-
 
         play_btn.setOnClickListener(new View.OnClickListener() {
             boolean state = false;
@@ -304,6 +304,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             intent.putExtra("btn5tx", sp.getInt("btn5tx", 0xFFFFFFFF));
             intent.putExtra("btnbgbg", sp.getInt("btnbgbg", 0xFFFFFFFF));
             intent.putExtra("btnbgtx", sp.getInt("btnbgtx", 0xFF000000));
+            intent.putExtra("radius", sp.getInt("radius", 0));
             setResult(RESULT_OK, intent);
         }
         super.onBackPressed();
