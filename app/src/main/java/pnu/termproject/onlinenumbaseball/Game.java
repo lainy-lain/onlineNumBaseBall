@@ -196,6 +196,7 @@ public class Game extends AppCompatActivity{
             ((MaterialButton)memo_color[i]).setCornerRadius(cornerRadius);
         }
         guess.setTextColor(colors[11]);
+        color = colors[11].getDefaultColor();
 
         //결과를 나타내는 리스트들을 위한 코드
         List<String> data = new ArrayList<>();
@@ -348,6 +349,7 @@ public class Game extends AppCompatActivity{
 
         btn_memo.setOnClickListener(v -> {
             if(!memoStatus[0]) {
+                btn_memo.setText("게임");
                 guess.setVisibility(View.VISIBLE);
                 inputTable.setVisibility(View.INVISIBLE);
                 drawBtnLinear.setVisibility(View.VISIBLE);
@@ -355,6 +357,7 @@ public class Game extends AppCompatActivity{
                 memoStatus[0] = true;
             }
             else {
+                btn_memo.setText("메모");
                 inputTable.setVisibility(View.VISIBLE);
                 drawBtnLinear.setVisibility(View.INVISIBLE);
                 memoStatus[0] = false;
