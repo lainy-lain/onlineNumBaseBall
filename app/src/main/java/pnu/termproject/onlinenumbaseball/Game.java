@@ -141,6 +141,7 @@ public class Game extends AppCompatActivity{
         for (int i = 0; i < 6; i++) {
             memo_color[i] = findViewById(memo_color_Id[i]);
         }
+        TextView guess = findViewById(R.id.guess);
 
         rb_select = findViewById(R.id.radioButton1);
         radio_btn[0].setChecked(true);
@@ -194,6 +195,7 @@ public class Game extends AppCompatActivity{
             }
             ((MaterialButton)memo_color[i]).setCornerRadius(cornerRadius);
         }
+        guess.setTextColor(colors[11]);
 
         //결과를 나타내는 리스트들을 위한 코드
         List<String> data = new ArrayList<>();
@@ -346,25 +348,22 @@ public class Game extends AppCompatActivity{
 
         btn_memo.setOnClickListener(v -> {
             if(!memoStatus[0]) {
-                resultLinear.setVisibility(View.INVISIBLE);
-                tv_turn.setVisibility(View.INVISIBLE);
+                guess.setVisibility(View.VISIBLE);
                 inputTable.setVisibility(View.INVISIBLE);
                 drawBtnLinear.setVisibility(View.VISIBLE);
                 drawLinear.setVisibility(View.VISIBLE);
                 memoStatus[0] = true;
             }
             else {
-                resultLinear.setVisibility(View.VISIBLE);
-                tv_turn.setVisibility(View.VISIBLE);
                 inputTable.setVisibility(View.VISIBLE);
                 drawBtnLinear.setVisibility(View.INVISIBLE);
-                drawLinear.setVisibility(View.INVISIBLE);
                 memoStatus[0] = false;
             }
         });
         btn_clear.setOnClickListener(v -> {
             points.clear();
             m.invalidate();
+            guess.setVisibility(View.INVISIBLE);
         });
         drawLinear.addView(m);
     }
