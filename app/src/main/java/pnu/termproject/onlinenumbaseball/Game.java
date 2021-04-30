@@ -37,12 +37,13 @@ public class Game extends AppCompatActivity{
     private RadioButton rb_select;
     private RadioButton[] radio_btn = new RadioButton[5];
     private Button[] btn_num = new Button[10];
-    private Button btn_result, btn_cancel, btn_memo, btn_clear;
+    private Button btn_result, btn_cancel, btn_memo;
     private TextView tv_turn;
     private Random random = new Random();
     private int strike, ball, turn;
     private ListView result_list;
-    private Button[] memo_color = new Button[6];
+    private Button[] memo_color = new Button[7];
+    private Button[] btn_clear = new Button[2];
 
     private long startTime, endTime, clearTime; // 클리어 시간 측정을 위한 변수
     private long backKeyPressedTime = 0;
@@ -51,7 +52,7 @@ public class Game extends AppCompatActivity{
     ArrayList<Point> points = new ArrayList<Point>();
     LinearLayout drawLinear, resultLinear, drawBtnLinear;
     TableLayout inputTable;
-    int color = Color.BLACK;
+    int color;
 
     //메모 기능을 위한 클래스 2개
     class Point{
@@ -134,11 +135,12 @@ public class Game extends AppCompatActivity{
         btn_result = findViewById(R.id.btn_result);
         btn_cancel = findViewById(R.id.btn_cancel);
         btn_memo = findViewById(R.id.btn_memo);
-        btn_clear = findViewById(R.id.btn_clear);
+        btn_clear[0] = findViewById(R.id.btn_clear_all);
+        btn_clear[1] = findViewById(R.id.btn_clear_draws);
         tv_turn = findViewById(R.id.turn_text);
         result_list = findViewById(R.id.result_ListView);
-        int[] memo_color_Id = {R.id.button1, R.id.button2, R.id.button3, R.id.button4, R.id.button5, R.id.button6};
-        for (int i = 0; i < 6; i++) {
+        int[] memo_color_Id = {R.id.button1, R.id.button2, R.id.button3, R.id.button4, R.id.button5, R.id.button6, R.id.eraser};
+        for (int i = 0; i < 7; i++) {
             memo_color[i] = findViewById(memo_color_Id[i]);
         }
         TextView guess = findViewById(R.id.guess);
@@ -183,12 +185,18 @@ public class Game extends AppCompatActivity{
         btn_memo.setTextColor(colors[10]);
         btn_memo.setBackgroundTintList(colors[4]);
         ((MaterialButton)btn_memo).setCornerRadius(cornerRadius);
-        btn_clear.setTextColor(colors[9]);
-        btn_clear.setBackgroundTintList(colors[3]);
-        ((MaterialButton)btn_clear).setCornerRadius(cornerRadius);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 2; i++) {
+            btn_clear[i].setTextColor(colors[9]);
+            btn_clear[i].setBackgroundTintList(colors[3]);
+            ((MaterialButton)btn_clear[i]).setCornerRadius(cornerRadius);
+        }
+        for (int i = 0; i < 7; i++) {
             if (i == 5) {
                 memo_color[i].setBackgroundTintList(colors[11]);
+            }
+            else if (i == 6) {
+                memo_color[i].setBackgroundTintList(colors[5]);
+                memo_color[i].setTextColor(colors[11]);
             }
             else {
                 memo_color[i].setBackgroundTintList(colors[i]);
@@ -334,13 +342,13 @@ public class Game extends AppCompatActivity{
 
         //아래로는 메모기능을 위한 코드임
         final MyView m = new MyView(this);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 7; i++) {
             memo_color[i].setOnClickListener(v -> color = v.getBackgroundTintList().getDefaultColor());
         }
 
         drawLinear = findViewById(R.id.draw_linear);
         drawLinear.setVisibility(View.INVISIBLE);
-        drawBtnLinear = findViewById(R.id.draw_btn_linear);
+        drawBtnLinear = findViewById(R.id.memo_colors);
         drawBtnLinear.setVisibility(View.INVISIBLE);
         inputTable = findViewById(R.id.input_Table);
 
@@ -363,10 +371,14 @@ public class Game extends AppCompatActivity{
                 memoStatus[0] = false;
             }
         });
-        btn_clear.setOnClickListener(v -> {
+        btn_clear[0].setOnClickListener(v -> {
             points.clear();
             m.invalidate();
             guess.setVisibility(View.INVISIBLE);
+        });
+        btn_clear[1].setOnClickListener(v -> {
+            points.clear();
+            m.invalidate();
         });
         drawLinear.addView(m);
     }
