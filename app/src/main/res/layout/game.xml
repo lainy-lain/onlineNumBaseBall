@@ -20,85 +20,98 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:id="@+id/draw_btn_linear"
+    <TableLayout
+        android:id="@+id/memo_colors"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:layout_weight="1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
 
-        <TableLayout
-            android:id="@+id/memo_colors"
+        <TableRow
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:layout_height="match_parent">
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            <Button
+                android:id="@+id/button1"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:minWidth="50dp"
+                android:text="@string/blank" />
 
-                <Button
-                    android:id="@+id/button1"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/blank" />
+            <Button
+                android:id="@+id/button2"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:minWidth="50dp"
+                android:text="@string/blank" />
 
-                <Button
-                    android:id="@+id/button2"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/blank" />
+            <Button
+                android:id="@+id/button3"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:minWidth="50dp"
+                android:text="@string/blank" />
 
-                <Button
-                    android:id="@+id/button3"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/blank" />
+            <Button
+                android:id="@+id/eraser"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="50dp"
+                android:text="@string/eraser" />
 
-            </TableRow>
+            <Button
+                android:id="@+id/btn_clear_draws"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="60dp"
+                android:text="@string/clear_draws"
+                android:textAllCaps="false" />
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+        </TableRow>
 
-                <Button
-                    android:id="@+id/button4"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/blank" />
-
-                <Button
-                    android:id="@+id/button5"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/blank" />
-
-                <Button
-                    android:id="@+id/button6"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/blank" />
-
-            </TableRow>
-
-        </TableLayout>
-
-        <Button
-            android:id="@+id/btn_clear"
-            style="?android:attr/buttonBarButtonStyle"
+        <TableRow
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/clear" />
+            android:layout_height="match_parent">
 
-    </LinearLayout>
+            <Button
+                android:id="@+id/button4"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="@string/blank" />
+
+            <Button
+                android:id="@+id/button5"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="@string/blank" />
+
+            <Button
+                android:id="@+id/button6"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:text="@string/blank" />
+
+            <Button
+                android:id="@+id/btn_clear_all"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clear_all"
+                android:textAllCaps="false" />
+
+        </TableRow>
+
+    </TableLayout>
 
     <TextView
         android:id="@+id/guess"
@@ -118,7 +131,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:gravity="top|left"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/input_Table"
         app:layout_constraintEnd_toEndOf="parent"
@@ -138,7 +150,7 @@
         android:layout_height="0dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/draw_btn_linear"
+        app:layout_constraintBottom_toTopOf="@+id/memo_colors"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -155,7 +167,7 @@
         android:layout_weight="1"
         android:text="@string/memo"
         app:backgroundTint="#E3A7A7"
-        app:layout_constraintEnd_toEndOf="@+id/draw_btn_linear"
+        app:layout_constraintEnd_toEndOf="@+id/memo_colors"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TableLayout
