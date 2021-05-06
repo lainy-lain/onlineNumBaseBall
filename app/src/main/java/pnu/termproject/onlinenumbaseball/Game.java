@@ -198,8 +198,8 @@ public class Game extends AppCompatActivity{
         btn_memo.setTextColor(colors[10]);
         btn_memo.setBackgroundTintList(colors[4]);
         ((MaterialButton)btn_memo).setCornerRadius(cornerRadius);
-        btn_clear.setTextColor(colors[9]);
-        btn_clear.setBackgroundTintList(colors[3]);
+        btn_clear.setTextColor(colors[11]);
+        btn_clear.setBackgroundTintList(colors[5]);
         ((MaterialButton)btn_clear).setCornerRadius(cornerRadius);
         for (int i = 0; i < 6; i++) {
             if (i == 5) {
