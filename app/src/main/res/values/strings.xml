@@ -37,8 +37,7 @@
     <string name="mean_time">평균 클리어 시간</string>
     <string name="mean_turn">평균 클리어 턴 수</string>
     <string name="turn">Turn : 1</string>
-    <string name="clear_draws">Clear Draws</string>
-    <string name="clear_all">Clear All</string>
+    <string name="clear">Clear</string>
     <string name="memo">메모</string>
     <string name="confirm_short">확인</string>
     <string name="cancel_short">취소</string>
@@ -61,6 +60,6 @@
     <string name="mean_time_">평균 클리어 시간 :</string>
     <string name="mean_turn_">평균 클리어 턴 수 :</string>
     <string name="loading">Loading...</string>
-    <string name="guess">0 1 2 3 4 5 6 7 8 9\n\n___ ___ ___</string>
-    <string name="eraser">지우개</string>
+    <string name="guess">0 1 2 3 4 5 6 7 8 9</string>
+    <string name="back">되돌리기</string>
 </resources>
