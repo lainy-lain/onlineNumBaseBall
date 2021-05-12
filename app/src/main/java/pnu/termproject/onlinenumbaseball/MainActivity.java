@@ -192,6 +192,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             toGame.putExtra("ballNumber", ballNumber[0]);
             startActivity(toGame);
         });
+
+        multi_btn.setOnClickListener(v -> {
+            Intent toMulGame = new Intent(getApplicationContext(), MultiList.class);
+            startActivity(toMulGame);
+        });
         //수정한 부분의 끝입니다!
 
         set_btn.setOnClickListener(v -> {
