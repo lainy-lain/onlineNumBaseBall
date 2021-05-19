@@ -29,20 +29,23 @@ public class Room {
 
     // 유저 퇴장, 방에 2명 있을 때
     // 1명 있을 때는 방을 없애야 함
-    public void exitUser(String userId) {
+    public boolean exitUser(String userId) {
         if (userId.equals(user1Id)) { // 1 자리에 있을 때
             user1State = false;
             if (owner == 1) { // 방장이었으면 넘겨주기
                 owner = 2;
+                return true;
             }
         }
         else {
             user2State = false;
             if (owner == 2) {
                 owner = 1;
+                return true;
             }
         }
         numUser--;
+        return false;
     }
 
     public String getRoomName() {

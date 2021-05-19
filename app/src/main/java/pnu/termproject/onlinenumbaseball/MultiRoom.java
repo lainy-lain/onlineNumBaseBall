@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.INotificationSideChannel;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -72,12 +73,54 @@ public class MultiRoom extends AppCompatActivity {
         tv_roomName.setText(roomName);
     }
 
+    private void setVisibilities() {
+        if (currentRoom.user1State()) {
+            findViewById(R.id.user1).setVisibility(View.VISIBLE);
+        }
+        else {
+            findViewById(R.id.user1).setVisibility(View.INVISIBLE);
+        }
+        if (currentRoom.user2State()) {
+            findViewById(R.id.user2).setVisibility(View.VISIBLE);
+        }
+        else {
+            findViewById(R.id.user2).setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void ownerChanged() {
+        findViewById(R.id.player).setVisibility(View.INVISIBLE);
+        findViewById(R.id.owner).setVisibility(View.VISIBLE);
+    }
+
+    private void notifyUpdate() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds: snapshot.getChildren()) {
+                    if (ds.hasChild("roomName") && roomName.equals(ds.child("roomName").getValue())) {
+                        currentRoom = ds.getValue(Room.class);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        setVisibilities();
+    }
+
     private void updateRoom(Room room) {
         reference.child(room.getRoomName()).setValue(room);
+        notifyUpdate();
     }
     private void deleteRoom(String roomName) {
         reference.child(roomName).setValue(null);
     }
+
     @Override
     public void onBackPressed() {
         if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
@@ -87,24 +130,15 @@ public class MultiRoom extends AppCompatActivity {
             return;
         }
         else {
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (currentRoom.getNumUser() == 1) {
-                        deleteRoom(currentRoom.getRoomName());
-                    }
-                    else {
-                        currentRoom.exitUser(currentUser.getUid());
-                        updateRoom(currentRoom);
-                    }
+            if (currentRoom.getNumUser() == 1) {
+                deleteRoom(currentRoom.getRoomName());
+            }
+            else {
+                if (currentRoom.exitUser(currentUser.getUid())) {
+                    ownerChanged();
                 }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
+                updateRoom(currentRoom);
+            }
             super.onBackPressed();
         }
     }
