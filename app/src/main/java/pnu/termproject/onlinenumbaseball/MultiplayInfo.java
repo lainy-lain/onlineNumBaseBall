@@ -3,17 +3,17 @@ package pnu.termproject.onlinenumbaseball;
 public class MultiplayInfo {
     private String player1 = null; // 방장 uid
     private String player2 = null; // guest uid
-    private boolean isP1Input = false; // 초기 숫자 입력 여부
-    private boolean isP2Input = false;
     private String whosTurn = null; // player uid로 구별
     private boolean isEnd = false; // 한사람이 숫자 맞추면 게임 종료
     // 플레이 정보
     private String p1_inputNum = null;
     private int p1_time = 0;
     private int p1_turn = 0;
+    private String p1_status = null; // "1B 1S 이런 정보를 담음"
     private String p2_inputNum = null;
     private int p2_time = 0;
     private int p2_turn = 0;
+    private String p2_status = null;
 
     public MultiplayInfo() {
 
@@ -34,22 +34,6 @@ public class MultiplayInfo {
 
     public void setPlayer2(String player2) {
         this.player2 = player2;
-    }
-
-    public boolean isP1Input() {
-        return isP1Input;
-    }
-
-    public void setP1Input(boolean p1Input) {
-        isP1Input = p1Input;
-    }
-
-    public boolean isP2Input() {
-        return isP2Input;
-    }
-
-    public void setP2Input(boolean p2Input) {
-        isP2Input = p2Input;
     }
 
     public String getWhosTurn() {
@@ -114,6 +98,22 @@ public class MultiplayInfo {
 
     public void setP2_turn(int p2_turn) {
         this.p2_turn = p2_turn;
+    }
+
+    public String getP1_status() {
+        return p1_status;
+    }
+
+    public void setP1_status(String p1_status) {
+        this.p1_status = p1_status;
+    }
+
+    public String getP2_status() {
+        return p2_status;
+    }
+
+    public void setP2_status(String p2_status) {
+        this.p2_status = p2_status;
     }
 /***********************************************/
 }
