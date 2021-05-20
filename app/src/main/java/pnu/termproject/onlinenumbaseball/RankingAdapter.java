@@ -2,6 +2,7 @@ package pnu.termproject.onlinenumbaseball;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,19 +20,20 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.CustomVi
 
     private ArrayList<User> arrayList;
     private Context context;
+    private ColorStateList tx;
 
-    public RankingAdapter(ArrayList<User> arrayList, Context context) {
+    public RankingAdapter(ArrayList<User> arrayList, Context context, ColorStateList tx) {
         this.arrayList = arrayList;
         this.context = context;
+        this.tx = tx;
     }
 
     @NonNull
     @Override
     public CustomViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_ranking, parent, false);
-        CustomViewHolder holder = new CustomViewHolder(view);
 
-        return holder;
+        return new CustomViewHolder(view);
     }
 
     @Override
@@ -44,12 +46,16 @@ public class RankingAdapter extends RecyclerView.Adapter<RankingAdapter.CustomVi
         holder.tv_userName.setText(arrayList.get(position).getUserName());
 
         long meanTime = (long)arrayList.get(position).getMeanTime();
-        String str_meanTime =  "평균 클리어 시간 : " + String.valueOf(meanTime / 60) + "분 " +
-                String.valueOf(meanTime % 60) + "초";
+        String str_meanTime =  "평균 클리어 시간 : " + (meanTime / 60) + "분 " +
+                (meanTime % 60) + "초";
         @SuppressLint("DefaultLocale")
         String str_meanTurn = String.format("평균 클리어 턴 수 : %.2f", arrayList.get(position).getMeanTurn());
         holder.tv_meanTime.setText(str_meanTime);
         holder.tv_meanTurn.setText(str_meanTurn);
+        holder.tv_ranking.setTextColor(tx);
+        holder.tv_userName.setTextColor(tx);
+        holder.tv_meanTime.setTextColor(tx);
+        holder.tv_meanTurn.setTextColor(tx);
     }
 
     @Override

@@ -1,10 +1,14 @@
 package pnu.termproject.onlinenumbaseball;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.os.Build;
 import android.os.Bundle;
 import android.renderscript.Sampler;
 import android.view.View;
@@ -37,6 +41,7 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
     private TextView tv_avgTurn;
     private String mode;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,9 +72,29 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
         TextView tv_clearTurn = findViewById(R.id.tv_clearTurn);
         Button btn_gotoLobby = findViewById(R.id.btn_gotoLobby);
 
-        String clearTimeStr = String.valueOf(clearTime / 60) + "분 " + String.valueOf(clearTime % 60) + "초";
+        String clearTimeStr = (clearTime / 60) + "분 " + (clearTime % 60) + "초";
         tv_clearTime.setText(clearTimeStr);
         tv_clearTurn.setText(String.valueOf(clearTurn));
+
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        btn_gotoLobby.setBackgroundTintList(colors[0]);
+        btn_gotoLobby.setTextColor(colors[2]);
+        btn_gotoLobby.getRootView().setBackgroundTintList(colors[1]);
+        tv_avgTime.setTextColor(colors[3]);
+        tv_avgTurn.setTextColor(colors[3]);
+        tv_clearTime.setTextColor(colors[3]);
+        tv_clearTurn.setTextColor(colors[3]);
+        ((TextView)findViewById(R.id.tv_gameInfo)).setTextColor(colors[3]);
+        ((TextView)findViewById(R.id.tv_dbInfo)).setTextColor(colors[3]);
+        ((TextView)findViewById(R.id.tv_time)).setTextColor(colors[3]);
+        ((TextView)findViewById(R.id.tv_turn)).setTextColor(colors[3]);
+        ((TextView)findViewById(R.id.tv_dbTime)).setTextColor(colors[3]);
+        ((TextView)findViewById(R.id.tv_dbTurn)).setTextColor(colors[3]);
 
         btn_gotoLobby.setOnClickListener(v -> finish());
     }
@@ -149,20 +174,10 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
     @SuppressLint("DefaultLocale")
     private void updateDBwithClass(User user){
         mDatabase.child(mode).child(currentUser.getUid()).setValue(user)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(SingleRankingUpdateActivity.this, "DB 업데이트 성공", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(SingleRankingUpdateActivity.this, "에러 발생. DB 업데이트 실패", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                .addOnSuccessListener(aVoid -> Toast.makeText(SingleRankingUpdateActivity.this, "DB 업데이트 성공", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(SingleRankingUpdateActivity.this, "에러 발생. DB 업데이트 실패", Toast.LENGTH_SHORT).show());
 
-        String meanTimeStr = String.valueOf((long)user.getMeanTime() / 60) + "분 " + String.valueOf((long)user.getMeanTime() % 60) + "초";
+        String meanTimeStr = ((long)user.getMeanTime() / 60) + "분 " + ((long)user.getMeanTime() % 60) + "초";
         tv_avgTime.setText(meanTimeStr);
         tv_avgTurn.setText(String.format("%.2f", user.getMeanTurn()));
     }

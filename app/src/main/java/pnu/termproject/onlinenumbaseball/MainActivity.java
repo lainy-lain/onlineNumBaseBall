@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Image Load를 도와주는 Glide 이용
         Glide.with(this).load(photoUrl).into(iv_profile); // profile URL을 Image View에 세팅
 
+        // 설정한 색들 버튼에 세팅
         SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
         ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
                 ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
@@ -144,15 +145,16 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ((MaterialButton)multi_btn).setCornerRadius(cornerRadius);
         ((MaterialButton)rank_btn).setCornerRadius(cornerRadius);
         ((MaterialButton)set_btn).setCornerRadius(cornerRadius);
-
-
-        // logout, 탈퇴, 랭킹 버튼 눌렀을때 어떤 method를 수행할지를 설정하는 부분 (setOnClickListener)
         Button logout_btn = findViewById(R.id.logout_btn);
         Button revoke_btn = findViewById(R.id.revoke_btn);
+        ((MaterialButton)logout_btn).setCornerRadius(cornerRadius);
+        ((MaterialButton)revoke_btn).setCornerRadius(cornerRadius);
+
+        // logout, 탈퇴, 랭킹 버튼 눌렀을때 어떤 method를 수행할지를 설정하는 부분 (setOnClickListener)
+
         logout_btn.setOnClickListener(v -> signOut());
         revoke_btn.setOnClickListener(v -> revokeAccess());
         rank_btn.setOnClickListener(v -> gotoRanking());
-
 
         play_btn.setOnClickListener(new View.OnClickListener() {
             boolean state = false;
@@ -189,6 +191,11 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             Intent toGame = new Intent(getApplicationContext(), Game.class);
             toGame.putExtra("ballNumber", ballNumber[0]);
             startActivity(toGame);
+        });
+
+        multi_btn.setOnClickListener(v -> {
+            Intent toMulGame = new Intent(getApplicationContext(), MultiList.class);
+            startActivity(toMulGame);
         });
         //수정한 부분의 끝입니다!
 
@@ -290,6 +297,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if (loginSuccess) {
             FirebaseAuth.getInstance().signOut(); // Firebase에서 로그아웃. Google에선 로그아웃되지 않음.
             Toast.makeText(MainActivity.this, "로그인 정보가 저장됩니다", Toast.LENGTH_SHORT).show(); // 토스트 문자 짧게 출력
+            // 로그인한 채로 설정했을 때도 뒤로가기 버튼 누르면 바로 적용되도록
             Intent intent = new Intent();
             SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
             intent.putExtra("btn1bg", sp.getInt("btn1bg", 0xFFFFEB3B));
@@ -304,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             intent.putExtra("btn5tx", sp.getInt("btn5tx", 0xFFFFFFFF));
             intent.putExtra("btnbgbg", sp.getInt("btnbgbg", 0xFFFFFFFF));
             intent.putExtra("btnbgtx", sp.getInt("btnbgtx", 0xFF000000));
+            intent.putExtra("radius", sp.getInt("radius", 0));
             setResult(RESULT_OK, intent);
         }
         super.onBackPressed();

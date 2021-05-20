@@ -184,352 +184,399 @@
                 app:backgroundTint="#FFFFFF" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/colorPosition"
+        <FrameLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fadeScrollbars="false"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/colorKind"
-                android:layout_width="320dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/btn1guide"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="@string/btn1guide" />
+
+                <TextView
+                    android:id="@+id/btn2guide"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="@string/btn2guide" />
+
+                <TextView
+                    android:id="@+id/btn3guide"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="@string/btn3guide" />
+
+                <TextView
+                    android:id="@+id/btn4guide"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="@string/btn4guide" />
+
+                <TextView
+                    android:id="@+id/btn5guide"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:text="@string/btn5guide" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/colorPosition"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fadeScrollbars="false"
                 android:gravity="center"
-                android:orientation="vertical"
-                android:visibility="invisible">
+                android:orientation="vertical">
 
                 <LinearLayout
-                    android:id="@+id/simpleColors"
+                    android:id="@+id/colorKind"
+                    android:layout_width="320dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:visibility="invisible">
+
+                    <LinearLayout
+                        android:id="@+id/simpleColors"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center">
+
+                        <Button
+                            android:id="@+id/black"
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:text="@string/blank"
+                            android:textColor="#000000"
+                            app:backgroundTint="#000000" />
+
+                        <Button
+                            android:id="@+id/red"
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:minWidth="40dip"
+                            android:text="@string/reds"
+                            android:textAllCaps="false"
+                            android:textColor="#FFFFFF"
+                            app:backgroundTint="#ff0000" />
+
+                        <Button
+                            android:id="@+id/green"
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:minWidth="40dip"
+                            android:text="@string/greens"
+                            android:textAllCaps="false"
+                            android:textColor="#FFFFFF"
+                            app:backgroundTint="#00ff00" />
+
+                        <Button
+                            android:id="@+id/blue"
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:minWidth="40dip"
+                            android:text="@string/blues"
+                            android:textAllCaps="false"
+                            android:textColor="#FFFFFF"
+                            app:backgroundTint="#0000ff" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/complexColors"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center">
+
+                        <Button
+                            android:id="@+id/other"
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:minWidth="40dip"
+                            android:text="@string/others"
+                            android:textAllCaps="false"
+                            android:textColor="#000000"
+                            app:backgroundTint="#ffffff" />
+
+                        <Button
+                            android:id="@+id/yellow"
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:minWidth="40dip"
+                            android:text="@string/yellows"
+                            android:textAllCaps="false"
+                            android:textColor="#000000"
+                            app:backgroundTint="#ffff00" />
+
+                        <Button
+                            android:id="@+id/cyan"
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:minWidth="40dip"
+                            android:text="@string/cyans"
+                            android:textAllCaps="false"
+                            android:textColor="#000000"
+                            app:backgroundTint="#00ffff" />
+
+                        <Button
+                            android:id="@+id/magenta"
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="40dp"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:minWidth="40dip"
+                            android:text="@string/magentas"
+                            android:textAllCaps="false"
+                            android:textColor="#000000"
+                            app:backgroundTint="#ff00ff" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/greens"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center">
+                    android:orientation="horizontal"
+                    android:visibility="invisible">
 
                     <Button
-                        android:id="@+id/black"
+                        android:id="@+id/color00ff00"
                         style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:text="@string/blank"
-                        android:textColor="#000000"
-                        app:backgroundTint="#000000" />
-
-                    <Button
-                        android:id="@+id/red"
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:minWidth="40dip"
-                        android:text="@string/reds"
-                        android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
-                        app:backgroundTint="#ff0000" />
-
-                    <Button
-                        android:id="@+id/green"
-                        style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="40dp"
-                        android:insetTop="0dp"
-                        android:insetBottom="0dp"
-                        android:minWidth="40dip"
-                        android:text="@string/greens"
-                        android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#00ff00"
                         app:backgroundTint="#00ff00" />
 
                     <Button
-                        android:id="@+id/blue"
+                        android:id="@+id/color00cc00"
                         style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:minWidth="40dip"
-                        android:text="@string/blues"
-                        android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
-                        app:backgroundTint="#0000ff" />
+                        android:text="@string/blank"
+                        android:textColor="#00cc00"
+                        app:backgroundTint="#00cc00" />
+
+                    <Button
+                        android:id="@+id/color009900"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#009900"
+                        app:backgroundTint="#009900" />
+
+                    <Button
+                        android:id="@+id/color006600"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#006600"
+                        app:backgroundTint="#006600" />
+
+                    <Button
+                        android:id="@+id/color003300"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#003300"
+                        app:backgroundTint="#003300" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/complexColors"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center">
+                    android:id="@+id/blues"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="invisible">
 
                     <Button
-                        android:id="@+id/other"
+                        android:id="@+id/color0000ff"
                         style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:minWidth="40dip"
-                        android:text="@string/others"
-                        android:textAllCaps="false"
-                        android:textColor="#000000"
-                        app:backgroundTint="#ffffff" />
+                        android:text="@string/blank"
+                        android:textColor="#0000ff"
+                        app:backgroundTint="#0000ff" />
 
                     <Button
-                        android:id="@+id/yellow"
+                        android:id="@+id/color0000cc"
                         style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:minWidth="40dip"
-                        android:text="@string/yellows"
-                        android:textAllCaps="false"
-                        android:textColor="#000000"
-                        app:backgroundTint="#ffff00" />
+                        android:text="@string/blank"
+                        android:textColor="#0000cc"
+                        app:backgroundTint="#0000cc" />
 
                     <Button
-                        android:id="@+id/cyan"
+                        android:id="@+id/color000099"
                         style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:minWidth="40dip"
-                        android:text="@string/cyans"
-                        android:textAllCaps="false"
-                        android:textColor="#000000"
-                        app:backgroundTint="#00ffff" />
+                        android:text="@string/blank"
+                        android:textColor="#000099"
+                        app:backgroundTint="#000099" />
 
                     <Button
-                        android:id="@+id/magenta"
+                        android:id="@+id/color000066"
                         style="?android:attr/buttonBarButtonStyle"
-                        android:layout_width="wrap_content"
+                        android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
-                        android:minWidth="40dip"
-                        android:text="@string/magentas"
-                        android:textAllCaps="false"
-                        android:textColor="#000000"
-                        app:backgroundTint="#ff00ff" />
+                        android:text="@string/blank"
+                        android:textColor="#000066"
+                        app:backgroundTint="#000066" />
+
+                    <Button
+                        android:id="@+id/color000033"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#000033"
+                        app:backgroundTint="#000033" />
                 </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/reds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:visibility="invisible">
+
+                    <Button
+                        android:id="@+id/colorff0000"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#FF0000"
+                        app:backgroundTint="#ff0000" />
+
+                    <Button
+                        android:id="@+id/colorcc0000"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#cc0000"
+                        app:backgroundTint="#cc0000" />
+
+                    <Button
+                        android:id="@+id/color990000"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#990000"
+                        app:backgroundTint="#990000" />
+
+                    <Button
+                        android:id="@+id/color660000"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#660000"
+                        app:backgroundTint="#660000" />
+
+                    <Button
+                        android:id="@+id/color330000"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
+                        android:text="@string/blank"
+                        android:textColor="#330000"
+                        app:backgroundTint="#330000" />
+                </LinearLayout>
+
+                <ScrollView
+                    android:id="@+id/forY"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp"
+                    android:fadeScrollbars="true" />
+
+                <ScrollView
+                    android:id="@+id/forC"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp"
+                    android:fadeScrollbars="false" />
+
+                <ScrollView
+                    android:id="@+id/forM"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp"
+                    android:fadeScrollbars="false" />
+
+                <ScrollView
+                    android:id="@+id/forO"
+                    android:layout_width="wrap_content"
+                    android:layout_height="120dp"
+                    android:fadeScrollbars="false" />
+
             </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/greens"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="invisible">
-
-                <Button
-                    android:id="@+id/color00ff00"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#00ff00"
-                    app:backgroundTint="#00ff00" />
-
-                <Button
-                    android:id="@+id/color00cc00"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#00cc00"
-                    app:backgroundTint="#00cc00" />
-
-                <Button
-                    android:id="@+id/color009900"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#009900"
-                    app:backgroundTint="#009900" />
-
-                <Button
-                    android:id="@+id/color006600"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#006600"
-                    app:backgroundTint="#006600" />
-
-                <Button
-                    android:id="@+id/color003300"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#003300"
-                    app:backgroundTint="#003300" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/blues"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="invisible">
-
-                <Button
-                    android:id="@+id/color0000ff"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#0000ff"
-                    app:backgroundTint="#0000ff" />
-
-                <Button
-                    android:id="@+id/color0000cc"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#0000cc"
-                    app:backgroundTint="#0000cc" />
-
-                <Button
-                    android:id="@+id/color000099"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#000099"
-                    app:backgroundTint="#000099" />
-
-                <Button
-                    android:id="@+id/color000066"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#000066"
-                    app:backgroundTint="#000066" />
-
-                <Button
-                    android:id="@+id/color000033"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#000033"
-                    app:backgroundTint="#000033" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/reds"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:visibility="invisible">
-
-                <Button
-                    android:id="@+id/colorff0000"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#FF0000"
-                    app:backgroundTint="#ff0000" />
-
-                <Button
-                    android:id="@+id/colorcc0000"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#cc0000"
-                    app:backgroundTint="#cc0000" />
-
-                <Button
-                    android:id="@+id/color990000"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#990000"
-                    app:backgroundTint="#990000" />
-
-                <Button
-                    android:id="@+id/color660000"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#660000"
-                    app:backgroundTint="#660000" />
-
-                <Button
-                    android:id="@+id/color330000"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:text="@string/blank"
-                    android:textColor="#330000"
-                    app:backgroundTint="#330000" />
-            </LinearLayout>
-
-            <ScrollView
-                android:id="@+id/forY"
-                android:layout_width="wrap_content"
-                android:layout_height="120dp"
-                android:fadeScrollbars="true" />
-
-            <ScrollView
-                android:id="@+id/forC"
-                android:layout_width="wrap_content"
-                android:layout_height="120dp"
-                android:fadeScrollbars="false" />
-
-            <ScrollView
-                android:id="@+id/forM"
-                android:layout_width="wrap_content"
-                android:layout_height="120dp"
-                android:fadeScrollbars="false" />
-
-            <ScrollView
-                android:id="@+id/forO"
-                android:layout_width="wrap_content"
-                android:layout_height="120dp"
-                android:fadeScrollbars="false" />
-
-        </LinearLayout>
+        </FrameLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
