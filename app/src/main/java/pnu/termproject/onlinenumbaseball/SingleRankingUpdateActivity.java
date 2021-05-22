@@ -115,7 +115,9 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
                 break;
         }
 
+        // mode에 대한 DB reference를 가져온다
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference(mode);
+        // DB에서 현재 유저에 대한 데이터가 있는지 찾는다
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -144,7 +146,7 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
                     user.setAbility(meanTime + meanTurn);
                     user.setPlayCount(playCount);
 
-                    // DB에 값 갱신
+                    // DB에 값 갱신 (class 이용)
                     updateDBwithClass(user);
                 }
                 else{ // DB에 데이터가 없음. 새로 등록해야함.
@@ -167,16 +169,18 @@ public class SingleRankingUpdateActivity extends AppCompatActivity {
         user.setMeanTurn(clearTurn);
         user.setAbility(clearTime + clearTurn);
 
-        // DB에 값 갱신
+        // DB에 값 갱신 (class 이용)
         updateDBwithClass(user);
     }
 
     @SuppressLint("DefaultLocale")
     private void updateDBwithClass(User user){
+        // DB에 값 쓰기 (class 이용)
         mDatabase.child(mode).child(currentUser.getUid()).setValue(user)
                 .addOnSuccessListener(aVoid -> Toast.makeText(SingleRankingUpdateActivity.this, "DB 업데이트 성공", Toast.LENGTH_SHORT).show())
                 .addOnFailureListener(e -> Toast.makeText(SingleRankingUpdateActivity.this, "에러 발생. DB 업데이트 실패", Toast.LENGTH_SHORT).show());
 
+        // 화면에 기록 보여주기 위한 코드. DB와는 관련없음.
         String meanTimeStr = ((long)user.getMeanTime() / 60) + "분 " + ((long)user.getMeanTime() % 60) + "초";
         tv_avgTime.setText(meanTimeStr);
         tv_avgTurn.setText(String.format("%.2f", user.getMeanTurn()));
