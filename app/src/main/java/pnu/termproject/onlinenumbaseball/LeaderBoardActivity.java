@@ -135,6 +135,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser(); // 로그인 안돼있으면 null이다
         if (currentUser != null){ // 로그인 되어있는 경우
+            // DB에서 내 데이터를 가져온다
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -184,7 +185,7 @@ public class LeaderBoardActivity extends AppCompatActivity {
         // 전체 Ranking을 보여주기 위한 코드
         adapter_ranking = new RankingAdapter(arrayList_ranking, this, tx);
         recyclerView_ranking.setAdapter(adapter_ranking);
-
+        // ability를 기준으로 정렬된 데이터를 읽어오기 위한 코드
         Query query = databaseReference.orderByChild("ability");
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
