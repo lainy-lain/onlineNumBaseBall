@@ -21,14 +21,30 @@ import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 public class MultiplayActivity extends AppCompatActivity{
     //변수 선언
@@ -37,7 +53,7 @@ public class MultiplayActivity extends AppCompatActivity{
     private RadioButton[] radio_btn = new RadioButton[5];
     private Button[] btn_num = new Button[10];
     private Button btn_result, btn_cancel, btn_memo;
-    private TextView tv_turn;
+    private TextView tv_info;
     private Random random = new Random();
     private int strike, ball, turn;
     private ListView result_list;
@@ -45,10 +61,28 @@ public class MultiplayActivity extends AppCompatActivity{
     private Button btn_back;
     private Button btn_clear;
 
-    private String myUid; // 나의 UID
-    private String opponentUid; // 상대의 UID
-    private String roomId; // 방 ID, 방 제작자의 UID를 방 ID로 설정?
-    private boolean is_myTurn;
+    int[] ans; //맞춰야 할 정답
+    int[] input_num; //사용자가 선택한 정답
+
+    // 이전 activity로부터 전달받을 것들.
+    private String p1_nickname, p2_nickname;
+    private String p1_profileUrl, p2_profileUrl;
+    private String p1_id, p2_id;
+    private int ball_number;
+    // 게임 진행에 필요한 정보들
+    private int whosTurn; // 1이면 방장, 2면 게스트의 차례
+    private boolean isEnd;
+    private String p1_solNum, p2_solNum;
+    private String p1_inputNum, p2_inputNum;
+    private long p1_time, p2_time;
+    private int p1_turn, p2_turn;
+    private String p1_status, p2_status;
+    private String opponentInputNum; // 상대가 입력한 숫자
+
+    private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference DB_game = FirebaseDatabase.getInstance().getReference("GAME");
+
+
 
     private long startTime, endTime, clearTime; // 클리어 시간 측정을 위한 변수
     private long backKeyPressedTime = 0;
@@ -138,7 +172,7 @@ public class MultiplayActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.game);
+        setContentView(R.layout.activity_multi_play);
 
         //game.xml 의 값을 변수에 대입
         int[] radio_Id = {R.id.radioButton1, R.id.radioButton2, R.id.radioButton3, R.id.radioButton4, R.id.radioButton5};
@@ -154,7 +188,8 @@ public class MultiplayActivity extends AppCompatActivity{
         btn_cancel = findViewById(R.id.btn_cancel);
         btn_memo = findViewById(R.id.btn_memo);
         btn_clear = findViewById(R.id.btn_clear);
-        tv_turn = findViewById(R.id.turn_text);
+        // tv_turn = findViewById(R.id.turn_text);
+        tv_info = findViewById(R.id.text_info);
         result_list = findViewById(R.id.result_ListView);
         int[] memo_color_Id = {R.id.button1, R.id.button2, R.id.button3, R.id.button4, R.id.button5, R.id.button6};
         for (int i = 0; i < 6; i++) {
@@ -165,6 +200,12 @@ public class MultiplayActivity extends AppCompatActivity{
 
         rb_select = findViewById(R.id.radioButton1);
         radio_btn[0].setChecked(true);
+
+        // 데이터 초기화 해야함
+        Intent intent = getIntent();
+        ball_number = intent.getExtras().getInt("ballNumber");
+        ans       = new int[ball_number]; //맞춰야 할 정답
+        input_num = new int[ball_number]; //사용자가 선택한 정답
 
         // 설정 적용
         SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
@@ -183,8 +224,8 @@ public class MultiplayActivity extends AppCompatActivity{
         };
         int radiusChecked = sp.getInt("radius", 0);
         int cornerRadius = (radiusChecked + 1) * 8;
-        tv_turn.setTextColor(colors[11]);
-        tv_turn.getRootView().setBackgroundTintList(colors[5]);
+//        tv_turn.setTextColor(colors[11]);
+//        tv_turn.getRootView().setBackgroundTintList(colors[5]);
         for (int i = 0; i < 5; i++) {
             radio_btn[i].setTextColor(colors[6]);
         }
@@ -234,28 +275,10 @@ public class MultiplayActivity extends AppCompatActivity{
         };
         result_list.setAdapter(adapter);
 
-        //공의 개수에 따라서, 랜덤 변수를 생성하는 부분
-        Intent intent = getIntent();
-        int ball_number = intent.getExtras().getInt("ballNumber");
-        int[] ans = new int[ball_number]; //맞춰야 할 정답
-        int[] num = new int[ball_number]; //사용자가 선택한 정답
-        for(int i = 0; i < ball_number; i++) {
-            boolean isOverlap = false;
-            while(!isOverlap) {
-                ans[i] = random.nextInt(10);
-                isOverlap = true;
-                for(int j = 0; j < i; j++) {
-                    if(ans[i] == ans[j])
-                        isOverlap = false;
-                }
-            }
-            num[i] = -1;
-        }
+        // 라디오 버튼 갯수 설정
         for(int i = ball_number; i < 5; i++)
             radio_btn[i].setVisibility(View.INVISIBLE);
         turn = 1;
-
-        startTime = System.currentTimeMillis(); // 시간 측정 시작
 
         //라디오 버튼(몇번째 공을 선택했는지 구별)을 눌렀을때의 동작을 구현하는 코드
         rg_number.setOnCheckedChangeListener((radioGroup, i) -> rb_select = findViewById(i));
@@ -268,7 +291,7 @@ public class MultiplayActivity extends AppCompatActivity{
                 rb_select.setText(String.valueOf(tmp));
                 for(int i1 = 0; i1 < ball_number; i1++) {
                     if(rb_select == radio_btn[i1]) {
-                        num[i1] = tmp;
+                        input_num[i1] = tmp;
                         if (i1 < ball_number - 1) {
                             rb_select = radio_btn[i1 + 1];
                             rb_select.setChecked(true);
@@ -277,18 +300,155 @@ public class MultiplayActivity extends AppCompatActivity{
                     }
                 }
                 for(int i1 = 0; i1 < 10; i1++)
-                        btn_num[i1].setEnabled(true);
+                    btn_num[i1].setEnabled(true);
                 for(int i1 = 0; i1 < ball_number; i1++)
-                    if(num[i1] != -1)
-                        btn_num[num[i1]].setEnabled(false);
+                    if(input_num[i1] != -1)
+                        btn_num[input_num[i1]].setEnabled(false);
             });
         }
+
+
+        // 초기 숫자 결정
+        // 10초동안 초기 숫자를 선택가능
+        // 10초 후에 체크박스에 입력되어있는 숫자가 해답이 됨.
+        // 만약 숫자가 중복된다면, 중복되지 않게 숫자를 바꿈.
+        Timer init_timer = new Timer();
+        TimerTask init_task = new TimerTask() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void run() {
+                // 입력된 초기숫자를 받아서, 중복이 있으면 없도록 처리해줌
+                Integer[] inpNum = Arrays.stream(input_num).boxed().toArray(Integer[]::new);
+                Set<Integer> inpNumSet = new HashSet<>(Arrays.asList(inpNum));
+                boolean is_dup = false;
+
+                while (inpNumSet.size() < ball_number){ // 중복이 없어질때까지
+                    is_dup = true;
+                    int randomNum = random.nextInt(10);
+                    inpNumSet.add(randomNum);
+                }
+
+                String inpNum_str = "";
+                if (is_dup){
+                    Iterator<Integer> it = inpNumSet.iterator();
+                    while (it.hasNext()){
+                        inpNum_str += String.valueOf(it.next());
+                    }
+                }
+                else{
+                    for (int i : input_num){
+                        inpNum_str += String.valueOf(i);
+                    }
+                }
+                // 중복처리 완료
+
+                // DB에 입력한 초기 값 쓰기
+                if (Objects.equals(currentUser.getUid(), p1_id)){
+                    DB_game.child(p1_id).child("p1_inputNum").setValue(inpNum_str);
+                }
+                else{
+                    DB_game.child(p1_id).child("p2_inputNum").setValue(inpNum_str);
+                }
+
+                // 확인(제출) 버튼 다시 이용가능
+                btn_result.setVisibility(View.VISIBLE);
+                // input_num 초기화시켜야함.
+                // play();
+            }
+        };
+
+        btn_result.setVisibility(View.GONE); // 확인(제출) 버튼 사용불가
+        init_timer.schedule(init_task, 10000); // 10초 후에 이 타이머 스레드가 실행된다.
+
+
+        // 방장이 선공을 결정한다
+        if (currentUser.getUid().equals(p1_id)) { // 이 코드를 수행하는 것이 방장(p1) 이라면
+            int randomNum = random.nextInt(2) + 1;
+            switch (randomNum){
+                case 1:
+                    whosTurn = 1;
+                    break;
+                case 2:
+                    whosTurn = 2;
+                    break;
+                default:
+                    break;
+            }
+        }
+        DB_game.child(p1_id).child("whosTurn").setValue(whosTurn); // DB에 선공 데이터 갱신
+
+        // p1, p2 둘다에게 선공이 누구인지 알려야 하므로, DB에서 값을 읽어오는 코드 작성
+        DB_game.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    if (Objects.equals(ds.child("p1_id").getValue(), p1_id)){ // 이 snapshot이 현재 게임에 대한 data라면
+                        whosTurn = (int) ds.child("whosTurn").getValue();
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        // tv_info에 선공이 누군지 표시
+        String firstAttacker;
+        switch (whosTurn){
+            case 1:
+                firstAttacker = "선공:" + p1_nickname + "(P1)";
+                break;
+            case 2:
+                firstAttacker = "선공:" + p2_nickname + "(P2)";
+                break;
+            default:
+                firstAttacker = "error";
+                break;
+        }
+        tv_info.setText(firstAttacker);
+
+
+
+        // DB에서 상대방이 입력한 숫자를 받아온다
+        DB_game.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    if (Objects.equals(ds.child("p1_id").getValue(), p1_id)){ // 이 snapshot이 현재 게임에 대한 data라면
+                        if (currentUser.getUid().equals(p1_id)) { // 이 코드를 수행하는 것이 방장(p1) 이라면
+                            opponentInputNum = (String) ds.child("p2_solNum").getValue();
+                        }
+                        else{ // 방장이 아니라면
+                            opponentInputNum = (String) ds.child("p1_solNum").getValue();
+                        }
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        for(int i = 0; i < ball_number; i++) { // 상대방이 입력한 숫자(해답)을 배열에 저장
+            ans[i] = Integer.parseInt(opponentInputNum.substring(i, i+1));
+            input_num[i] = -1;
+        }
+
+
+
+
 
         //완료 버튼을 눌렀을때의 동작을 구현하는 코드
         btn_result.setOnClickListener(view -> {
             boolean triger = true;
             for(int i = 0; i < ball_number; i++){
-                if(num[i] == -1)
+                if(input_num[i] == -1)
                     triger = false;
             }
             if(triger) {
@@ -296,11 +456,11 @@ public class MultiplayActivity extends AppCompatActivity{
                 strike = 0;
                 ball = 0;
                 for (int i = 0; i < ball_number; i++) {
-                    if (ans[i] == num[i])
+                    if (ans[i] == input_num[i])
                         strike++;
                     else {
                         for (int j = 0; j < ball_number; j++) {
-                            if (ans[i] == num[j])
+                            if (ans[i] == input_num[j]) // 중복 허용할거면  i != j 조건도 있어야함
                                 ball++;
                         }
                     }
@@ -309,7 +469,7 @@ public class MultiplayActivity extends AppCompatActivity{
                 //진행상황을 기록하는 코드
                 String result = "";
                 for (int i = 0; i < ball_number; i++)
-                    result += String.valueOf(num[i]);
+                    result += String.valueOf(input_num[i]);
                 result += "\n" + strike + "S" + " " + ball + "B";
                 data.add(result);
                 adapter.notifyDataSetChanged();
@@ -328,11 +488,11 @@ public class MultiplayActivity extends AppCompatActivity{
                 } else {//다음 회를 준비하기 위한 코드
                     turn++;
                     String turnStr = "Turn : " + turn;
-                    tv_turn.setText(turnStr);
+                    // tv_turn.setText(turnStr);
                     rb_select = radio_btn[0];
                     rb_select.setChecked(true);
                     for (int i = 0; i < ball_number; i++) {
-                        num[i] = -1;
+                        input_num[i] = -1;
                         radio_btn[i].setText("");
                     }
                     for(int i = 0; i < 10; i++){
@@ -347,7 +507,7 @@ public class MultiplayActivity extends AppCompatActivity{
             rb_select = radio_btn[0];
             rb_select.setChecked(true);
             for (int i = 0; i < ball_number; i++) {
-                num[i] = -1;
+                input_num[i] = -1;
                 radio_btn[i].setText("");
             }
             for(int i = 0; i < 10; i++){
