@@ -13,6 +13,7 @@ public class Room {
     private int numUser = 1;
     private boolean user1State = true;
     private boolean user2State = false;
+    private boolean ownerChanged = false;
 
     public Room(String name, String userId, String userName, String userPhoto) {
         roomName = name;
@@ -42,23 +43,23 @@ public class Room {
 
     // 유저 퇴장, 방에 2명 있을 때
     // 1명 있을 때는 방을 없애야 함
-    public boolean exitUser(String userId) {
+    public void exitUser(String userId) {
         if (userId.equals(user1Id)) { // 1 자리에 있을 때
             user1State = false;
             if (owner == 1) { // 방장이었으면 넘겨주기
                 owner = 2;
-                return true;
+                ownerChanged = true;
             }
         }
         else {
             user2State = false;
             if (owner == 2) {
                 owner = 1;
-                return true;
+                ownerChanged = true;
             }
         }
         numUser--;
-        return false;
+        ownerChanged = false;
     }
 
     public String getRoomName() {
@@ -107,5 +108,12 @@ public class Room {
 
     public int getRoomId() {
         return roomId;
+    }
+
+    public void setOwnerChanged(boolean changed) {
+        ownerChanged = changed;
+    }
+    public boolean isOwnerChanged() {
+        return ownerChanged;
     }
 }

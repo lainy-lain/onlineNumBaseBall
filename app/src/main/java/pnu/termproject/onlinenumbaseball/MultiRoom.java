@@ -49,17 +49,19 @@ public class MultiRoom extends AppCompatActivity {
             roomIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    for (DataSnapshot ds: snapshot.getChildren()) {
-                        if (ds.getValue(RoomIdManage.class) == null) {
-                            roomIdManage = new RoomIdManage();
-                            roomId = roomIdManage.receiveId();
-                            updateRoomIds(roomIdManage);
-                        }
-                        else {
-                            roomIdManage = ds.getValue(RoomIdManage.class);
-                            roomId = roomIdManage.receiveId();
-                        }
+                    if (snapshot.getValue(RoomIdManage.class) == null) {
+                        roomIdManage = new RoomIdManage();
                     }
+                    else {
+                        roomIdManage = snapshot.getValue(RoomIdManage.class);
+                    }
+                    roomId = roomIdManage.receiveId();
+                    updateRoomIds(roomIdManage);
+                    currentRoom = new Room(roomName, uid, nickName, photoUrl);
+                    currentRoom.setRoomId(roomId);
+                    updateRoom(currentRoom);
+                    findViewById(R.id.user1).setVisibility(View.VISIBLE);
+                    findViewById(R.id.owner).setVisibility(View.VISIBLE);
                 }
 
                 @Override
@@ -67,17 +69,12 @@ public class MultiRoom extends AppCompatActivity {
 
                 }
             });
-            currentRoom = new Room(roomName, uid, nickName, photoUrl);
-            currentRoom.setRoomId(roomId);
-            updateRoom(currentRoom);
-            findViewById(R.id.user1).setVisibility(View.VISIBLE);
-            findViewById(R.id.owner).setVisibility(View.VISIBLE);
         }
         else {
             findViewById(R.id.user1).setVisibility(View.VISIBLE);
             findViewById(R.id.user2).setVisibility(View.VISIBLE);
             findViewById(R.id.player).setVisibility(View.VISIBLE);
-            roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            roomRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot ds: snapshot.getChildren()) {
@@ -87,7 +84,6 @@ public class MultiRoom extends AppCompatActivity {
                         }
                     }
                     currentRoom.addUser(uid, nickName, photoUrl);
-                    updateRoom(currentRoom);
                 }
 
                 @Override
@@ -99,6 +95,44 @@ public class MultiRoom extends AppCompatActivity {
 
         TextView tv_roomName = findViewById(R.id.room_name);
         tv_roomName.setText(roomName);
+
+        // 실시간 업데이트
+        roomRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds: snapshot.getChildren()) {
+                    if (ds.hasChild("roomId") && roomId == ds.child("roomId").getValue(Integer.class)) {
+                        currentRoom = ds.getValue(Room.class);
+                        if (currentRoom.isOwnerChanged()) {
+                            currentRoom.setOwnerChanged(false);
+                            updateRoom(currentRoom);
+                            ownerChanged();
+                        }
+                        break;
+                    }
+                }
+                if (currentRoom != null) {
+                    setVisibilities();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        roomIdRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                roomIdManage = snapshot.getValue(RoomIdManage.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void setVisibilities() {
@@ -121,29 +155,8 @@ public class MultiRoom extends AppCompatActivity {
         findViewById(R.id.owner).setVisibility(View.VISIBLE);
     }
 
-    private void notifyUpdate() {
-        roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds: snapshot.getChildren()) {
-                    if (ds.hasChild("roomId") && roomId == ds.child("roomId").getValue(Integer.class)) {
-                        currentRoom = ds.getValue(Room.class);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        setVisibilities();
-    }
-
     private void updateRoom(Room room) {
         roomRef.child("room" + room.getRoomId()).setValue(room);
-        notifyUpdate();
     }
     private void deleteRoom() {
         roomRef.child("room" + roomId).setValue(null);
@@ -167,9 +180,7 @@ public class MultiRoom extends AppCompatActivity {
                 deleteRoom();
             }
             else {
-                if (currentRoom.exitUser(currentUser.getUid())) {
-                    ownerChanged();
-                }
+                currentRoom.exitUser(currentUser.getUid());
                 updateRoom(currentRoom);
             }
             super.onBackPressed();
