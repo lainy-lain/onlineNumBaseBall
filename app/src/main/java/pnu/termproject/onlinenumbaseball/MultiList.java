@@ -36,7 +36,7 @@ public class MultiList extends AppCompatActivity {
     private Button btn_create, btn_quick;
     private DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("room");
     private String str_room;
-    private boolean isOrder; //대기방의 생성자인지, 참가자인지 구별하는 변수
+    private boolean isOwner; //대기방의 생성자인지, 참가자인지 구별하는 변수
 
     Map<String, Object> map = new HashMap<String, Object>();
 
@@ -117,10 +117,10 @@ public class MultiList extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 //☆☆☆☆☆☆☆☆두번째 수정해야 할 부분입니다. MainActivity부분만 수정해 주시면 됩니다☆☆☆☆☆☆☆☆
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                isOrder = false;
+                isOwner = false;
                 intent.putExtra("room-name", ((TextView) view).getText().toString().split("")[1]);
                 intent.putExtra("room-number", ((TextView) view).getText().toString().split("")[3]);
-                intent.putExtra("is-order", isOrder);
+                intent.putExtra("owner", isOwner);
                 startActivity(intent);
                 finish();
             }
