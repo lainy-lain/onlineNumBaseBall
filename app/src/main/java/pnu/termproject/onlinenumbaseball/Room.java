@@ -59,7 +59,6 @@ public class Room {
             }
         }
         numUser--;
-        ownerChanged = false;
     }
 
     public String getRoomName() {
@@ -78,11 +77,11 @@ public class Room {
         return numUser;
     }
 
-    public boolean user1State() {
+    public boolean getUser1State() {
         return user1State;
     }
 
-    public boolean user2State() {
+    public boolean getUser2State() {
         return user2State;
     }
 
@@ -113,7 +112,8 @@ public class Room {
     public void setOwnerChanged(boolean changed) {
         ownerChanged = changed;
     }
-    public boolean isOwnerChanged() {
+
+    public boolean getOwnerChanged() {
         return ownerChanged;
     }
 }

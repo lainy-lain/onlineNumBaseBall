@@ -38,7 +38,10 @@ public class MultiRoom extends AppCompatActivity {
         // 방 만들기 또는 방 입장으로 이 액티비티가 실행됨
         Intent intent = getIntent();
         String roomName = intent.getStringExtra("room name");
-        roomId = intent.getIntExtra("room id", 0);
+        String strRoomId = intent.getStringExtra("room id");
+        if (strRoomId != null) {
+            roomId = Integer.parseInt(strRoomId);
+        }
         boolean isOwner = intent.getBooleanExtra("owner", false);
 
         String uid = currentUser.getUid();
@@ -74,7 +77,7 @@ public class MultiRoom extends AppCompatActivity {
             findViewById(R.id.user1).setVisibility(View.VISIBLE);
             findViewById(R.id.user2).setVisibility(View.VISIBLE);
             findViewById(R.id.player).setVisibility(View.VISIBLE);
-            roomRef.addValueEventListener(new ValueEventListener() {
+            roomRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot ds: snapshot.getChildren()) {
@@ -83,7 +86,10 @@ public class MultiRoom extends AppCompatActivity {
                             break;
                         }
                     }
-                    currentRoom.addUser(uid, nickName, photoUrl);
+                    if (currentRoom != null) {
+                        currentRoom.addUser(uid, nickName, photoUrl);
+                        updateRoom(currentRoom);
+                    }
                 }
 
                 @Override
@@ -103,7 +109,7 @@ public class MultiRoom extends AppCompatActivity {
                 for (DataSnapshot ds: snapshot.getChildren()) {
                     if (ds.hasChild("roomId") && roomId == ds.child("roomId").getValue(Integer.class)) {
                         currentRoom = ds.getValue(Room.class);
-                        if (currentRoom.isOwnerChanged()) {
+                        if (currentRoom.getOwnerChanged()) {
                             currentRoom.setOwnerChanged(false);
                             updateRoom(currentRoom);
                             ownerChanged();
@@ -136,13 +142,13 @@ public class MultiRoom extends AppCompatActivity {
     }
 
     private void setVisibilities() {
-        if (currentRoom.user1State()) {
+        if (currentRoom.getUser1State()) {
             findViewById(R.id.user1).setVisibility(View.VISIBLE);
         }
         else {
             findViewById(R.id.user1).setVisibility(View.INVISIBLE);
         }
-        if (currentRoom.user2State()) {
+        if (currentRoom.getUser2State()) {
             findViewById(R.id.user2).setVisibility(View.VISIBLE);
         }
         else {
