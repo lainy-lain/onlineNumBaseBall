@@ -2,7 +2,6 @@ package pnu.termproject.onlinenumbaseball;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.icu.text.Edits;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,10 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,9 +35,7 @@ public class MultiList extends AppCompatActivity {
     private ListView listView;
     private Button btn_create, btn_quick;
     private DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("room");
-    private String str_name, str_room;
-    private FirebaseUser currentUser;
-    private User user;
+    private String str_room;
     private boolean isOrder; //대기방의 생성자인지, 참가자인지 구별하는 변수
 
     Map<String, Object> map = new HashMap<String, Object>();
@@ -101,7 +94,10 @@ public class MultiList extends AppCompatActivity {
                 Iterator i = snapshot.getChildren().iterator();
 
                 while(i.hasNext()){
-                    set.add(((DataSnapshot) i.next()).getKey());
+                    DataSnapshot tmp1 = (DataSnapshot) i.next();
+                    String tmp2 = "방이름: " + (tmp1).child("roomName").getValue().toString()
+                            + "\n" + "방번호: " + (tmp1).child("roomId").getValue().toString();
+                    set.add(tmp2);
                 }
 
                 arr_roomList.clear();
@@ -123,8 +119,9 @@ public class MultiList extends AppCompatActivity {
                 //☆☆☆☆☆☆☆☆두번째 수정해야 할 부분입니다. MainActivity부분만 수정해 주시면 됩니다☆☆☆☆☆☆☆☆
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                 isOrder = false;
-                intent.putExtra("room-name", ((TextView) view).getText().toString());
-                intent.putExtra("isOrder", isOrder);
+                intent.putExtra("room-name", ((TextView) view).getText().toString().split("")[1]);
+                intent.putExtra("room-number", ((TextView) view).getText().toString().split("")[3]);
+                intent.putExtra("is-order", isOrder);
                 startActivity(intent);
                 finish();
             }
