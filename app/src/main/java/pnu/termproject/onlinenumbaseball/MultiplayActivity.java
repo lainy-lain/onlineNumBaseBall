@@ -61,6 +61,7 @@ public class MultiplayActivity extends AppCompatActivity{
     private Button[] memo_color = new Button[6];
     private Button btn_back;
     private Button btn_clear;
+    private TextView guess;
 
     int[] ans; //맞춰야 할 정답
     int[] input_num; //사용자가 선택한 정답
@@ -72,20 +73,17 @@ public class MultiplayActivity extends AppCompatActivity{
     private int ball_number;
     // 게임 진행에 필요한 정보들
     private int whosTurn; // 1이면 방장, 2면 게스트의 차례
-    private boolean isEnd = false;
-    private String p1_solNum, p2_solNum;
-    private String p1_inputNum, p2_inputNum;
-    private String p1_status, p2_status;
-    private int p1_turn, p2_turn;
+//    private boolean isEnd = false;
+//    private String p1_solNum, p2_solNum;
+//    private String p1_inputNum, p2_inputNum;
+//    private String p1_status, p2_status;
+    // 필요하지만 DB에 R/W하지는 않는 변수들
     private String opponentInputNum; // 상대가 입력한 숫자
     private boolean isAlreadySubmit = false; // 내 턴을 소모했는가?
 
     private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     private DatabaseReference DB_game = FirebaseDatabase.getInstance().getReference("GAME");
 
-
-
-    private long startTime, endTime, clearTime; // 클리어 시간 측정을 위한 변수
     private long backKeyPressedTime = 0;
     private Toast toast;
 
@@ -95,79 +93,9 @@ public class MultiplayActivity extends AppCompatActivity{
     int color;
     ArrayList<Integer> lastDraw = new ArrayList<Integer>();
 
-    //메모 기능을 위한 클래스 2개
-    class Point{
-        float x;
-        float y;
-        boolean check;
-        int color;
+    // 설정(색깔) 관련한 변수 전역변수로 뺐습니다.
+    SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
 
-        public Point(float x, float y, boolean check, int color) {
-            this.x = x;
-            this.y = y;
-            this.check = check;
-            this.color = color;
-        }
-    }
-
-    class MyView extends View{
-        public MyView(Context context) {super(context);}
-        @Override
-        protected void onDraw(Canvas canvas) {
-            Paint p = new Paint();
-            p.setStrokeWidth(5);
-            for(int i=1; i<points.size(); i++){
-                p.setColor(points.get(i).color);
-                if(!points.get(i).check)
-                    continue;
-                canvas.drawLine(points.get(i-1).x,points.get(i-1).y,points.get(i).x,points.get(i).y,p);
-            }
-        }
-        @Override
-        public boolean onTouchEvent(MotionEvent event){
-            float x = event.getX();
-            float y = event.getY();
-
-            switch(event.getAction()){
-                case MotionEvent.ACTION_DOWN:
-                    points.add(new Point(x, y, false, color));
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    points.add(new Point(x, y, true, color));
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if (lastDraw.isEmpty()) {
-                        lastDraw.add(points.size());
-                    }
-                    else {
-                        int lastPointNum = 0;
-                        for (int i = 0; i < lastDraw.size(); i++) {
-                            lastPointNum = lastPointNum + lastDraw.get(i);
-                        }
-                        lastDraw.add(points.size() - lastPointNum);
-                    }
-                    break;
-            }
-            invalidate();
-            return true;
-        }
-    }
-
-    //뒤로가기 버튼 관련 설정
-    @Override
-    public void onBackPressed(){
-        if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
-            backKeyPressedTime = System.currentTimeMillis();
-            toast = Toast.makeText(this, "뒤로 가기 버튼을 한 번 더 누르시면 처음화면으로 돌아갑니다.", Toast.LENGTH_LONG);
-            toast.show();
-            return;
-        }
-        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
-        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지나지 않았으면 배경화면으로 돌아감
-        if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
-            super.onBackPressed();
-        }
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -178,12 +106,10 @@ public class MultiplayActivity extends AppCompatActivity{
         //game.xml 의 값을 변수에 대입
         int[] radio_Id = {R.id.radioButton1, R.id.radioButton2, R.id.radioButton3, R.id.radioButton4, R.id.radioButton5};
         int[] btn_Id = {R.id.btn_0, R.id.btn_1, R.id.btn_2, R.id.btn_3, R.id.btn_4, R.id.btn_5, R.id.btn_6, R.id.btn_7, R.id.btn_8, R.id.btn_9};
-        for(int i = 0; i < 5; i++) {
+        for(int i = 0; i < 5; i++)
             radio_btn[i] = findViewById(radio_Id[i]);
-        }
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < 10; i++)
             btn_num[i] = findViewById(btn_Id[i]);
-        }
         rg_number = findViewById(R.id.rg_number);
         btn_result = findViewById(R.id.btn_result);
         btn_cancel = findViewById(R.id.btn_cancel);
@@ -197,71 +123,36 @@ public class MultiplayActivity extends AppCompatActivity{
             memo_color[i] = findViewById(memo_color_Id[i]);
         }
         btn_back = findViewById(R.id.back);
-        TextView guess = findViewById(R.id.guess);
-
+        guess = findViewById(R.id.guess);
         rb_select = findViewById(R.id.radioButton1);
         radio_btn[0].setChecked(true);
 
+
+        // DB에 게임 방 생성 (방장(p1)이 생성)
+        if (Objects.equals(currentUser.getUid(), p1_id)){
+            // 게임이 진행되기 전에, 이 child에 대한 listener가 설정돼야 하므로
+            // 여기서 미리 초기화시켜두는 것이다.
+            DB_game.child(p1_id).child("p1_inputNum").setValue("init");
+            DB_game.child(p1_id).child("p2_inputNum").setValue("init");
+            DB_game.child(p1_id).child("p1_status").setValue("init");
+            DB_game.child(p1_id).child("p2_status").setValue("init");
+            DB_game.child(p1_id).child("isEnd").setValue(false);
+            DB_game.child(p1_id).child("whosTurn").setValue(0);
+        }
+
+
         // 데이터 초기화 해야함
+        // 공 갯수, 플레이어 2명의 정보를 이전 activity로부터 받아오면 됨
         Intent intent = getIntent();
         ball_number = intent.getExtras().getInt("ballNumber");
         ans       = new int[ball_number]; //맞춰야 할 정답
         input_num = new int[ball_number]; //사용자가 선택한 정답
 
-        // 설정 적용
-        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
-        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
-                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
-                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
-                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
-                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
-                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
-        };
-        int radiusChecked = sp.getInt("radius", 0);
-        int cornerRadius = (radiusChecked + 1) * 8;
-//        tv_turn.setTextColor(colors[11]);
-//        tv_turn.getRootView().setBackgroundTintList(colors[5]);
-        for (int i = 0; i < 5; i++) {
-            radio_btn[i].setTextColor(colors[6]);
-        }
-        rg_number.setBackgroundColor(sp.getInt("btn1bg", 0xFFFFEB3B));
-        for (int i = 0; i < 10; i++) {
-            btn_num[i].setTextColor(colors[7]);
-            btn_num[i].setBackgroundTintList(colors[1]);
-            ((MaterialButton)btn_num[i]).setCornerRadius(cornerRadius);
-        }
-        btn_result.setTextColor(colors[8]);
-        btn_result.setBackgroundTintList(colors[2]);
-        ((MaterialButton)btn_result).setCornerRadius(cornerRadius);
-        btn_cancel.setTextColor(colors[9]);
-        btn_cancel.setBackgroundTintList(colors[3]);
-        ((MaterialButton)btn_cancel).setCornerRadius(cornerRadius);
-        btn_memo.setTextColor(colors[10]);
-        btn_memo.setBackgroundTintList(colors[4]);
-        ((MaterialButton)btn_memo).setCornerRadius(cornerRadius);
-        btn_clear.setTextColor(colors[11]);
-        btn_clear.setBackgroundTintList(colors[5]);
-        ((MaterialButton)btn_clear).setCornerRadius(cornerRadius);
-        for (int i = 0; i < 6; i++) {
-            if (i == 5) {
-                memo_color[i].setBackgroundTintList(colors[11]);
-            }
-            else {
-                memo_color[i].setBackgroundTintList(colors[i]);
-            }
-            ((MaterialButton)memo_color[i]).setCornerRadius(cornerRadius);
-        }
-        btn_back.setBackgroundTintList(colors[5]);
-        btn_back.setTextColor(colors[11]);
-        ((MaterialButton)btn_back).setCornerRadius(cornerRadius);
-        guess.setTextColor(colors[11]);
-        color = colors[11].getDefaultColor();
+        // 플레이어 2명의 정보를 화면에 띄워야 함
+
+
+        // 설정
+        setting();
 
         //결과를 나타내는 리스트들을 위한 코드
         // recyclerView로 바꾸자...
@@ -358,13 +249,10 @@ public class MultiplayActivity extends AppCompatActivity{
                 playMultiGame();
             }
         };
-
         btn_result.setVisibility(View.GONE); // 확인(제출) 버튼 사용불가
         init_timer.schedule(init_task, 10000); // 10초 후에 이 타이머 스레드가 실행된다.
         tv_info.setText("당신의 숫자를 입력하세요");
 
-        
-        // 프로필/상태에 관한 리스너 설정해줘야 함
 
         // 이 아래는, 그냥 listener 설정만 해주는 것이다.
         //확인(제출) 버튼을 눌렀을때의 동작을 구현하는 코드
@@ -499,11 +387,11 @@ public class MultiplayActivity extends AppCompatActivity{
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if (Objects.equals(whosInput, "p2_inputNum")){ // 방장이 실행할 코드
-                    p2_inputNum = (String) snapshot.getValue();
+                    String p2_inputNum = (String) snapshot.getValue();
                     // 이걸 표시해줘야함 이제
                 }
                 else{ // guest가 실행할 코드
-                    p1_inputNum = (String) snapshot.getValue();
+                    String p1_inputNum = (String) snapshot.getValue();
                 }
             }
 
@@ -525,10 +413,10 @@ public class MultiplayActivity extends AppCompatActivity{
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 if (Objects.equals(whosStatus, "p2_status")){ // 방장이 실행할 코드
-                    p2_status = (String) snapshot.getValue();
+                    String p2_status = (String) snapshot.getValue();
                 }
                 else{ // guest가 실행할 코드
-                    p1_status = (String) snapshot.getValue();
+                    String p1_status = (String) snapshot.getValue();
                 }
             }
 
@@ -689,8 +577,7 @@ public class MultiplayActivity extends AppCompatActivity{
 
 
         if (ball_number == strike) { // 게임 종료. 승자만이 이 코드를 실행하게 된다.
-            isEnd = true;
-            DB_game.child(p1_id).child("isEnd").setValue(isEnd); // DB에 값 갱신
+            DB_game.child(p1_id).child("isEnd").setValue(true); // DB에 값 갱신
         }
         else{
             resetButton();
@@ -727,4 +614,140 @@ public class MultiplayActivity extends AppCompatActivity{
         }
         tv_info.setText(info);
     }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void setting(){
+        // 설정 적용
+        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
+                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
+                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
+                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        int radiusChecked = sp.getInt("radius", 0);
+        int cornerRadius = (radiusChecked + 1) * 8;
+//        tv_turn.setTextColor(colors[11]);
+//        tv_turn.getRootView().setBackgroundTintList(colors[5]);
+        for (int i = 0; i < 5; i++) {
+            radio_btn[i].setTextColor(colors[6]);
+        }
+        rg_number.setBackgroundColor(sp.getInt("btn1bg", 0xFFFFEB3B));
+        for (int i = 0; i < 10; i++) {
+            btn_num[i].setTextColor(colors[7]);
+            btn_num[i].setBackgroundTintList(colors[1]);
+            ((MaterialButton)btn_num[i]).setCornerRadius(cornerRadius);
+        }
+        btn_result.setTextColor(colors[8]);
+        btn_result.setBackgroundTintList(colors[2]);
+        ((MaterialButton)btn_result).setCornerRadius(cornerRadius);
+        btn_cancel.setTextColor(colors[9]);
+        btn_cancel.setBackgroundTintList(colors[3]);
+        ((MaterialButton)btn_cancel).setCornerRadius(cornerRadius);
+        btn_memo.setTextColor(colors[10]);
+        btn_memo.setBackgroundTintList(colors[4]);
+        ((MaterialButton)btn_memo).setCornerRadius(cornerRadius);
+        btn_clear.setTextColor(colors[11]);
+        btn_clear.setBackgroundTintList(colors[5]);
+        ((MaterialButton)btn_clear).setCornerRadius(cornerRadius);
+        for (int i = 0; i < 6; i++) {
+            if (i == 5) {
+                memo_color[i].setBackgroundTintList(colors[11]);
+            }
+            else {
+                memo_color[i].setBackgroundTintList(colors[i]);
+            }
+            ((MaterialButton)memo_color[i]).setCornerRadius(cornerRadius);
+        }
+        btn_back.setBackgroundTintList(colors[5]);
+        btn_back.setTextColor(colors[11]);
+        ((MaterialButton)btn_back).setCornerRadius(cornerRadius);
+        guess.setTextColor(colors[11]);
+        color = colors[11].getDefaultColor();
+    }
+
+
+    //메모 기능을 위한 클래스 2개
+    class Point{
+        float x;
+        float y;
+        boolean check;
+        int color;
+
+        public Point(float x, float y, boolean check, int color) {
+            this.x = x;
+            this.y = y;
+            this.check = check;
+            this.color = color;
+        }
+    }
+
+    class MyView extends View{
+        public MyView(Context context) {super(context);}
+        @Override
+        protected void onDraw(Canvas canvas) {
+            Paint p = new Paint();
+            p.setStrokeWidth(5);
+            for(int i=1; i<points.size(); i++){
+                p.setColor(points.get(i).color);
+                if(!points.get(i).check)
+                    continue;
+                canvas.drawLine(points.get(i-1).x,points.get(i-1).y,points.get(i).x,points.get(i).y,p);
+            }
+        }
+        @Override
+        public boolean onTouchEvent(MotionEvent event){
+            float x = event.getX();
+            float y = event.getY();
+
+            switch(event.getAction()){
+                case MotionEvent.ACTION_DOWN:
+                    points.add(new Point(x, y, false, color));
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    points.add(new Point(x, y, true, color));
+                    break;
+                case MotionEvent.ACTION_UP:
+                    if (lastDraw.isEmpty()) {
+                        lastDraw.add(points.size());
+                    }
+                    else {
+                        int lastPointNum = 0;
+                        for (int i = 0; i < lastDraw.size(); i++) {
+                            lastPointNum = lastPointNum + lastDraw.get(i);
+                        }
+                        lastDraw.add(points.size() - lastPointNum);
+                    }
+                    break;
+            }
+            invalidate();
+            return true;
+        }
+    }
+
+    //뒤로가기 버튼 관련 설정
+    @Override
+    public void onBackPressed(){
+        if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
+            backKeyPressedTime = System.currentTimeMillis();
+            toast = Toast.makeText(this, "뒤로 가기 버튼을 한 번 더 누르시면 처음화면으로 돌아갑니다.", Toast.LENGTH_LONG);
+            toast.show();
+            return;
+        }
+        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
+        // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지나지 않았으면 배경화면으로 돌아감
+        if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
+            super.onBackPressed();
+        }
+    }
+
 }
+
+
