@@ -65,12 +65,11 @@ public class MultiList extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         str_room = et_inDialog.getText().toString();
-                        isOrder = true;
-                        //☆☆☆☆☆☆☆☆첫번째 수정해야할 부분입니다! MainActivity부분을 수정해주세요☆☆☆☆☆☆☆☆
+                        isOwner = true;
 
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.putExtra("room-name", str_room);
-                        intent.putExtra("isOrder", isOrder);
+                        Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                        intent.putExtra("room name", str_room);
+                        intent.putExtra("owner", isOwner);
                         startActivity(intent);
                         finish();
                     }

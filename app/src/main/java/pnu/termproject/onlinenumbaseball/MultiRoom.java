@@ -5,9 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.INotificationSideChannel;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,10 +19,12 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MultiRoom extends AppCompatActivity {
     private FirebaseUser currentUser;
-    private DatabaseReference reference;
+    private DatabaseReference roomRef;
+    private DatabaseReference roomIdRef;
     private long backKeyPressedTime = 0;
-    private String roomName;
     private Room currentRoom;
+    private int roomId;
+    private RoomIdManage roomIdManage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,34 +32,58 @@ public class MultiRoom extends AppCompatActivity {
         setContentView(R.layout.activity_multi_room);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        reference = FirebaseDatabase.getInstance().getReference("room");
+        roomRef = FirebaseDatabase.getInstance().getReference("room");
+        roomIdRef = FirebaseDatabase.getInstance().getReference("room id manage");
 
         // 방 만들기 또는 방 입장으로 이 액티비티가 실행됨
         Intent intent = getIntent();
-        roomName = intent.getStringExtra("room name");
+        String roomName = intent.getStringExtra("room name");
+        roomId = intent.getIntExtra("room id", 0);
         boolean isOwner = intent.getBooleanExtra("owner", false);
 
+        String uid = currentUser.getUid();
+        String nickName = currentUser.getDisplayName();
+        String photoUrl = currentUser.getPhotoUrl().toString();
+
         if (isOwner) { // 만들어서 들어온 경우
-            currentRoom = new Room(roomName, currentUser.getUid());
-            updateRoom(currentRoom);
-            findViewById(R.id.user1).setVisibility(View.VISIBLE);
-            findViewById(R.id.owner).setVisibility(View.VISIBLE);
+            roomIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.getValue(RoomIdManage.class) == null) {
+                        roomIdManage = new RoomIdManage();
+                    }
+                    else {
+                        roomIdManage = snapshot.getValue(RoomIdManage.class);
+                    }
+                    roomId = roomIdManage.receiveId();
+                    updateRoomIds(roomIdManage);
+                    currentRoom = new Room(roomName, uid, nickName, photoUrl);
+                    currentRoom.setRoomId(roomId);
+                    updateRoom(currentRoom);
+                    findViewById(R.id.user1).setVisibility(View.VISIBLE);
+                    findViewById(R.id.owner).setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
         else {
             findViewById(R.id.user1).setVisibility(View.VISIBLE);
             findViewById(R.id.user2).setVisibility(View.VISIBLE);
             findViewById(R.id.player).setVisibility(View.VISIBLE);
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            roomRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for (DataSnapshot ds: snapshot.getChildren()) {
-                        if (ds.hasChild("roomName") && roomName.equals(ds.child("roomName").getValue())) {
+                        if (ds.hasChild("roomId") && roomId == ds.child("roomId").getValue(Integer.class)) {
                             currentRoom = ds.getValue(Room.class);
                             break;
                         }
                     }
-                    currentRoom.addUser(currentUser.getUid());
-                    updateRoom(currentRoom);
+                    currentRoom.addUser(uid, nickName, photoUrl);
                 }
 
                 @Override
@@ -71,6 +95,44 @@ public class MultiRoom extends AppCompatActivity {
 
         TextView tv_roomName = findViewById(R.id.room_name);
         tv_roomName.setText(roomName);
+
+        // 실시간 업데이트
+        roomRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds: snapshot.getChildren()) {
+                    if (ds.hasChild("roomId") && roomId == ds.child("roomId").getValue(Integer.class)) {
+                        currentRoom = ds.getValue(Room.class);
+                        if (currentRoom.isOwnerChanged()) {
+                            currentRoom.setOwnerChanged(false);
+                            updateRoom(currentRoom);
+                            ownerChanged();
+                        }
+                        break;
+                    }
+                }
+                if (currentRoom != null) {
+                    setVisibilities();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+        roomIdRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                roomIdManage = snapshot.getValue(RoomIdManage.class);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void setVisibilities() {
@@ -93,32 +155,16 @@ public class MultiRoom extends AppCompatActivity {
         findViewById(R.id.owner).setVisibility(View.VISIBLE);
     }
 
-    private void notifyUpdate() {
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds: snapshot.getChildren()) {
-                    if (ds.hasChild("roomName") && roomName.equals(ds.child("roomName").getValue())) {
-                        currentRoom = ds.getValue(Room.class);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-        setVisibilities();
-    }
-
     private void updateRoom(Room room) {
-        reference.child(room.getRoomName()).setValue(room);
-        notifyUpdate();
+        roomRef.child("room" + room.getRoomId()).setValue(room);
     }
-    private void deleteRoom(String roomName) {
-        reference.child(roomName).setValue(null);
+    private void deleteRoom() {
+        roomRef.child("room" + roomId).setValue(null);
+        roomIdManage.add(roomId);
+        updateRoomIds(roomIdManage);
+    }
+    private void updateRoomIds(RoomIdManage idManage) {
+        roomIdRef.setValue(idManage);
     }
 
     @Override
@@ -131,12 +177,10 @@ public class MultiRoom extends AppCompatActivity {
         }
         else {
             if (currentRoom.getNumUser() == 1) {
-                deleteRoom(currentRoom.getRoomName());
+                deleteRoom();
             }
             else {
-                if (currentRoom.exitUser(currentUser.getUid())) {
-                    ownerChanged();
-                }
+                currentRoom.exitUser(currentUser.getUid());
                 updateRoom(currentRoom);
             }
             super.onBackPressed();
