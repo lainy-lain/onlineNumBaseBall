@@ -1,28 +1,41 @@
 package pnu.termproject.onlinenumbaseball;
 
 public class Room {
+    private int roomId;
     private String roomName;
     private String user1Id;
     private String user2Id;
+    private String user1Name;
+    private String user2Name;
+    private String user1Photo;
+    private String user2Photo;
     private int owner = 1;
     private int numUser = 1;
     private boolean user1State = true;
     private boolean user2State = false;
 
-    public Room(String name, String userId) {
+    public Room(String name, String userId, String userName, String userPhoto) {
         roomName = name;
         user1Id = userId;
+        user1Name = userName;
+        user1Photo = userPhoto;
     }
 
+    public Room() {}
+
     // 유저 입장
-    public void addUser(String userId) {
+    public void addUser(String userId, String userName, String userPhoto) {
         if (user1State) {
             user2State = true;
             user2Id = userId;
+            user2Name = userName;
+            user2Photo = userPhoto;
         }
         else {
             user1State = true;
             user1Id = userId;
+            user1Name = userName;
+            user1Photo = userPhoto;
         }
         numUser++;
     }
@@ -60,17 +73,39 @@ public class Room {
         return user2Id;
     }
 
-    public int getOwner() {
-        return owner;
-    }
-
     public int getNumUser() {
         return numUser;
     }
 
-    public boolean user1State() { return user1State; }
+    public boolean user1State() {
+        return user1State;
+    }
 
     public boolean user2State() {
         return user2State;
+    }
+
+    public String getUser1Name() {
+        return user1Name;
+    }
+
+    public String getUser2Name() {
+        return user2Name;
+    }
+
+    public String getUser1Photo() {
+        return user1Photo;
+    }
+
+    public String getUser2Photo() {
+        return user2Photo;
+    }
+
+    public void setRoomId(int id) {
+        roomId = id;
+    }
+
+    public int getRoomId() {
+        return roomId;
     }
 }

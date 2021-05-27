@@ -2,7 +2,6 @@ package pnu.termproject.onlinenumbaseball;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.icu.text.Edits;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,9 +15,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -43,7 +39,7 @@ public class MultiList extends AppCompatActivity {
     private String str_name, str_room;
     private FirebaseUser currentUser;
     private User user;
-    private boolean isOrder; //대기방의 생성자인지, 참가자인지 구별하는 변수
+    private boolean isOwner; //대기방의 생성자인지, 참가자인지 구별하는 변수
 
     Map<String, Object> map = new HashMap<String, Object>();
 
@@ -72,12 +68,11 @@ public class MultiList extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         str_room = et_inDialog.getText().toString();
-                        isOrder = true;
-                        //☆☆☆☆☆☆☆☆첫번째 수정해야할 부분입니다! MainActivity부분을 수정해주세요☆☆☆☆☆☆☆☆
+                        isOwner = true;
 
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.putExtra("room-name", str_room);
-                        intent.putExtra("isOrder", isOrder);
+                        Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                        intent.putExtra("room name", str_room);
+                        intent.putExtra("owner", isOwner);
                         startActivity(intent);
                         finish();
                     }
@@ -120,11 +115,10 @@ public class MultiList extends AppCompatActivity {
             @Override
             //"방이름"과 "생성자 여부"를 전송합니다
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                //☆☆☆☆☆☆☆☆두번째 수정해야 할 부분입니다. MainActivity부분만 수정해 주시면 됩니다☆☆☆☆☆☆☆☆
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                isOrder = false;
-                intent.putExtra("room-name", ((TextView) view).getText().toString());
-                intent.putExtra("isOrder", isOrder);
+                Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                isOwner = false;
+                intent.putExtra("room name", ((TextView) view).getText().toString());
+                intent.putExtra("owner", isOwner);
                 startActivity(intent);
                 finish();
             }
