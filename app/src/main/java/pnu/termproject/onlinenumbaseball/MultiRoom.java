@@ -48,6 +48,7 @@ public class MultiRoom extends AppCompatActivity {
         Intent intent = getIntent();
         String roomName = intent.getStringExtra("room name");
         String strRoomId = intent.getStringExtra("room id");
+        int ball = intent.getIntExtra("ball", 0);
         if (strRoomId != null) {
             roomId = Integer.parseInt(strRoomId);
         }
@@ -71,6 +72,7 @@ public class MultiRoom extends AppCompatActivity {
                     updateRoomIds(roomIdManage);
                     currentRoom = new Room(roomName, uid, nickName, photoUrl);
                     currentRoom.setRoomId(roomId);
+                    currentRoom.setBall(ball);
                     updateRoom(currentRoom);
                     findViewById(R.id.user1).setVisibility(View.VISIBLE);
                     findViewById(R.id.owner).setVisibility(View.VISIBLE);
@@ -97,6 +99,14 @@ public class MultiRoom extends AppCompatActivity {
                         }
                     }
                     if (currentRoom != null) {
+                        int owner = currentRoom.getOwner();
+                        TextView roomOwner = findViewById(R.id.room_owner);
+                        if (owner == 1) {
+                            roomOwner.setText(currentRoom.getUser1Name());
+                        }
+                        else {
+                            roomOwner.setText(currentRoom.getUser2Name());
+                        }
                         currentRoom.addUser(uid, nickName, photoUrl);
                         updateRoom(currentRoom);
                     }
@@ -196,11 +206,6 @@ public class MultiRoom extends AppCompatActivity {
             toast.show();
             return;
         }
-        super.onBackPressed();
-    }
-
-    @Override
-    public void onDestroy() {
         if (currentRoom.getNumUser() == 1) {
             deleteRoom();
         }
@@ -208,7 +213,7 @@ public class MultiRoom extends AppCompatActivity {
             currentRoom.exitUser(currentUser.getUid());
             updateRoom(currentRoom);
         }
-        super.onDestroy();
+        super.onBackPressed();
     }
 
     public static class ClosingService extends Service {

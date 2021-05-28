@@ -14,6 +14,7 @@ public class Room {
     private boolean user1State = true;
     private boolean user2State = false;
     private boolean ownerChanged = false;
+    private int ball;
 
     public Room(String name, String userId, String userName, String userPhoto) {
         roomName = name;
@@ -115,5 +116,17 @@ public class Room {
 
     public boolean getOwnerChanged() {
         return ownerChanged;
+    }
+
+    public void setBall(int ballNum) {
+        ball = ballNum;
+    }
+
+    public int getBall() {
+        return ball;
+    }
+
+    public int getOwner() {
+        return owner;
     }
 }

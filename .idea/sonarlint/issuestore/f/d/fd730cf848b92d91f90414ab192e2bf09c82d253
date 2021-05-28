@@ -1,0 +1,39 @@
+
+E
+java:S3740""/Provide the parametrized type for this generic.(Æ¯°
+J
+java:S3740#"/Provide the parametrized type for this generic.(Ä©Åéüÿÿÿÿ
+f	java:S117="QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Œâ­´
+k	java:S117>"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ñ±èËúÿÿÿÿ
+k	java:S117?"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ğ´Îıÿÿÿÿ
+f	java:S117A"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ä†Ş°
+g	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(€—´
+N
+java:S1128"3Remove this unused import 'android.graphics.Color'.(øãíòşÿÿÿÿ
+I
+java:S1128".Remove this unused import 'android.view.View'.(Ø½­äşÿÿÿÿ
+{
+java:S1450("`Remove the "databaseReference" field and declare it as a local variable in the relevant methods.(Ï¨Î·ùÿÿÿÿ
+~
+java:S1450%"cRemove the "layoutManager_myInfo" field and declare it as a local variable in the relevant methods.(´ò¿Ñşÿÿÿÿ
+z
+java:S1450$"dRemove the "layoutManager_ranking" field and declare it as a local variable in the relevant methods.(ÂÿÏ¸
+y	java:S116 "_Rename this field "recyclerView_ranking" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ò ˜öüÿÿÿÿ
+s	java:S116!"^Rename this field "recyclerView_myInfo" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ŞÙôÛ
+o	java:S116""ZRename this field "adapter_ranking" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Æ¯°
+s	java:S116#"YRename this field "adapter_myInfo" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ä©Åéüÿÿÿÿ
+u	java:S116$"`Rename this field "layoutManager_ranking" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÂÿÏ¸
+y	java:S116%"_Rename this field "layoutManager_myInfo" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´ò¿Ñşÿÿÿÿ
+q	java:S116&"\Rename this field "arrayList_ranking" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(øÑ‚
+u	java:S116'"[Rename this field "arrayList_myInfo" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îÙÌçøÿÿÿÿ
+n	java:S116)"TRename this field "tv_lbMode" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(öòş¹ùÿÿÿÿ
+h
+java:S3776h"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(·Çñ€
+<
+java:S1659i"!Declare "str" on a separate line.(Üñã§şÿÿÿÿ
+˜
+java:S1186¦"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(Ô°¤¦
+˜
+java:S1186Ê"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(Ô°¤¦
+V
+java:S1161Ñ":Add the "@Override" annotation above this method signature(ˆñ‹ùÿÿÿÿ
