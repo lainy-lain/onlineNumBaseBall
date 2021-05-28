@@ -1,14 +1,20 @@
 package pnu.termproject.onlinenumbaseball;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Service;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -16,6 +22,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import org.w3c.dom.Text;
 
 public class MultiRoom extends AppCompatActivity {
     private FirebaseUser currentUser;
@@ -25,6 +33,7 @@ public class MultiRoom extends AppCompatActivity {
     private Room currentRoom;
     private int roomId;
     private RoomIdManage roomIdManage;
+    private String nickName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +54,7 @@ public class MultiRoom extends AppCompatActivity {
         boolean isOwner = intent.getBooleanExtra("owner", false);
 
         String uid = currentUser.getUid();
-        String nickName = currentUser.getDisplayName();
+        nickName = currentUser.getDisplayName();
         String photoUrl = currentUser.getPhotoUrl().toString();
 
         if (isOwner) { // 만들어서 들어온 경우
@@ -65,6 +74,7 @@ public class MultiRoom extends AppCompatActivity {
                     updateRoom(currentRoom);
                     findViewById(R.id.user1).setVisibility(View.VISIBLE);
                     findViewById(R.id.owner).setVisibility(View.VISIBLE);
+                    ((TextView)findViewById(R.id.room_owner)).setText(nickName);
                 }
 
                 @Override
@@ -144,12 +154,16 @@ public class MultiRoom extends AppCompatActivity {
     private void setVisibilities() {
         if (currentRoom.getUser1State()) {
             findViewById(R.id.user1).setVisibility(View.VISIBLE);
+            ((TextView)findViewById(R.id.user1_name)).setText(currentRoom.getUser1Name());
+            Glide.with(this).load(currentRoom.getUser1Photo()).into((ImageView)findViewById(R.id.user1_profile));
         }
         else {
             findViewById(R.id.user1).setVisibility(View.INVISIBLE);
         }
         if (currentRoom.getUser2State()) {
             findViewById(R.id.user2).setVisibility(View.VISIBLE);
+            ((TextView)findViewById(R.id.user2_name)).setText(currentRoom.getUser2Name());
+            Glide.with(this).load(currentRoom.getUser2Photo()).into((ImageView)findViewById(R.id.user2_profile));
         }
         else {
             findViewById(R.id.user2).setVisibility(View.INVISIBLE);
@@ -159,6 +173,7 @@ public class MultiRoom extends AppCompatActivity {
     private void ownerChanged() {
         findViewById(R.id.player).setVisibility(View.INVISIBLE);
         findViewById(R.id.owner).setVisibility(View.VISIBLE);
+        ((TextView)findViewById(R.id.room_owner)).setText(nickName);
     }
 
     private void updateRoom(Room room) {
@@ -181,15 +196,33 @@ public class MultiRoom extends AppCompatActivity {
             toast.show();
             return;
         }
+        super.onBackPressed();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (currentRoom.getNumUser() == 1) {
+            deleteRoom();
+        }
         else {
-            if (currentRoom.getNumUser() == 1) {
-                deleteRoom();
-            }
-            else {
-                currentRoom.exitUser(currentUser.getUid());
-                updateRoom(currentRoom);
-            }
-            super.onBackPressed();
+            currentRoom.exitUser(currentUser.getUid());
+            updateRoom(currentRoom);
+        }
+        super.onDestroy();
+    }
+
+    public static class ClosingService extends Service {
+
+        @Nullable
+        @Override
+        public IBinder onBind(Intent intent) {
+            return null;
+        }
+        @Override
+        public void onTaskRemoved(Intent rootIntent) {
+            super.onTaskRemoved(rootIntent);
+            onDestroy();
+            stopSelf();
         }
     }
 }
