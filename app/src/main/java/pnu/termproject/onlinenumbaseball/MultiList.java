@@ -108,7 +108,9 @@ public class MultiList extends AppCompatActivity {
                 while(i.hasNext()){
                     DataSnapshot tmp1 = (DataSnapshot) i.next();
                     String tmp2 = "방이름: " + (tmp1).child("roomName").getValue().toString()
-                            + "\n" + "방번호: " + (tmp1).child("roomId").getValue().toString();
+                            + " \n방번호: " + (tmp1).child("roomId").getValue().toString()
+                            + " \n방인원: " + (tmp1).child("numUser").getValue().toString()
+                            + " \n공개수: " + (tmp1).child("ball").getValue().toString();
                     set.add(tmp2);
                 }
 
@@ -128,13 +130,18 @@ public class MultiList extends AppCompatActivity {
             @Override
             //"방이름"과 "생성자 여부"를 전송합니다
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
-                isOwner = false;
-                intent.putExtra("room name", (((TextView) view).getText().toString().split(" ")[1]).split("\n")[0]);
-                intent.putExtra("room id", ((TextView) view).getText().toString().split(" ")[2]);
-                intent.putExtra("owner", isOwner);
-                startActivity(intent);
-                finish();
+                if(((TextView) view).getText().toString().split(" ")[5] != "2") {
+                    Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                    isOwner = false;
+                    intent.putExtra("room name", ((TextView) view).getText().toString().split(" ")[1]);
+                    intent.putExtra("room id", ((TextView) view).getText().toString().split(" ")[3]);
+                    intent.putExtra("owner", isOwner);
+                    startActivity(intent);
+                    finish();
+                }
+                else{
+                    Toast.makeText(MultiList.this, "방 인원이 모두 차있습니다", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
