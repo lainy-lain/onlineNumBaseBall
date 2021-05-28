@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -36,6 +37,7 @@ public class MultiList extends AppCompatActivity {
     private Button btn_create, btn_quick;
     private DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("room");
     private String str_room;
+    private int ball = 3;
     private boolean isOwner; //대기방의 생성자인지, 참가자인지 구별하는 변수
 
     Map<String, Object> map = new HashMap<String, Object>();
@@ -56,11 +58,21 @@ public class MultiList extends AppCompatActivity {
         btn_create.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+                ball = 3;
                 final EditText et_inDialog = new EditText(MultiList.this);
 
                 final AlertDialog.Builder builder = new AlertDialog.Builder(MultiList.this);
                 builder.setTitle("대기방 이름 입력");
                 builder.setView(et_inDialog);
+                builder.setMessage("공 개수 선택");
+                final String[] balls = new String[] {"3개", "4개", "5개"};
+                builder.setSingleChoiceItems(balls, 0, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ball = which + 3;
+                        Toast.makeText(MultiList.this, ball, Toast.LENGTH_LONG).show();
+                    }
+                });
                 builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
@@ -70,6 +82,7 @@ public class MultiList extends AppCompatActivity {
                         Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
                         intent.putExtra("room name", str_room);
                         intent.putExtra("owner", isOwner);
+                        intent.putExtra("ball", ball);
                         startActivity(intent);
                         finish();
                     }
