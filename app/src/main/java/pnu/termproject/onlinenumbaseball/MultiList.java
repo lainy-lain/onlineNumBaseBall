@@ -130,11 +130,11 @@ public class MultiList extends AppCompatActivity {
             @Override
             //"방이름"과 "생성자 여부"를 전송합니다
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(((TextView) view).getText().toString().split(" ")[3].split("\n")[0] != "2") {
+                if(((TextView) view).getText().toString().split(": ")[3].split("\n")[0] != "2") {
                     Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
                     isOwner = false;
                     intent.putExtra("room name", ((TextView) view).getText().toString().split(": ")[1].split("\n")[0]);
-                    intent.putExtra("room id", ((TextView) view).getText().toString().split(" ")[2].split("\n")[0]);
+                    intent.putExtra("room id", ((TextView) view).getText().toString().split(": ")[2].split("\n")[0]);
                     intent.putExtra("owner", isOwner);
                     startActivity(intent);
                     finish();
