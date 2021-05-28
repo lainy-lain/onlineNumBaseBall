@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startService(new Intent(this, ForcedTermination.class));
         setContentView(R.layout.activity_main);
 
         RadioGroup ballCount = findViewById(R.id.ball_count);

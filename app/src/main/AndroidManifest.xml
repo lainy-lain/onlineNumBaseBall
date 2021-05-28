@@ -12,10 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.OnlineNumBaseball">
 
-        <service
-            android:enabled="true"
-            android:name=".MultiRoom$ClosingService"
-            android:exported="false"
+        <service android:name=".ForcedTermination"
             android:stopWithTask="false" />
 
         <activity android:name=".MultiRoom" />
