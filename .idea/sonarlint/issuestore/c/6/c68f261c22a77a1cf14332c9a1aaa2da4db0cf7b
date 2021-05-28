@@ -1,0 +1,12 @@
+
+
+java:S1319"tThe type of the "arrayList" object should be an interface such as "List" rather than the implementation "ArrayList".(¿¿Šøÿÿÿÿ
+k	java:S1171"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Õ„¢Áüÿÿÿÿ
+f	java:S1174"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÿû×
+j	java:S116C"URename this field "tv_ranking" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ä¸Àù
+o	java:S116D"URename this field "iv_profile" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(îØöèÿÿÿÿÿ
+p	java:S116E"VRename this field "tv_userName" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¦·ë÷ûÿÿÿÿ
+k	java:S116F"VRename this field "tv_meanTime" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÈÔƒµ
+k	java:S116G"VRename this field "tv_meanTurn" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÚËµ¶
+@
+java:S1068"+Remove this unused "context" private field.(êİç
