@@ -19,6 +19,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 public class MultiRoom extends AppCompatActivity {
     private FirebaseUser currentUser;
     private DatabaseReference roomRef;
@@ -28,6 +30,8 @@ public class MultiRoom extends AppCompatActivity {
     private int roomId;
     private RoomIdManage roomIdManage;
     private String nickName;
+    private int owner;
+    private int ball;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class MultiRoom extends AppCompatActivity {
         Intent intent = getIntent();
         String roomName = intent.getStringExtra("room name");
         String strRoomId = intent.getStringExtra("room id");
-        int ball = intent.getIntExtra("ball", 0);
+        ball = intent.getIntExtra("ball", 0);
         if (strRoomId != null) {
             roomId = Integer.parseInt(strRoomId);
         }
@@ -54,6 +58,7 @@ public class MultiRoom extends AppCompatActivity {
         String photoUrl = currentUser.getPhotoUrl().toString();
 
         if (isOwner) { // 만들어서 들어온 경우
+            owner = 1;
             roomIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -64,6 +69,8 @@ public class MultiRoom extends AppCompatActivity {
                         roomIdManage = snapshot.getValue(RoomIdManage.class);
                     } // 받아와서 아이디를 받는다
                     roomId = roomIdManage.receiveId();
+                    TextView tv_gameInfo = findViewById(R.id.game_info);
+                    tv_gameInfo.setText("공 개수: " + ball);
                     updateRoomIds(roomIdManage); // 받은 아이디로 방 생성
                     currentRoom = new Room(roomName, uid, nickName, photoUrl);
                     currentRoom.setRoomId(roomId);
@@ -71,7 +78,7 @@ public class MultiRoom extends AppCompatActivity {
                     updateRoom(); // db에 업데이트
                     findViewById(R.id.user1).setVisibility(View.VISIBLE); // 화면 표시 부분
                     findViewById(R.id.owner).setVisibility(View.VISIBLE);
-                    ((TextView)findViewById(R.id.room_owner)).setText(nickName);
+                    ((TextView)findViewById(R.id.room_owner)).setText("방장: " + nickName);
                 }
 
                 @Override
@@ -94,14 +101,18 @@ public class MultiRoom extends AppCompatActivity {
                         }
                     } // 아이디에 해당하는 방을 찾는다
                     if (currentRoom != null) {
-                        int owner = currentRoom.getOwner(); // 방장 이름을 표시하기 위함
+                        // 방장 이름을 표시하기 위함
                         TextView roomOwner = findViewById(R.id.room_owner);
+                        owner = currentRoom.getOwner();
                         if (owner == 1) {
-                            roomOwner.setText(currentRoom.getUser1Name());
+                            roomOwner.setText("방장: " + currentRoom.getUser1Name());
                         }
                         else {
-                            roomOwner.setText(currentRoom.getUser2Name());
+                            roomOwner.setText("방장: " + currentRoom.getUser2Name());
                         } // 입장 처리(유저 추가), db에 방 정보 업데이트
+                        ball = currentRoom.getBall();
+                        TextView tv_gameInfo = findViewById(R.id.game_info);
+                        tv_gameInfo.setText("공 개수: " + ball);
                         currentRoom.addUser(uid, nickName, photoUrl);
                         updateRoom();
                     }
@@ -115,7 +126,11 @@ public class MultiRoom extends AppCompatActivity {
         }
 
         TextView tv_roomName = findViewById(R.id.room_name);
-        tv_roomName.setText(roomName);
+        tv_roomName.setText("방 이름: " + roomName);
+        findViewById(R.id.ready_btn).setOnClickListener(v -> {
+            currentRoom.toggleReady();
+            updateRoom();
+        });
 
         // 방 정보 실시간 업데이트
         roomRef.addValueEventListener(new ValueEventListener() {
@@ -124,16 +139,18 @@ public class MultiRoom extends AppCompatActivity {
                 for (DataSnapshot ds: snapshot.getChildren()) {
                     if (ds.hasChild("roomId") && roomId == ds.child("roomId").getValue(Integer.class)) {
                         currentRoom = ds.getValue(Room.class);
+                        owner = currentRoom.getOwner();
                         if (currentRoom.getOwnerChanged()) {
+                            ownerChanged();
                             currentRoom.setOwnerChanged(false);
                             updateRoom();
-                            ownerChanged();
                         }
                         break;
                     }
                 }
                 if (currentRoom != null) {
                     setVisibilities(); // 바뀌는 상황에 따라 화면 표시 바꾸기
+                    readySet();
                 }
             }
 
@@ -161,10 +178,8 @@ public class MultiRoom extends AppCompatActivity {
         if (currentRoom.getUser1State()) { // 유저1이 있을 때 이름과 사진을 띄움
             findViewById(R.id.user1).setVisibility(View.VISIBLE);
             ((TextView)findViewById(R.id.user1_name)).setText(currentRoom.getUser1Name());
-            if (!MultiRoom.this.isFinishing()) { // 오류 해결
-                Glide.with(this).load(currentRoom.getUser1Photo())
-                        .into((ImageView)findViewById(R.id.user1_profile));
-            }
+            Glide.with(getApplicationContext()).load(currentRoom.getUser1Photo())
+                    .into((ImageView)findViewById(R.id.user1_profile));
         }
         else { // 없으면 안 보이게
             findViewById(R.id.user1).setVisibility(View.INVISIBLE);
@@ -172,23 +187,44 @@ public class MultiRoom extends AppCompatActivity {
         if (currentRoom.getUser2State()) {
             findViewById(R.id.user2).setVisibility(View.VISIBLE);
             ((TextView)findViewById(R.id.user2_name)).setText(currentRoom.getUser2Name());
-            if (!MultiRoom.this.isFinishing()) {
-                Glide.with(this).load(currentRoom.getUser2Photo())
-                        .into((ImageView)findViewById(R.id.user2_profile));
-            }
+            Glide.with(getApplicationContext()).load(currentRoom.getUser2Photo())
+                    .into((ImageView)findViewById(R.id.user2_profile));
         }
         else {
             findViewById(R.id.user2).setVisibility(View.INVISIBLE);
         }
     }
 
+    private void readySet() {
+        if (owner == 1) {
+            findViewById(R.id.ready_state1).setVisibility(View.INVISIBLE);
+            findViewById(R.id.ready_state2).setVisibility(View.VISIBLE);
+            if (currentRoom.getReady()) {
+                ((TextView)findViewById(R.id.ready_state2)).setText("준비됨");
+            }
+            else {
+                ((TextView)findViewById(R.id.ready_state2)).setText("준비되지 않음");
+            }
+        }
+        else {
+            findViewById(R.id.ready_state1).setVisibility(View.VISIBLE);
+            findViewById(R.id.ready_state2).setVisibility(View.INVISIBLE);
+            if (currentRoom.getReady()) {
+                ((TextView)findViewById(R.id.ready_state1)).setText("준비됨");
+            }
+            else {
+                ((TextView)findViewById(R.id.ready_state1)).setText("준비되지 않음");
+            }
+        }
+    }
+
     private void ownerChanged() { // 방장이 나가면
         findViewById(R.id.player).setVisibility(View.INVISIBLE);
         findViewById(R.id.owner).setVisibility(View.VISIBLE);
-        ((TextView)findViewById(R.id.room_owner)).setText(nickName);
+        ((TextView)findViewById(R.id.room_owner)).setText("방장: " + nickName);
     }
 
-    public void updateRoom() {
+    private void updateRoom() {
         roomRef.child("room" + currentRoom.getRoomId()).setValue(currentRoom);
     }
     private void deleteRoom() {
