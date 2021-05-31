@@ -374,7 +374,7 @@ public class Game extends AppCompatActivity{
         drawBtnLinear.setVisibility(View.INVISIBLE);
         inputTable = findViewById(R.id.input_Table);
 
-        resultLinear = findViewById(R.id.result_linear);
+        resultLinear = findViewById(R.id.layout_result);
         final boolean[] memoStatus = {false};
 
         btn_memo.setOnClickListener(v -> {

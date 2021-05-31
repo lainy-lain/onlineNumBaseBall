@@ -80,6 +80,7 @@ public class MultiplayActivity extends AppCompatActivity{
     // 필요하지만 DB에 R/W하지는 않는 변수들
     private String opponentInputNum; // 상대가 입력한 숫자
     private boolean isAlreadySubmit = false; // 내 턴을 소모했는가?
+    private boolean am_i_p1; // 내가 플레이어 1인지 아닌지를 나타내는 변수
 
     private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
     private DatabaseReference DB_game = FirebaseDatabase.getInstance().getReference("GAME");
@@ -127,9 +128,21 @@ public class MultiplayActivity extends AppCompatActivity{
         rb_select = findViewById(R.id.radioButton1);
         radio_btn[0].setChecked(true);
 
+        // 데이터 초기화 해야함
+        if (Objects.equals(currentUser.getUid(), p1_id)){
+            am_i_p1 = true;
+        }
+        else{
+            am_i_p1 = false;
+        }
+        // 공 갯수, 플레이어 2명의 정보를 이전 activity로부터 받아오면 됨
+        Intent intent = getIntent();
+        ball_number = intent.getExtras().getInt("ballNumber");
+        ans       = new int[ball_number]; //맞춰야 할 정답
+        input_num = new int[ball_number]; //사용자가 선택한 정답
 
         // DB에 게임 방 생성 (방장(p1)이 생성)
-        if (Objects.equals(currentUser.getUid(), p1_id)){
+        if (am_i_p1){
             // 게임이 진행되기 전에, 이 child에 대한 listener가 설정돼야 하므로
             // 여기서 미리 초기화시켜두는 것이다.
             DB_game.child(p1_id).child("p1_inputNum").setValue("init");
@@ -138,15 +151,9 @@ public class MultiplayActivity extends AppCompatActivity{
             DB_game.child(p1_id).child("p2_status").setValue("init");
             DB_game.child(p1_id).child("isEnd").setValue(false);
             DB_game.child(p1_id).child("whosTurn").setValue(0);
+            DB_game.child(p1_id).child("isOneExited").setValue(false);
         }
 
-
-        // 데이터 초기화 해야함
-        // 공 갯수, 플레이어 2명의 정보를 이전 activity로부터 받아오면 됨
-        Intent intent = getIntent();
-        ball_number = intent.getExtras().getInt("ballNumber");
-        ans       = new int[ball_number]; //맞춰야 할 정답
-        input_num = new int[ball_number]; //사용자가 선택한 정답
 
         // 플레이어 2명의 정보를 화면에 띄워야 함
 
@@ -167,6 +174,8 @@ public class MultiplayActivity extends AppCompatActivity{
             }
         };
         result_list.setAdapter(adapter);
+
+
 
         // 라디오 버튼 갯수 설정
         for(int i = ball_number; i < 5; i++)
@@ -236,7 +245,7 @@ public class MultiplayActivity extends AppCompatActivity{
                 // 중복처리 완료
 
                 // DB에 입력한 초기 값 쓰기
-                if (Objects.equals(currentUser.getUid(), p1_id)){
+                if (am_i_p1){
                     DB_game.child(p1_id).child("p1_solNum").setValue(solNum_str);
                 }
                 else{
@@ -249,7 +258,7 @@ public class MultiplayActivity extends AppCompatActivity{
                 playMultiGame();
             }
         };
-        btn_result.setVisibility(View.GONE); // 확인(제출) 버튼 사용불가
+        btn_result.setVisibility(View.INVISIBLE); // 확인(제출) 버튼 사용불가
         init_timer.schedule(init_task, 10000); // 10초 후에 이 타이머 스레드가 실행된다.
         tv_info.setText("당신의 숫자를 입력하세요");
 
@@ -282,54 +291,31 @@ public class MultiplayActivity extends AppCompatActivity{
             resetButton();
         });
 
-        //아래로는 메모기능을 위한 코드임
-        final MyView m = new MyView(this);
-        for (int i = 0; i < 6; i++) {
-            memo_color[i].setOnClickListener(v -> color = v.getBackgroundTintList().getDefaultColor());
-        }
-        btn_back.setOnClickListener(v -> {
-            if (!lastDraw.isEmpty()) {
-                for (int i = 0; i < lastDraw.get(lastDraw.size() - 1); i++) {
-                    if (points.isEmpty()) {
-                        break;
-                    }
-                    points.remove(points.size() - 1);
-                }
-                lastDraw.remove(lastDraw.size() - 1);
-                m.invalidate();
+        // 게임 강제종료에 대한 이벤트 리스너 만들어야 함
+        // 상대방이 뒤로가기 버튼을 눌러 나간 경우 실행되는 리스너
+        DB_game.child(p1_id).child("isOneExited").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                // 상대방이 나가서 게임이 종료됐습니다. 승리 처리됩니다.
+                // 상대방의 해답은 xxx였습니다.
+                // 방 청소
             }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
         });
 
-        drawLinear = findViewById(R.id.draw_linear);
-        drawLinear.setVisibility(View.INVISIBLE);
-        drawBtnLinear = findViewById(R.id.memo_colors);
-        drawBtnLinear.setVisibility(View.INVISIBLE);
-        inputTable = findViewById(R.id.input_Table);
+        setMemoFunc();
 
-        resultLinear = findViewById(R.id.result_linear);
-        final boolean[] memoStatus = {false};
-
-        btn_memo.setOnClickListener(v -> {
-            if(!memoStatus[0]) {
-                btn_memo.setText("게임");
-                guess.setVisibility(View.VISIBLE);
-                inputTable.setVisibility(View.INVISIBLE);
-                drawBtnLinear.setVisibility(View.VISIBLE);
-                drawLinear.setVisibility(View.VISIBLE);
-                memoStatus[0] = true;
-            }
-            else {
-                btn_memo.setText("메모");
-                inputTable.setVisibility(View.VISIBLE);
-                drawBtnLinear.setVisibility(View.INVISIBLE);
-                memoStatus[0] = false;
-            }
-        });
-        btn_clear.setOnClickListener(v -> {
-            points.clear();
-            m.invalidate();
-        });
-        drawLinear.addView(m);
     } // end of onCreate()
 
 
@@ -370,7 +356,7 @@ public class MultiplayActivity extends AppCompatActivity{
 
         // 상대방의 입력값/상태 를 얻어오기 위한 변수
         String whosInput, whosStatus;
-        if (Objects.equals(currentUser.getUid(), p1_id)) {
+        if (am_i_p1) {
             whosInput = "p2_inputNum";
             whosStatus = "p2_status";
         }
@@ -437,7 +423,17 @@ public class MultiplayActivity extends AppCompatActivity{
 
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+                int opponentClearTurn;
+                if (am_i_p1){
+                    opponentClearTurn = turn;
+                }
+                else{
+                    opponentClearTurn = turn + 1;
+                }
+                // 상대방이 opponentClearTurn 만에 클리어하셨습니다.
+                // 상대방의 해답은 xxx였습니다.
+                // 방 청소
+                // 룸으로 돌아오게.
             }
 
             @Override
@@ -512,20 +508,21 @@ public class MultiplayActivity extends AppCompatActivity{
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private boolean isMyTurn(){
-        if (Objects.equals(currentUser.getUid(), p1_id)){ // 방장이라면
+        if (am_i_p1){ // 방장이라면
             return whosTurn == 1;
         }
-        else if (Objects.equals(currentUser.getUid(), p2_id)){ // 손님이라면
+        else{
             return whosTurn == 2;
         }
-
-        return false;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void getResultAndUpdate(){
         // 이 밑은 '함수'로 만들어야 할듯
         // 왜냐? 버튼을 누르거나, 시간 제한이 다되거나 했을때 둘다 작동해야 하므로!
+
+        // 소모 turn 1회 증가.
+        turn++;
 
         // 결과를 계산하는 코드
         strike = 0;
@@ -552,7 +549,7 @@ public class MultiplayActivity extends AppCompatActivity{
 
         // inputForDB, resultForDB를 DB에 갱신해야함
         String my_inputNum, my_status;
-        if (Objects.equals(currentUser.getUid(), p1_id)){
+        if (am_i_p1){
             my_inputNum = "p1_inputNum";
             my_status = "p1_status";
         }
@@ -578,6 +575,10 @@ public class MultiplayActivity extends AppCompatActivity{
 
         if (ball_number == strike) { // 게임 종료. 승자만이 이 코드를 실행하게 된다.
             DB_game.child(p1_id).child("isEnd").setValue(true); // DB에 값 갱신
+            // 승리하셨습니다! x turn 소모 표시하기.
+            // 승/패수 갱신 후 승률 갱신하기.
+            // 방으로 나가기.
+
         }
         else{
             resetButton();
@@ -732,9 +733,62 @@ public class MultiplayActivity extends AppCompatActivity{
         }
     }
 
+    //아래로는 메모기능을 위한 코드임
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void setMemoFunc(){
+        final MyView m = new MyView(this);
+        for (int i = 0; i < 6; i++) {
+            memo_color[i].setOnClickListener(v -> color = v.getBackgroundTintList().getDefaultColor());
+        }
+        btn_back.setOnClickListener(v -> {
+            if (!lastDraw.isEmpty()) {
+                for (int i = 0; i < lastDraw.get(lastDraw.size() - 1); i++) {
+                    if (points.isEmpty()) {
+                        break;
+                    }
+                    points.remove(points.size() - 1);
+                }
+                lastDraw.remove(lastDraw.size() - 1);
+                m.invalidate();
+            }
+        });
+
+        drawLinear = findViewById(R.id.draw_linear);
+        drawLinear.setVisibility(View.INVISIBLE);
+        drawBtnLinear = findViewById(R.id.memo_colors);
+        drawBtnLinear.setVisibility(View.INVISIBLE);
+        inputTable = findViewById(R.id.input_Table);
+
+        resultLinear = findViewById(R.id.layout_result);
+        final boolean[] memoStatus = {false};
+
+        btn_memo.setOnClickListener(v -> {
+            if(!memoStatus[0]) {
+                btn_memo.setText("게임");
+                guess.setVisibility(View.VISIBLE);
+                inputTable.setVisibility(View.INVISIBLE);
+                drawBtnLinear.setVisibility(View.VISIBLE);
+                drawLinear.setVisibility(View.VISIBLE);
+                memoStatus[0] = true;
+            }
+            else {
+                btn_memo.setText("메모");
+                inputTable.setVisibility(View.VISIBLE);
+                drawBtnLinear.setVisibility(View.INVISIBLE);
+                memoStatus[0] = false;
+            }
+        });
+        btn_clear.setOnClickListener(v -> {
+            points.clear();
+            m.invalidate();
+        });
+        drawLinear.addView(m);
+    }
+
     //뒤로가기 버튼 관련 설정
     @Override
     public void onBackPressed(){
+
         if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
             backKeyPressedTime = System.currentTimeMillis();
             toast = Toast.makeText(this, "뒤로 가기 버튼을 한 번 더 누르시면 처음화면으로 돌아갑니다.", Toast.LENGTH_LONG);
@@ -744,6 +798,8 @@ public class MultiplayActivity extends AppCompatActivity{
         // 마지막으로 뒤로 가기 버튼을 눌렀던 시간에 2.5초를 더해 현재 시간과 비교 후
         // 마지막으로 뒤로 가기 버튼을 눌렀던 시간이 2.5초가 지나지 않았으면 배경화면으로 돌아감
         if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
+            // DB에 플레이어 한명이 나갔다는 값을 true로 만들어야 함.
+            DB_game.child(p1_id).child("isOneExited").setValue(true);
             super.onBackPressed();
         }
     }
