@@ -43,6 +43,7 @@ public class MultiList extends AppCompatActivity {
     final String[] ballArr = new String[] {"3개", "4개", "5개"};
 
     Map<String, Object> map = new HashMap<String, Object>();
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +113,7 @@ public class MultiList extends AppCompatActivity {
                     intent.putExtra("room id", ((TextView) view).getText().toString().split(": ")[2].split("\n")[0]);
                     intent.putExtra("owner", isOwner);
                     startActivity(intent);
+                    dialog.dismiss();
                     finish();
                 }
                 else{
@@ -133,7 +135,7 @@ public class MultiList extends AppCompatActivity {
         final Button btn_create1 = (Button) view.findViewById(R.id.btn_create1);
         final Button btn_dont = (Button) view.findViewById(R.id.btn_dont);
         final RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg);
-        final AlertDialog dialog = builder.create();
+        dialog = builder.create();
 
         rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -166,6 +168,7 @@ public class MultiList extends AppCompatActivity {
                     intent.putExtra("owner", isOwner);
                     intent.putExtra("ball", ball[0]);
                     startActivity(intent);
+                    dialog.dismiss();
                     finish();
             }
         }});
@@ -190,7 +193,7 @@ public class MultiList extends AppCompatActivity {
         final Button btn_find = (Button) view.findViewById(R.id.btn_find);
         final Button btn_dont1 = (Button) view.findViewById(R.id.btn_dont1);
         final RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg_quick);
-        final AlertDialog dialog = builder.create();
+        dialog = builder.create();
 
         rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override

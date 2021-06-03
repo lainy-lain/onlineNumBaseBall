@@ -15,6 +15,7 @@ public class Room {
     private boolean user2State = false;
     private boolean ownerChanged = false;
     private int ball;
+    private boolean ready = false;
 
     public Room(String name, String userId, String userName, String userPhoto) {
         roomName = name;
@@ -60,6 +61,19 @@ public class Room {
             }
         }
         numUser--;
+        ready = false;
+    }
+
+    public void setRoomName(String name) {
+        roomName = name;
+    }
+
+    public void toggleReady() {
+        ready = !ready;
+    }
+
+    public boolean getReady() {
+        return ready;
     }
 
     public String getRoomName() {
