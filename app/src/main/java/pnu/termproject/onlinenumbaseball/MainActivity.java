@@ -56,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             "btn1tx", "btn2tx", "btn3tx", "btn4tx", "btn5tx", "btnbgtx", "radius"
     };
 
+    ColorStateList[] colors = new ColorStateList[12];
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,19 +110,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         // 설정한 색들 버튼에 세팅
         SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
-        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt(PREFERENCES[0], 0xFFFFEB3B)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[1], 0xFFCDDC39)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[2], 0xFF8BC34A)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[3], 0xFF00BCD4)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[4], 0xFF03A9F4)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[5], 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[6], 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[7], 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[8], 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[9], 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[10], 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt(PREFERENCES[11], 0xFF000000))
-        };
+        colors[0] = ColorStateList.valueOf(sp.getInt(PREFERENCES[0], 0xFFFFEB3B));
+        colors[1] = ColorStateList.valueOf(sp.getInt(PREFERENCES[1], 0xFFCDDC39));
+        colors[2] = ColorStateList.valueOf(sp.getInt(PREFERENCES[2], 0xFF8BC34A));
+        colors[3] = ColorStateList.valueOf(sp.getInt(PREFERENCES[3], 0xFF00BCD4));
+        colors[4] = ColorStateList.valueOf(sp.getInt(PREFERENCES[4], 0xFF03A9F4));
+        colors[5] = ColorStateList.valueOf(sp.getInt(PREFERENCES[5], 0xFFFFFFFF));
+        colors[6] = ColorStateList.valueOf(sp.getInt(PREFERENCES[6], 0xFF000000));
+        colors[7] = ColorStateList.valueOf(sp.getInt(PREFERENCES[7], 0xFF000000));
+        colors[8] = ColorStateList.valueOf(sp.getInt(PREFERENCES[8], 0xFFFFFFFF));
+        colors[9] = ColorStateList.valueOf(sp.getInt(PREFERENCES[9], 0xFFFFFFFF));
+        colors[10] = ColorStateList.valueOf(sp.getInt(PREFERENCES[10], 0xFFFFFFFF));
+        colors[11] = ColorStateList.valueOf(sp.getInt(PREFERENCES[11], 0xFF000000));
         play_btn.setBackgroundTintList(colors[0]);
         play_btn.setTextColor(colors[6]);
         single_btn.setBackgroundTintList(colors[1]);
@@ -219,41 +220,40 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         //색깔 바꾼 거 즉시 적용
         if (requestCode == 0 && resultCode == RESULT_OK) {
-            ColorStateList[] colorSettings = {ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[0], 0xFFFFEB3B)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[1], 0xFFCDDC39)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[2], 0xFF8BC34A)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[3], 0xFF00BCD4)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[4], 0xFF03A9F4)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[5], 0xFF000000)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[6], 0xFF000000)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[7], 0xFF000000)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[8], 0xFFFFFFFF)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[9], 0xFFFFFFFF)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[10], 0xFFFFFFFF)),
-                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[11], 0xFFFFFFFF))
-            };
+            colors[0] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[0], 0xFFFFEB3B));
+            colors[1] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[1], 0xFFCDDC39));
+            colors[2] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[2], 0xFF8BC34A));
+            colors[3] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[3], 0xFF00BCD4));
+            colors[4] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[4], 0xFF03A9F4));
+            colors[5] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[5], 0xFF000000));
+            colors[6] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[6], 0xFF000000));
+            colors[7] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[7], 0xFF000000));
+            colors[8] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[8], 0xFFFFFFFF));
+            colors[9] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[9], 0xFFFFFFFF));
+            colors[10] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[10], 0xFFFFFFFF));
+            colors[11] = ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[11], 0xFFFFFFFF));
             View[] views = {
                     findViewById(R.id.play_btn), findViewById(R.id.single_btn), findViewById(R.id.multi_btn),
                     findViewById(R.id.rank_btn), findViewById(R.id.set_btn),
                     findViewById(R.id.tv_nickname), findViewById(R.id.guide),
                     findViewById(R.id.three_ball), findViewById(R.id.four_ball), findViewById(R.id.five_ball)
             };
-            views[0].setBackgroundTintList(colorSettings[0]);
-            ((Button)views[0]).setTextColor(colorSettings[6]);
-            views[1].setBackgroundTintList(colorSettings[1]);
-            ((Button)views[1]).setTextColor(colorSettings[7]);
-            views[2].setBackgroundTintList(colorSettings[2]);
-            ((Button)views[2]).setTextColor(colorSettings[8]);
-            views[3].setBackgroundTintList(colorSettings[3]);
-            ((Button)views[3]).setTextColor(colorSettings[9]);
-            views[4].setBackgroundTintList(colorSettings[4]);
-            ((Button)views[4]).setTextColor(colorSettings[10]);
-            views[5].getRootView().setBackgroundTintList(colorSettings[5]);
-            ((TextView)views[5]).setTextColor(colorSettings[11]);
-            ((TextView)views[6]).setTextColor(colorSettings[11]);
-            ((RadioButton)views[7]).setTextColor(colorSettings[11]);
-            ((RadioButton)views[8]).setTextColor(colorSettings[11]);
-            ((RadioButton)views[9]).setTextColor(colorSettings[11]);
+            views[0].setBackgroundTintList(colors[0]);
+            ((Button)views[0]).setTextColor(colors[6]);
+            views[1].setBackgroundTintList(colors[1]);
+            ((Button)views[1]).setTextColor(colors[7]);
+            views[2].setBackgroundTintList(colors[2]);
+            ((Button)views[2]).setTextColor(colors[8]);
+            views[3].setBackgroundTintList(colors[3]);
+            ((Button)views[3]).setTextColor(colors[9]);
+            views[4].setBackgroundTintList(colors[4]);
+            ((Button)views[4]).setTextColor(colors[10]);
+            views[5].getRootView().setBackgroundTintList(colors[5]);
+            ((TextView)views[5]).setTextColor(colors[11]);
+            ((TextView)views[6]).setTextColor(colors[11]);
+            ((RadioButton)views[7]).setTextColor(colors[11]);
+            ((RadioButton)views[8]).setTextColor(colors[11]);
+            ((RadioButton)views[9]).setTextColor(colors[11]);
             int radiusChecked = data.getExtras().getInt(PREFERENCES[12], 0);
             int cornerRadius = (radiusChecked + 1) * 8;
             ((MaterialButton)views[0]).setCornerRadius(cornerRadius);
@@ -261,7 +261,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             ((MaterialButton)views[2]).setCornerRadius(cornerRadius);
             ((MaterialButton)views[3]).setCornerRadius(cornerRadius);
             ((MaterialButton)views[4]).setCornerRadius(cornerRadius);
-
         }
     }
 
