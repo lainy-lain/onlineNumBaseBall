@@ -3,12 +3,14 @@ package pnu.termproject.onlinenumbaseball;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,8 +39,8 @@ public class MultiList extends AppCompatActivity {
     private Button btn_create, btn_quick;
     private DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("room");
     private String str_room;
-    private int ball = 3;
     private boolean isOwner; //대기방의 생성자인지, 참가자인지 구별하는 변수
+    final String[] ballArr = new String[] {"3개", "4개", "5개"};
 
     Map<String, Object> map = new HashMap<String, Object>();
 
@@ -58,44 +60,17 @@ public class MultiList extends AppCompatActivity {
         btn_create.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                ball = 3;
-                final EditText et_inDialog = new EditText(MultiList.this);
-
-                final AlertDialog.Builder builder = new AlertDialog.Builder(MultiList.this);
-                builder.setTitle("대기방 이름 입력");
-                builder.setView(et_inDialog);
-                builder.setMessage("공 개수 선택");
-                final String[] balls = new String[] {"3개", "4개", "5개"};
-                builder.setSingleChoiceItems(balls, -1, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ball = which + 3;
-                        Toast.makeText(MultiList.this, ball, Toast.LENGTH_LONG).show();
-                    }
-                });
-                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        str_room = et_inDialog.getText().toString();
-                        isOwner = true;
-
-                        Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
-                        intent.putExtra("room name", str_room);
-                        intent.putExtra("owner", isOwner);
-                        intent.putExtra("ball", ball);
-                        startActivity(intent);
-                        finish();
-                    }
-                });
-                builder.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                    }
-                });
-                builder.show();
+                show();
             }
         });
+
+        //빠른시작을 하는 코드입니다
+        btn_quick.setOnClickListener(new View.OnClickListener(){
+             @Override
+             public void onClick(View view) {
+                 quick();
+             }
+         });
 
         //Database가 변경되었을때 호출되는 코드입니다
         //실시간으로 변경사항을 감지하고 업데이트 합니다
@@ -144,5 +119,121 @@ public class MultiList extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    void show(){
+        final int[] ball = {3};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MultiList.this);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.roommake, null);
+        builder.setView(view);
+
+        final EditText nameEditText = (EditText) view.findViewById(R.id.name);
+        final Button btn_create1 = (Button) view.findViewById(R.id.btn_create1);
+        final Button btn_dont = (Button) view.findViewById(R.id.btn_dont);
+        final RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg);
+        final AlertDialog dialog = builder.create();
+
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (i){
+                    case R.id.rb_ball3:
+                        ball[0] = 3; break;
+                    case R.id.rb_ball4:
+                        ball[0] = 4; break;
+                    case R.id.rb_ball5:
+                        ball[0] = 5; break;
+                }
+            }
+        });
+        btn_create1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                str_room = nameEditText.getText().toString();
+                if(str_room.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else if(str_room.indexOf(":") != -1 || str_room.indexOf("\\n") != -1){
+                    Toast.makeText(getApplicationContext(), "방 제목으로 :와 \\n은 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    isOwner = true;
+
+                    Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                    intent.putExtra("room name", str_room);
+                    intent.putExtra("owner", isOwner);
+                    intent.putExtra("ball", ball[0]);
+                    startActivity(intent);
+                    finish();
+            }
+        }});
+        btn_dont.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    void quick(){
+        final int[] ball = {3};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MultiList.this);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.roomquick, null);
+        builder.setView(view);
+
+        final Button btn_find = (Button) view.findViewById(R.id.btn_find);
+        final Button btn_dont1 = (Button) view.findViewById(R.id.btn_dont1);
+        final RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg_quick);
+        final AlertDialog dialog = builder.create();
+
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (i){
+                    case R.id.rb_ball3:
+                        ball[0] = 3; break;
+                    case R.id.rb_ball4:
+                        ball[0] = 4; break;
+                    case R.id.rb_ball5:
+                        ball[0] = 5; break;
+                }
+            }
+        });
+        btn_find.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*
+                if(str_room.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else if(str_room.indexOf(":") != -1 || str_room.indexOf("\\n") != -1){
+                    Toast.makeText(getApplicationContext(), "방 제목으로 :와 \\n은 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    isOwner = true;
+
+                    Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                    intent.putExtra("room name", str_room);
+                    intent.putExtra("owner", isOwner);
+                    intent.putExtra("ball", ball[0]);
+                    startActivity(intent);
+                    finish();
+                }
+                 */
+            }});
+        btn_dont1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 }
