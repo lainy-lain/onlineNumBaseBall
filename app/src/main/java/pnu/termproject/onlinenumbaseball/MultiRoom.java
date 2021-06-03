@@ -136,8 +136,15 @@ public class MultiRoom extends AppCompatActivity {
         TextView tv_roomName = findViewById(R.id.room_name);
         String roomNameText = "방 이름: " + roomName;
         tv_roomName.setText(roomNameText);
-        findViewById(R.id.ready_btn).setOnClickListener(v -> {
+        Button ready_btn = findViewById(R.id.ready_btn);
+        ready_btn.setOnClickListener(v -> {
             currentRoom.toggleReady();
+            if (currentRoom.getReady()) {
+                ready_btn.setText("취소하기");
+            }
+            else {
+                ready_btn.setText("준비하기");
+            }
             updateRoom();
         });
         findViewById(R.id.start_btn).setOnClickListener(v -> {
@@ -318,6 +325,8 @@ public class MultiRoom extends AppCompatActivity {
             return;
         }
         super.onBackPressed();
+        Intent intent = new Intent(getApplicationContext(), MultiList.class);
+        startActivity(intent);
     }
 
     @Override
@@ -329,7 +338,6 @@ public class MultiRoom extends AppCompatActivity {
             currentRoom.exitUser(currentUser.getUid());
             updateRoom();
         }
-        dialog.dismiss();
         super.onDestroy();
     }
 }
