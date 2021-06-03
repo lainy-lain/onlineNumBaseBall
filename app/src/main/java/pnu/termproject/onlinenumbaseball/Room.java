@@ -64,6 +64,10 @@ public class Room {
         ready = false;
     }
 
+    public void setRoomName(String name) {
+        roomName = name;
+    }
+
     public void toggleReady() {
         ready = !ready;
     }

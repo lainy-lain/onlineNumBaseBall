@@ -1,12 +1,17 @@
 package pnu.termproject.onlinenumbaseball;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,8 +24,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
 public class MultiRoom extends AppCompatActivity {
     private FirebaseUser currentUser;
     private DatabaseReference roomRef;
@@ -32,6 +35,7 @@ public class MultiRoom extends AppCompatActivity {
     private String nickName;
     private int owner;
     private int ball;
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +135,63 @@ public class MultiRoom extends AppCompatActivity {
             currentRoom.toggleReady();
             updateRoom();
         });
+        findViewById(R.id.start_btn).setOnClickListener(v -> {
+            /*if (currentRoom.getReady()) { // 준비된 상태면 게임 화면으로
+                Intent multiGameIntent = new Intent(getApplicationContext(), MultiPlayActivity.class);
+                multiGameIntent.putExtra("user1id", currentRoom.getUser1Id());
+                multiGameIntent.putExtra("user1name", currentRoom.getUser1Name());
+                multiGameIntent.putExtra("user1photo", currentRoom.getUser1Photo());
+                multiGameIntent.putExtra("user1id", currentRoom.getUser2Id());
+                multiGameIntent.putExtra("user1name", currentRoom.getUser2Name());
+                multiGameIntent.putExtra("user1photo", currentRoom.getUser2Photo());
+                multiGameIntent.putExtra("ball", ball);
+                startActivity(multiGameIntent);
+            }*/
+        });
+        // 방, 게임 정보 바꾸기
+        findViewById(R.id.game_set).setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MultiRoom.this);
+            LayoutInflater inflater = getLayoutInflater();
+            View view = inflater.inflate(R.layout.game_room_set, null);
+            builder.setView(view);
+
+            final EditText nameEditText = findViewById(R.id.text_input);
+            final Button btn_apply = findViewById(R.id.btn_apply);
+            final Button btn_dont = findViewById(R.id.btn_dismiss);
+            final RadioGroup rg = findViewById(R.id.ball_select);
+            dialog = builder.create();
+
+            rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                    switch (i) {
+                        case R.id.toball3:
+                            ball = 3; break;
+                        case R.id.toball4:
+                            ball = 4; break;
+                        case R.id.toball5:
+                            ball = 5; break;
+                    }
+                }
+            });
+            btn_apply.setOnClickListener(apply -> {
+                String str_room = nameEditText.getText().toString();
+                if(str_room.isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else if (str_room.contains(":")) {
+                    Toast.makeText(getApplicationContext(), "방 제목으로 :은 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    currentRoom.setRoomName(str_room);
+                    currentRoom.setBall(ball);
+                    updateRoom();
+                }
+            });
+            btn_dont.setOnClickListener(dont -> dialog.dismiss());
+
+            dialog.show();
+        });
 
         // 방 정보 실시간 업데이트
         roomRef.addValueEventListener(new ValueEventListener() {
@@ -150,6 +211,7 @@ public class MultiRoom extends AppCompatActivity {
                 }
                 if (currentRoom != null) {
                     setVisibilities(); // 바뀌는 상황에 따라 화면 표시 바꾸기
+                    roomSet();
                     readySet();
                 }
             }
@@ -218,6 +280,11 @@ public class MultiRoom extends AppCompatActivity {
         }
     }
 
+    private void roomSet() {
+        ((TextView)findViewById(R.id.room_name)).setText("방 이름: " + currentRoom.getRoomName());
+        ((TextView)findViewById(R.id.game_info)).setText("공 개수: " + ball);
+    }
+
     private void ownerChanged() { // 방장이 나가면
         findViewById(R.id.player).setVisibility(View.INVISIBLE);
         findViewById(R.id.owner).setVisibility(View.VISIBLE);
@@ -256,6 +323,7 @@ public class MultiRoom extends AppCompatActivity {
             currentRoom.exitUser(currentUser.getUid());
             updateRoom();
         }
+        dialog.dismiss();
         super.onDestroy();
     }
 }
