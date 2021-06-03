@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -247,11 +248,12 @@ public class MultiRoom extends AppCompatActivity {
     }
 
     private void setVisibilities() {
+        int imageSize = findViewById(R.id.user1).getHeight() / 2;
         if (currentRoom.getUser1State()) { // 유저1이 있을 때 이름과 사진을 띄움
             findViewById(R.id.user1).setVisibility(View.VISIBLE);
             ((TextView)findViewById(R.id.user1_name)).setText(currentRoom.getUser1Name());
             Glide.with(getApplicationContext()).load(currentRoom.getUser1Photo())
-                    .into((ImageView)findViewById(R.id.user1_profile));
+                    .override(imageSize, imageSize).into((ImageView)findViewById(R.id.user1_profile));
         }
         else { // 없으면 안 보이게
             findViewById(R.id.user1).setVisibility(View.INVISIBLE);
@@ -260,7 +262,7 @@ public class MultiRoom extends AppCompatActivity {
             findViewById(R.id.user2).setVisibility(View.VISIBLE);
             ((TextView)findViewById(R.id.user2_name)).setText(currentRoom.getUser2Name());
             Glide.with(getApplicationContext()).load(currentRoom.getUser2Photo())
-                    .into((ImageView)findViewById(R.id.user2_profile));
+                    .override(imageSize, imageSize).into((ImageView)findViewById(R.id.user2_profile));
         }
         else {
             findViewById(R.id.user2).setVisibility(View.INVISIBLE);
