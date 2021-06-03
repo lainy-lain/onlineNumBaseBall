@@ -17,17 +17,18 @@
             android:layout_marginLeft="10dp"
             android:layout_marginEnd="40dp"
             android:layout_marginRight="40dp"
-            android:text="방 이름" />
+            android:text="@string/room_name" />
 
         <EditText
             android:id="@+id/text_input"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
             android:layout_weight="1"
             android:ems="10"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:autofillHints="" />
     </LinearLayout>
 
     <LinearLayout
@@ -44,7 +45,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="공 개수" />
+            android:text="@string/ball_number" />
 
         <RadioGroup
             android:id="@+id/ball_select"
@@ -59,32 +60,32 @@
                 android:id="@+id/toball3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
                 android:checked="true"
-                android:text="3개" />
+                android:text="@string/b3" />
 
             <RadioButton
                 android:id="@+id/toball4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:text="4개" />
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:text="@string/b4" />
 
             <RadioButton
                 android:id="@+id/toball5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginEnd="20dp"
-                android:layout_marginRight="20dp"
-                android:text="5개" />
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:text="@string/b5" />
         </RadioGroup>
 
     </LinearLayout>
@@ -108,10 +109,12 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="적용" />
+            android:text="@string/apply"
+            style="?android:attr/buttonBarButtonStyle" />
 
         <Button
             android:id="@+id/btn_dismiss"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
@@ -119,7 +122,7 @@
             android:layout_marginEnd="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:text="취소" />
+            android:text="@string/cancel_short" />
     </LinearLayout>
 
 </LinearLayout>

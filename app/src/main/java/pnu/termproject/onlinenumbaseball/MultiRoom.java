@@ -61,6 +61,7 @@ public class MultiRoom extends AppCompatActivity {
         nickName = currentUser.getDisplayName();
         String photoUrl = currentUser.getPhotoUrl().toString();
 
+        final String ballText = "공 개수: " + ball;
         if (isOwner) { // 만들어서 들어온 경우
             owner = 1;
             roomIdRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -74,7 +75,7 @@ public class MultiRoom extends AppCompatActivity {
                     } // 받아와서 아이디를 받는다
                     roomId = roomIdManage.receiveId();
                     TextView tv_gameInfo = findViewById(R.id.game_info);
-                    tv_gameInfo.setText("공 개수: " + ball);
+                    tv_gameInfo.setText(ballText);
                     updateRoomIds(roomIdManage); // 받은 아이디로 방 생성
                     currentRoom = new Room(roomName, uid, nickName, photoUrl);
                     currentRoom.setRoomId(roomId);
@@ -82,7 +83,8 @@ public class MultiRoom extends AppCompatActivity {
                     updateRoom(); // db에 업데이트
                     findViewById(R.id.user1).setVisibility(View.VISIBLE); // 화면 표시 부분
                     findViewById(R.id.owner).setVisibility(View.VISIBLE);
-                    ((TextView)findViewById(R.id.room_owner)).setText("방장: " + nickName);
+                    String ownerText = "방장: " + nickName;
+                    ((TextView)findViewById(R.id.room_owner)).setText(ownerText);
                 }
 
                 @Override
@@ -108,15 +110,17 @@ public class MultiRoom extends AppCompatActivity {
                         // 방장 이름을 표시하기 위함
                         TextView roomOwner = findViewById(R.id.room_owner);
                         owner = currentRoom.getOwner();
+                        String ownerText = "방장: ";
                         if (owner == 1) {
-                            roomOwner.setText("방장: " + currentRoom.getUser1Name());
+                            ownerText += currentRoom.getUser1Name();
                         }
                         else {
-                            roomOwner.setText("방장: " + currentRoom.getUser2Name());
+                            ownerText += currentRoom.getUser2Name();
                         } // 입장 처리(유저 추가), db에 방 정보 업데이트
+                        roomOwner.setText(ownerText);
                         ball = currentRoom.getBall();
                         TextView tv_gameInfo = findViewById(R.id.game_info);
-                        tv_gameInfo.setText("공 개수: " + ball);
+                        tv_gameInfo.setText(ballText);
                         currentRoom.addUser(uid, nickName, photoUrl);
                         updateRoom();
                     }
@@ -130,7 +134,8 @@ public class MultiRoom extends AppCompatActivity {
         }
 
         TextView tv_roomName = findViewById(R.id.room_name);
-        tv_roomName.setText("방 이름: " + roomName);
+        String roomNameText = "방 이름: " + roomName;
+        tv_roomName.setText(roomNameText);
         findViewById(R.id.ready_btn).setOnClickListener(v -> {
             currentRoom.toggleReady();
             updateRoom();
@@ -155,23 +160,20 @@ public class MultiRoom extends AppCompatActivity {
             View view = inflater.inflate(R.layout.game_room_set, null);
             builder.setView(view);
 
-            final EditText nameEditText = findViewById(R.id.text_input);
-            final Button btn_apply = findViewById(R.id.btn_apply);
-            final Button btn_dont = findViewById(R.id.btn_dismiss);
-            final RadioGroup rg = findViewById(R.id.ball_select);
+            final EditText nameEditText = view.findViewById(R.id.text_input);
+            final Button btn_apply = view.findViewById(R.id.btn_apply);
+            final Button btn_dismiss = view.findViewById(R.id.btn_dismiss);
+            final RadioGroup rg = view.findViewById(R.id.ball_select);
             dialog = builder.create();
 
-            rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                    switch (i) {
-                        case R.id.toball3:
-                            ball = 3; break;
-                        case R.id.toball4:
-                            ball = 4; break;
-                        case R.id.toball5:
-                            ball = 5; break;
-                    }
+            rg.setOnCheckedChangeListener((radioGroup, i) -> {
+                switch (i) {
+                    case R.id.toball3:
+                        ball = 3; break;
+                    case R.id.toball4:
+                        ball = 4; break;
+                    case R.id.toball5:
+                        ball = 5; break;
                 }
             });
             btn_apply.setOnClickListener(apply -> {
@@ -187,8 +189,9 @@ public class MultiRoom extends AppCompatActivity {
                     currentRoom.setBall(ball);
                     updateRoom();
                 }
+                dialog.dismiss();
             });
-            btn_dont.setOnClickListener(dont -> dialog.dismiss());
+            btn_dismiss.setOnClickListener(dont -> dialog.dismiss());
 
             dialog.show();
         });
@@ -281,14 +284,17 @@ public class MultiRoom extends AppCompatActivity {
     }
 
     private void roomSet() {
-        ((TextView)findViewById(R.id.room_name)).setText("방 이름: " + currentRoom.getRoomName());
-        ((TextView)findViewById(R.id.game_info)).setText("공 개수: " + ball);
+        String roomNameText = "방 이름: " + currentRoom.getRoomName();
+        ((TextView)findViewById(R.id.room_name)).setText(roomNameText);
+        String ballText = "공 개수: " + currentRoom.getBall();
+        ((TextView)findViewById(R.id.game_info)).setText(ballText);
     }
 
     private void ownerChanged() { // 방장이 나가면
         findViewById(R.id.player).setVisibility(View.INVISIBLE);
         findViewById(R.id.owner).setVisibility(View.VISIBLE);
-        ((TextView)findViewById(R.id.room_owner)).setText("방장: " + nickName);
+        String ownerText = "방장: " + nickName;
+        ((TextView)findViewById(R.id.room_owner)).setText(ownerText);
     }
 
     private void updateRoom() {

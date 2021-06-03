@@ -62,4 +62,10 @@
     <string name="loading">Loading&#8230;</string>
     <string name="guess">0 1 2 3 4 5 6 7 8 9</string>
     <string name="back">되돌리기</string>
+    <string name="room_name">방 이름</string>
+    <string name="apply">적용</string>
+    <string name="b5">5개</string>
+    <string name="b4">4개</string>
+    <string name="b3">3개</string>
+    <string name="ball_number">공 개수</string>
 </resources>

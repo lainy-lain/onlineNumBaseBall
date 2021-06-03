@@ -1,6 +1,5 @@
 package pnu.termproject.onlinenumbaseball;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -58,20 +57,10 @@ public class MultiList extends AppCompatActivity {
         listView.setAdapter(arrayAdapter);
 
         //채팅방을 생성하는 코드입니다
-        btn_create.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                show();
-            }
-        });
+        btn_create.setOnClickListener(view -> show());
 
         //빠른시작을 하는 코드입니다
-        btn_quick.setOnClickListener(new View.OnClickListener(){
-             @Override
-             public void onClick(View view) {
-                 quick();
-             }
-         });
+        btn_quick.setOnClickListener(view -> quick());
 
         //Database가 변경되었을때 호출되는 코드입니다
         //실시간으로 변경사항을 감지하고 업데이트 합니다
@@ -102,23 +91,19 @@ public class MultiList extends AppCompatActivity {
         });
 
         //대기방리스트중 하나를 클릭했을때의 코드입니다
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            //"방이름"과 "생성자 여부"를 전송합니다
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(!((TextView) view).getText().toString().split(": ")[3].split("\n")[0].equals("2")) {
-                    Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
-                    isOwner = false;
-                    intent.putExtra("room name", ((TextView) view).getText().toString().split(": ")[1].split("\n")[0]);
-                    intent.putExtra("room id", ((TextView) view).getText().toString().split(": ")[2].split("\n")[0]);
-                    intent.putExtra("owner", isOwner);
-                    startActivity(intent);
-                    dialog.dismiss();
-                    finish();
-                }
-                else{
-                    Toast.makeText(MultiList.this, "방 인원이 모두 차있습니다", Toast.LENGTH_LONG).show();
-                }
+        //"방이름"과 "생성자 여부"를 전송합니다
+        listView.setOnItemClickListener((adapterView, view, i, l) -> {
+            if(!((TextView) view).getText().toString().split(": ")[3].split("\n")[0].equals("2")) {
+                Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                isOwner = false;
+                intent.putExtra("room name", ((TextView) view).getText().toString().split(": ")[1].split("\n")[0]);
+                intent.putExtra("room id", ((TextView) view).getText().toString().split(": ")[2].split("\n")[0]);
+                intent.putExtra("owner", isOwner);
+                startActivity(intent);
+                finish();
+            }
+            else{
+                Toast.makeText(MultiList.this, "방 인원이 모두 차있습니다", Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -137,47 +122,37 @@ public class MultiList extends AppCompatActivity {
         final RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg);
         dialog = builder.create();
 
-        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                switch (i){
-                    case R.id.rb_ball3:
-                        ball[0] = 3; break;
-                    case R.id.rb_ball4:
-                        ball[0] = 4; break;
-                    case R.id.rb_ball5:
-                        ball[0] = 5; break;
-                }
+        rg.setOnCheckedChangeListener((radioGroup, i) -> {
+            switch (i){
+                case R.id.rb_ball3:
+                    ball[0] = 3; break;
+                case R.id.rb_ball4:
+                    ball[0] = 4; break;
+                case R.id.rb_ball5:
+                    ball[0] = 5; break;
             }
         });
-        btn_create1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                str_room = nameEditText.getText().toString();
-                if(str_room.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
-                }
-                else if(str_room.indexOf(":") != -1 || str_room.indexOf("\\n") != -1){
-                    Toast.makeText(getApplicationContext(), "방 제목으로 :와 \\n은 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    isOwner = true;
+        btn_create1.setOnClickListener(view1 -> {
+            str_room = nameEditText.getText().toString();
+            if(str_room.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
+            }
+            else if(str_room.contains(":")){
+                Toast.makeText(getApplicationContext(), "방 제목으로 :은 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                isOwner = true;
 
-                    Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
-                    intent.putExtra("room name", str_room);
-                    intent.putExtra("owner", isOwner);
-                    intent.putExtra("ball", ball[0]);
-                    startActivity(intent);
-                    dialog.dismiss();
-                    finish();
-            }
-        }});
-        btn_dont.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                intent.putExtra("room name", str_room);
+                intent.putExtra("owner", isOwner);
+                intent.putExtra("ball", ball[0]);
+                startActivity(intent);
                 dialog.dismiss();
-            }
-        });
+                finish();
+        }
+    });
+        btn_dont.setOnClickListener(view12 -> dialog.dismiss());
 
         dialog.show();
     }
@@ -195,47 +170,37 @@ public class MultiList extends AppCompatActivity {
         final RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg_quick);
         dialog = builder.create();
 
-        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-                switch (i){
-                    case R.id.rb_ball3:
-                        ball[0] = 3; break;
-                    case R.id.rb_ball4:
-                        ball[0] = 4; break;
-                    case R.id.rb_ball5:
-                        ball[0] = 5; break;
-                }
+        rg.setOnCheckedChangeListener((radioGroup, i) -> {
+            switch (i){
+                case R.id.rb_ball3:
+                    ball[0] = 3; break;
+                case R.id.rb_ball4:
+                    ball[0] = 4; break;
+                case R.id.rb_ball5:
+                    ball[0] = 5; break;
             }
         });
-        btn_find.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                /*
-                if(str_room.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
-                }
-                else if(str_room.indexOf(":") != -1 || str_room.indexOf("\\n") != -1){
-                    Toast.makeText(getApplicationContext(), "방 제목으로 :와 \\n은 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    isOwner = true;
+        btn_find.setOnClickListener(view1 -> {
+            /*
+            if(str_room.isEmpty()) {
+                Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
+            }
+            else if(str_room.indexOf(":") != -1 || str_room.indexOf("\\n") != -1){
+                Toast.makeText(getApplicationContext(), "방 제목으로 :와 \\n은 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                isOwner = true;
 
-                    Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
-                    intent.putExtra("room name", str_room);
-                    intent.putExtra("owner", isOwner);
-                    intent.putExtra("ball", ball[0]);
-                    startActivity(intent);
-                    finish();
-                }
-                 */
-            }});
-        btn_dont1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
+                Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                intent.putExtra("room name", str_room);
+                intent.putExtra("owner", isOwner);
+                intent.putExtra("ball", ball[0]);
+                startActivity(intent);
+                finish();
             }
+             */
         });
+        btn_dont1.setOnClickListener(view12 -> dialog.dismiss());
 
         dialog.show();
     }
