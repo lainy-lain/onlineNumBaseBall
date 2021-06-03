@@ -10,7 +10,6 @@ import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -33,19 +32,14 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
     private TextView tv_nickname; // 닉네임을 나타내는 Text
@@ -57,6 +51,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private static final int REQ_SIGN_GOOGLE = 100; // 구글 로그인 결과 코드
 
     private boolean loginSuccess;
+    private static final String[] PREFERENCES = {
+            "btn1bg", "btn2bg", "btn3bg", "btn4bg", "btn5bg", "btnbgbg",
+            "btn1tx", "btn2tx", "btn3tx", "btn4tx", "btn5tx", "btnbgtx", "radius"
+    };
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -110,18 +108,18 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
         // 설정한 색들 버튼에 세팅
         SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
-        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
-                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
-                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
-                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
-                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
-                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt(PREFERENCES[0], 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[1], 0xFFCDDC39)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[2], 0xFF8BC34A)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[3], 0xFF00BCD4)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[4], 0xFF03A9F4)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[5], 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[6], 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[7], 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[8], 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[9], 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[10], 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt(PREFERENCES[11], 0xFF000000))
         };
         play_btn.setBackgroundTintList(colors[0]);
         play_btn.setTextColor(colors[6]);
@@ -139,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         ((RadioButton)findViewById(R.id.three_ball)).setTextColor(colors[11]);
         ((RadioButton)findViewById(R.id.four_ball)).setTextColor(colors[11]);
         ((RadioButton)findViewById(R.id.five_ball)).setTextColor(colors[11]);
-        int radiusChecked = sp.getInt("radius", 0);
+        int radiusChecked = sp.getInt(PREFERENCES[12], 0);
         int cornerRadius = (radiusChecked + 1) * 8;
         ((MaterialButton)play_btn).setCornerRadius(cornerRadius);
         ((MaterialButton)single_btn).setCornerRadius(cornerRadius);
@@ -163,7 +161,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 if (!state) {
                     ObjectAnimator.ofFloat(single_btn, "translationY", v.getHeight()).start();
                     ObjectAnimator.ofFloat(multi_btn, "translationY", v.getHeight() * 2).start();
-                    single_btn.setEnabled(true);
                     if (loginSuccess) {
                         multi_btn.setEnabled(true);
                     }
@@ -180,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         final int[] ballNumber = new int[1];
         int[] radio_Id = {R.id.three_ball, R.id.four_ball, R.id.five_ball};
         ballCount.setOnCheckedChangeListener((radioGroup, i) -> {
-            play_btn.setEnabled(true);
+            single_btn.setEnabled(true);
             for(int j = 0; j < 3; j++){
                 if(i == radio_Id[j]) {
                     ballNumber[0] = 3 + j;
@@ -220,51 +217,51 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             }
         }
 
-        if (requestCode == 0) { //색깔 바꾼 거 즉시 적용하는 부분
-            if (resultCode == RESULT_OK) {
-                ColorStateList[] btnColors = {ColorStateList.valueOf(data.getExtras().getInt("btn1bg", 0xFFFFEB3B)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn2bg", 0xFFCDDC39)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn3bg", 0xFF8BC34A)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn4bg", 0xFF00BCD4)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn5bg", 0xFF03A9F4)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btnbgbg", 0xFF000000)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn1tx", 0xFF000000)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn2tx", 0xFF000000)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn3tx", 0xFFFFFFFF)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn4tx", 0xFFFFFFFF)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btn5tx", 0xFFFFFFFF)),
-                        ColorStateList.valueOf(data.getExtras().getInt("btnbgtx", 0xFFFFFFFF))
-                };
-                View[] views = {
-                        findViewById(R.id.play_btn), findViewById(R.id.single_btn), findViewById(R.id.multi_btn),
-                        findViewById(R.id.rank_btn), findViewById(R.id.set_btn),
-                        findViewById(R.id.tv_nickname), findViewById(R.id.guide),
-                        findViewById(R.id.three_ball), findViewById(R.id.four_ball), findViewById(R.id.five_ball)
-                };
-                views[0].setBackgroundTintList(btnColors[0]);
-                ((Button)views[0]).setTextColor(btnColors[6]);
-                views[1].setBackgroundTintList(btnColors[1]);
-                ((Button)views[1]).setTextColor(btnColors[7]);
-                views[2].setBackgroundTintList(btnColors[2]);
-                ((Button)views[2]).setTextColor(btnColors[8]);
-                views[3].setBackgroundTintList(btnColors[3]);
-                ((Button)views[3]).setTextColor(btnColors[9]);
-                views[4].setBackgroundTintList(btnColors[4]);
-                ((Button)views[4]).setTextColor(btnColors[10]);
-                views[5].getRootView().setBackgroundTintList(btnColors[5]);
-                ((TextView)views[5]).setTextColor(btnColors[11]);
-                ((TextView)views[6]).setTextColor(btnColors[11]);
-                ((RadioButton)views[7]).setTextColor(btnColors[11]);
-                ((RadioButton)views[8]).setTextColor(btnColors[11]);
-                ((RadioButton)views[9]).setTextColor(btnColors[11]);
-                int radiusChecked = data.getExtras().getInt("radius", 0);
-                int cornerRadius = (radiusChecked + 1) * 8;
-                ((MaterialButton)views[0]).setCornerRadius(cornerRadius);
-                ((MaterialButton)views[1]).setCornerRadius(cornerRadius);
-                ((MaterialButton)views[2]).setCornerRadius(cornerRadius);
-                ((MaterialButton)views[3]).setCornerRadius(cornerRadius);
-                ((MaterialButton)views[4]).setCornerRadius(cornerRadius);
-            }
+        //색깔 바꾼 거 즉시 적용
+        if (requestCode == 0 && resultCode == RESULT_OK) {
+            ColorStateList[] colorSettings = {ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[0], 0xFFFFEB3B)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[1], 0xFFCDDC39)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[2], 0xFF8BC34A)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[3], 0xFF00BCD4)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[4], 0xFF03A9F4)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[5], 0xFF000000)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[6], 0xFF000000)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[7], 0xFF000000)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[8], 0xFFFFFFFF)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[9], 0xFFFFFFFF)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[10], 0xFFFFFFFF)),
+                    ColorStateList.valueOf(data.getExtras().getInt(PREFERENCES[11], 0xFFFFFFFF))
+            };
+            View[] views = {
+                    findViewById(R.id.play_btn), findViewById(R.id.single_btn), findViewById(R.id.multi_btn),
+                    findViewById(R.id.rank_btn), findViewById(R.id.set_btn),
+                    findViewById(R.id.tv_nickname), findViewById(R.id.guide),
+                    findViewById(R.id.three_ball), findViewById(R.id.four_ball), findViewById(R.id.five_ball)
+            };
+            views[0].setBackgroundTintList(colorSettings[0]);
+            ((Button)views[0]).setTextColor(colorSettings[6]);
+            views[1].setBackgroundTintList(colorSettings[1]);
+            ((Button)views[1]).setTextColor(colorSettings[7]);
+            views[2].setBackgroundTintList(colorSettings[2]);
+            ((Button)views[2]).setTextColor(colorSettings[8]);
+            views[3].setBackgroundTintList(colorSettings[3]);
+            ((Button)views[3]).setTextColor(colorSettings[9]);
+            views[4].setBackgroundTintList(colorSettings[4]);
+            ((Button)views[4]).setTextColor(colorSettings[10]);
+            views[5].getRootView().setBackgroundTintList(colorSettings[5]);
+            ((TextView)views[5]).setTextColor(colorSettings[11]);
+            ((TextView)views[6]).setTextColor(colorSettings[11]);
+            ((RadioButton)views[7]).setTextColor(colorSettings[11]);
+            ((RadioButton)views[8]).setTextColor(colorSettings[11]);
+            ((RadioButton)views[9]).setTextColor(colorSettings[11]);
+            int radiusChecked = data.getExtras().getInt(PREFERENCES[12], 0);
+            int cornerRadius = (radiusChecked + 1) * 8;
+            ((MaterialButton)views[0]).setCornerRadius(cornerRadius);
+            ((MaterialButton)views[1]).setCornerRadius(cornerRadius);
+            ((MaterialButton)views[2]).setCornerRadius(cornerRadius);
+            ((MaterialButton)views[3]).setCornerRadius(cornerRadius);
+            ((MaterialButton)views[4]).setCornerRadius(cornerRadius);
+
         }
     }
 
@@ -301,19 +298,19 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             // 로그인한 채로 설정했을 때도 뒤로가기 버튼 누르면 바로 적용되도록
             Intent intent = new Intent();
             SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
-            intent.putExtra("btn1bg", sp.getInt("btn1bg", 0xFFFFEB3B));
-            intent.putExtra("btn1tx", sp.getInt("btn1tx", 0xFF000000));
-            intent.putExtra("btn2bg", sp.getInt("btn2bg", 0xFFCDDC39));
-            intent.putExtra("btn2tx", sp.getInt("btn2tx", 0xFF000000));
-            intent.putExtra("btn3bg", sp.getInt("btn3bg", 0xFF8BC34A));
-            intent.putExtra("btn3tx", sp.getInt("btn3tx", 0xFFFFFFFF));
-            intent.putExtra("btn4bg", sp.getInt("btn4bg", 0xFF00BCD4));
-            intent.putExtra("btn4tx", sp.getInt("btn4tx", 0xFFFFFFFF));
-            intent.putExtra("btn5bg", sp.getInt("btn5bg", 0xFF03A9F4));
-            intent.putExtra("btn5tx", sp.getInt("btn5tx", 0xFFFFFFFF));
-            intent.putExtra("btnbgbg", sp.getInt("btnbgbg", 0xFFFFFFFF));
-            intent.putExtra("btnbgtx", sp.getInt("btnbgtx", 0xFF000000));
-            intent.putExtra("radius", sp.getInt("radius", 0));
+            intent.putExtra(PREFERENCES[0], sp.getInt(PREFERENCES[0], 0xFFFFEB3B));
+            intent.putExtra(PREFERENCES[6], sp.getInt(PREFERENCES[6], 0xFF000000));
+            intent.putExtra(PREFERENCES[1], sp.getInt(PREFERENCES[1], 0xFFCDDC39));
+            intent.putExtra(PREFERENCES[7], sp.getInt(PREFERENCES[7], 0xFF000000));
+            intent.putExtra(PREFERENCES[2], sp.getInt(PREFERENCES[2], 0xFF8BC34A));
+            intent.putExtra(PREFERENCES[8], sp.getInt(PREFERENCES[8], 0xFFFFFFFF));
+            intent.putExtra(PREFERENCES[3], sp.getInt(PREFERENCES[3], 0xFF00BCD4));
+            intent.putExtra(PREFERENCES[9], sp.getInt(PREFERENCES[9], 0xFFFFFFFF));
+            intent.putExtra(PREFERENCES[4], sp.getInt(PREFERENCES[4], 0xFF03A9F4));
+            intent.putExtra(PREFERENCES[10], sp.getInt(PREFERENCES[10], 0xFFFFFFFF));
+            intent.putExtra(PREFERENCES[5], sp.getInt(PREFERENCES[5], 0xFFFFFFFF));
+            intent.putExtra(PREFERENCES[11], sp.getInt(PREFERENCES[11], 0xFF000000));
+            intent.putExtra(PREFERENCES[12], sp.getInt(PREFERENCES[12], 0));
             setResult(RESULT_OK, intent);
         }
         super.onBackPressed();

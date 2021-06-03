@@ -4,7 +4,7 @@
     <string name="toSetting">설정하기</string>
     <string name="toSingle">혼자하기</string>
     <string name="toMulti">같이하기</string>
-    <string name="guideText">공의 개수를 선택하고\n 게임시작 버튼을 눌러주세요</string>
+    <string name="guideText">혼자하기: 공 개수를 선택해주세요\n같이하기: 로그인이 필요합니다</string>
     <string name="toPlay">게임시작</string>
     <string name="_3">3</string>
     <string name="_4">4</string>
@@ -59,7 +59,7 @@
     <string name="db_info">DB에 기록된 정보</string>
     <string name="mean_time_">평균 클리어 시간 :</string>
     <string name="mean_turn_">평균 클리어 턴 수 :</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading&#8230;</string>
     <string name="guess">0 1 2 3 4 5 6 7 8 9</string>
     <string name="back">되돌리기</string>
 </resources>

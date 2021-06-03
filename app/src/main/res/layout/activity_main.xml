@@ -42,11 +42,11 @@
 
     <TextView
         android:id="@+id/guide"
-        android:layout_width="300dp"
+        android:layout_width="320dp"
         android:layout_height="80dp"
         android:gravity="center"
         android:text="@string/guideText"
-        android:textSize="24sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteY="127dp" />
@@ -117,7 +117,6 @@
             android:id="@+id/play_btn"
             android:layout_width="wrap_content"
             android:layout_height="50dp"
-            android:enabled="false"
             android:text="@string/toPlay"
             android:textColor="@color/black"
             android:textSize="18sp"
