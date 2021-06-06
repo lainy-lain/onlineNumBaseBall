@@ -95,7 +95,6 @@ public class MultiplayActivity extends AppCompatActivity{
     private int[] input_num; //사용자가 선택한 정답
     private int whosTurn; // 1이면 방장, 2면 게스트의 차례
     private String opponentInputNum; // 상대가 입력한 숫자
-    // private boolean isAlreadySubmit = false; // 내 턴을 소모했는가?
     private boolean am_i_p1; // 내가 플레이어 1인지 아닌지를 나타내는 변수
     Queue<Boolean> submit_queue = new LinkedList<>();
 
@@ -361,15 +360,10 @@ public class MultiplayActivity extends AppCompatActivity{
         init_timer.schedule(init_task, 15000); // 10초 후에 이 타이머 스레드가 실행된다.
         tv_info.setText("당신의 숫자를 입력하세요");
 
-
-        // 이 아래는, 그냥 listener 설정만 해주는 것이다.
-
         // 취소 버튼 눌렀을 때
         btn_cancel.setOnClickListener(v -> {
             resetButton();
         });
-
-
 
         DB_game.child(p1_id).addChildEventListener(new ChildEventListener() {
             @Override
@@ -380,15 +374,6 @@ public class MultiplayActivity extends AppCompatActivity{
             @Override
             public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                 // 여기서의 previousChildName이란... DB에서 '자신 위에 있는' Child의 이름을 말한다...
-
-                // Debug
-                myDebug("myDebug: " + previousChildName);
-                String str = "ans : ";
-                for (int i : ans){
-                    str += String.valueOf(i);
-                    str += " ";
-                }
-                myDebug(str);
 
                 // 상대방의 해답이 입력된 경우
                 // p_solnum위에 p_inputNum이 있으므로 whosAns 대신 whosInput과 비교
@@ -470,6 +455,9 @@ public class MultiplayActivity extends AppCompatActivity{
                     displayTurnInfo(); // 턴 정보를 화면에 표시
 
                     if (isMyTurn()) {
+                        // Toast로 자신의 턴임을 알림
+                        Toast.makeText(MultiplayActivity.this, "Your Turn", Toast.LENGTH_LONG).show(); // 토스트 문자 출력
+
                         Timer play_timer = new Timer();
                         TimerTask play_task = new TimerTask() {
                             @Override
@@ -477,18 +465,9 @@ public class MultiplayActivity extends AppCompatActivity{
                                 if (submit_queue.poll() == null){ // 시간이 경과할 동안 제출 버튼을 누르지 않은 경우, 자동 제출
                                     getResultAndUpdate();
                                 }
-//
-//                                if (isAlreadySubmit) { // 시간이 경과하기 전에 이미 제출(확인) 버튼을 누른 경우
-//                                    isAlreadySubmit = false; // 값 reset
-//                                    // do nothing
-//                                } else {
-//                                    getResultAndUpdate();
-//                                    isAlreadySubmit = false; // concurrency problem(race condition) 방지
-//                                }
                             }
                         };
-
-                        play_timer.schedule(play_task, 10000); // 제한 시간은 10초
+                        play_timer.schedule(play_task, 15000); // 제한 시간은 15초
                     }
                 }
 
