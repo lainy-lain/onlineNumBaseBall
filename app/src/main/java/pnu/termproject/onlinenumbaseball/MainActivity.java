@@ -195,6 +195,17 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         multi_btn.setOnClickListener(v -> {
             Intent toMulGame = new Intent(getApplicationContext(), MultiList.class);
             startActivity(toMulGame);
+
+//            // MultiplayActivity를 위한 Debugging code
+//            Intent toMulPlay = new Intent(getApplicationContext(), MultiplayActivity.class);
+//            toMulPlay.putExtra("ballNumber", 3);
+//            toMulPlay.putExtra("p1_nickname", "sevenstars entanglement");
+//            toMulPlay.putExtra("p1_photoUrl", "https://lh4.googleusercontent.com/-NBD_79wOH5I/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuckBv6-wlZgIbgS_gPjRW0Oj4ZcX0w/s96-c/photo.jpg");
+//            toMulPlay.putExtra("p1_id", "HYccAMLf5yce4l12XpNfr3A6egX2");
+//            toMulPlay.putExtra("p2_nickname", "Dostoevsky Fyodor");
+//            toMulPlay.putExtra("p2_photoUrl", "https://lh4.googleusercontent.com/-Ko7142HH6t4/AAAAAAAAAAI/AAAAAAAAAAA/AMZuuclQvshB2VD_pCSeLs_zdCBpbXaRhA/s96-c/photo.jpg");
+//            toMulPlay.putExtra("p2_id", "lYHABhwlbLb98W38bbBg3rAvl573");
+//            startActivity(toMulPlay);
         });
         //수정한 부분의 끝입니다!
 
