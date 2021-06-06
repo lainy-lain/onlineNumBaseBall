@@ -11,6 +11,11 @@ public class InputAndResult {
         this.result = result;
     }
 
+    public InputAndResult(final InputAndResult other){
+        this.input = other.getInput();
+        this.result = other.getResult();
+    }
+
     public String getInput() {
         return input;
     }

@@ -1,5 +1,6 @@
 package pnu.termproject.onlinenumbaseball;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -8,11 +9,13 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -24,8 +27,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -34,27 +41,28 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static java.lang.Thread.sleep;
+
 public class MultiplayActivity extends AppCompatActivity{
-    //변수 선언
+    // 버튼 관련 전역변수
     private RadioGroup rg_number;
     private RadioButton rb_select;
     private RadioButton[] radio_btn = new RadioButton[5];
     private Button[] btn_num = new Button[10];
     private Button btn_result, btn_cancel, btn_memo;
-    private TextView tv_info;
     private Random random = new Random();
     private int strike, ball, turn;
     private ListView result_list;
@@ -63,48 +71,70 @@ public class MultiplayActivity extends AppCompatActivity{
     private Button btn_clear;
     private TextView guess;
 
-    int[] ans; //맞춰야 할 정답
-    int[] input_num; //사용자가 선택한 정답
-
-    // 이전 activity로부터 전달받을 것들.
+    // 이전 activity로부터 전달받을 정보들
     private String p1_nickname, p2_nickname;
-    private String p1_profileUrl, p2_profileUrl;
+    private String p1_photoUrl, p2_photoUrl;
     private String p1_id, p2_id;
     private int ball_number;
+
+    // 플레이어 2명의 정보를 나타내기 위한 View들
+    private ImageView iv_photo1, iv_photo2;
+    private TextView tv_nickname1, tv_nickname2;
+    private TextView tv_winRate1, tv_winRate2;
+
+    // RecyclerView관련 전역변수
+    private RecyclerView recyclerView_result1, recyclerView_result2;
+    private RecyclerView.Adapter adapter_result1, adapter_result2;
+    private RecyclerView.LayoutManager layoutManager_result1, layoutManager_result2;
+    private ArrayList<InputAndResult> arrayList_result1, arrayList_result2;
+    private InputAndResult ir = new InputAndResult();
+
     // 게임 진행에 필요한 정보들
+    private TextView tv_info;
+    private int[] ans; //맞춰야 할 정답
+    private int[] input_num; //사용자가 선택한 정답
     private int whosTurn; // 1이면 방장, 2면 게스트의 차례
-//    private boolean isEnd = false;
-//    private String p1_solNum, p2_solNum;
-//    private String p1_inputNum, p2_inputNum;
-//    private String p1_status, p2_status;
-    // 필요하지만 DB에 R/W하지는 않는 변수들
     private String opponentInputNum; // 상대가 입력한 숫자
-    private boolean isAlreadySubmit = false; // 내 턴을 소모했는가?
+    // private boolean isAlreadySubmit = false; // 내 턴을 소모했는가?
     private boolean am_i_p1; // 내가 플레이어 1인지 아닌지를 나타내는 변수
+    Queue<Boolean> submit_queue = new LinkedList<>();
 
+    private String whosInput, whosAns;
+    private ArrayList<String> inputAndResult = new ArrayList<>();
+
+    // Firebase DB 관련 전역변수
     private FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-    private DatabaseReference DB_game = FirebaseDatabase.getInstance().getReference("GAME");
+    private DatabaseReference DB_game;
 
-    private long backKeyPressedTime = 0;
-    private Toast toast;
-
+    // 메모 관련 변수
     ArrayList<Point> points = new ArrayList<Point>();
     LinearLayout drawLinear, resultLinear, drawBtnLinear;
     TableLayout inputTable;
     int color;
     ArrayList<Integer> lastDraw = new ArrayList<Integer>();
 
-    // 설정(색깔) 관련한 변수 전역변수로 뺐습니다.
-    SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+    private long backKeyPressedTime = 0;
+    private Handler handler;
 
 
+    @SuppressLint("HandlerLeak")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_multi_play);
 
-        //game.xml 의 값을 변수에 대입
+        // 이전 activity로부터 정보 받아오기
+        Intent intent = getIntent();
+        ball_number = intent.getExtras().getInt("ballNumber");
+        p1_nickname = intent.getExtras().getString("p1_nickname");
+        p2_nickname = intent.getExtras().getString("p2_nickname");
+        p1_photoUrl = intent.getExtras().getString("p1_photoUrl");
+        p2_photoUrl = intent.getExtras().getString("p2_photoUrl");
+        p1_id = intent.getExtras().getString("p1_id");
+        p2_id = intent.getExtras().getString("p2_id");
+
+        // 데이터 초기화, findViewById
         int[] radio_Id = {R.id.radioButton1, R.id.radioButton2, R.id.radioButton3, R.id.radioButton4, R.id.radioButton5};
         int[] btn_Id = {R.id.btn_0, R.id.btn_1, R.id.btn_2, R.id.btn_3, R.id.btn_4, R.id.btn_5, R.id.btn_6, R.id.btn_7, R.id.btn_8, R.id.btn_9};
         for(int i = 0; i < 5; i++)
@@ -128,54 +158,132 @@ public class MultiplayActivity extends AppCompatActivity{
         rb_select = findViewById(R.id.radioButton1);
         radio_btn[0].setChecked(true);
 
-        // 데이터 초기화 해야함
+        // 설정 적용
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
+                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
+                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
+                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        int radiusChecked = sp.getInt("radius", 0);
+        int cornerRadius = (radiusChecked + 1) * 8;
+        tv_info.setTextColor(colors[11]);
+        tv_info.getRootView().setBackgroundTintList(colors[5]);
+        for (int i = 0; i < 5; i++) {
+            radio_btn[i].setTextColor(colors[6]);
+        }
+        rg_number.setBackgroundColor(sp.getInt("btn1bg", 0xFFFFEB3B));
+        for (int i = 0; i < 10; i++) {
+            btn_num[i].setTextColor(colors[7]);
+            btn_num[i].setBackgroundTintList(colors[1]);
+            ((MaterialButton)btn_num[i]).setCornerRadius(cornerRadius);
+        }
+        btn_result.setTextColor(colors[8]);
+        btn_result.setBackgroundTintList(colors[2]);
+        ((MaterialButton)btn_result).setCornerRadius(cornerRadius);
+        btn_cancel.setTextColor(colors[9]);
+        btn_cancel.setBackgroundTintList(colors[3]);
+        ((MaterialButton)btn_cancel).setCornerRadius(cornerRadius);
+        btn_memo.setTextColor(colors[10]);
+        btn_memo.setBackgroundTintList(colors[4]);
+        ((MaterialButton)btn_memo).setCornerRadius(cornerRadius);
+        btn_clear.setTextColor(colors[11]);
+        btn_clear.setBackgroundTintList(colors[5]);
+        ((MaterialButton)btn_clear).setCornerRadius(cornerRadius);
+        for (int i = 0; i < 6; i++) {
+            if (i == 5) {
+                memo_color[i].setBackgroundTintList(colors[11]);
+            }
+            else {
+                memo_color[i].setBackgroundTintList(colors[i]);
+            }
+            ((MaterialButton)memo_color[i]).setCornerRadius(cornerRadius);
+        }
+        btn_back.setBackgroundTintList(colors[5]);
+        btn_back.setTextColor(colors[11]);
+        ((MaterialButton)btn_back).setCornerRadius(cornerRadius);
+        guess.setTextColor(colors[11]);
+        color = colors[11].getDefaultColor();
+
+        //
+        ans       = new int[ball_number]; // 맞춰야 할 정답
+        input_num = new int[ball_number]; // 사용자가 선택한 정답
         if (Objects.equals(currentUser.getUid(), p1_id)){
             am_i_p1 = true;
         }
         else{
             am_i_p1 = false;
         }
-        // 공 갯수, 플레이어 2명의 정보를 이전 activity로부터 받아오면 됨
-        Intent intent = getIntent();
-        ball_number = intent.getExtras().getInt("ballNumber");
-        ans       = new int[ball_number]; //맞춰야 할 정답
-        input_num = new int[ball_number]; //사용자가 선택한 정답
+        recyclerView_result1 = findViewById(R.id.recyclerView_result1);
+        recyclerView_result2 = findViewById(R.id.recyclerView_result2);
+        recyclerView_result1.setHasFixedSize(true);
+        recyclerView_result2.setHasFixedSize(true);
+        layoutManager_result1 = new LinearLayoutManager(this);
+        layoutManager_result2 = new LinearLayoutManager(this);
+        recyclerView_result1.setLayoutManager(layoutManager_result1);
+        recyclerView_result2.setLayoutManager(layoutManager_result2);
+        arrayList_result1 = new ArrayList<>();
+        arrayList_result2 = new ArrayList<>();
+        ColorStateList tx = ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000));
+        // 어댑터 설정
+        adapter_result1 = new ResultAdapter(arrayList_result1, this, tx);
+        adapter_result2 = new ResultAdapter(arrayList_result2, this, tx);
+        recyclerView_result1.setAdapter(adapter_result1);
+        recyclerView_result2.setAdapter(adapter_result2);
 
+        // reset button handler 설정
+        handler = new Handler(){
+            public void handleMessage(Message msg){
+                rb_select = radio_btn[0];
+                rb_select.setChecked(true);
+                for (int i = 0; i < ball_number; i++) {
+                    input_num[i] = -1;
+                    radio_btn[i].setText("");
+                }
+                for(int i = 0; i < 10; i++){
+                    btn_num[i].setEnabled(true);
+                }
+            }
+        };
+
+
+        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         // DB에 게임 방 생성 (방장(p1)이 생성)
         if (am_i_p1){
             // 게임이 진행되기 전에, 이 child에 대한 listener가 설정돼야 하므로
             // 여기서 미리 초기화시켜두는 것이다.
-            DB_game.child(p1_id).child("p1_inputNum").setValue("init");
-            DB_game.child(p1_id).child("p2_inputNum").setValue("init");
-            DB_game.child(p1_id).child("p1_status").setValue("init");
-            DB_game.child(p1_id).child("p2_status").setValue("init");
-            DB_game.child(p1_id).child("isEnd").setValue(false);
-            DB_game.child(p1_id).child("whosTurn").setValue(0);
-            DB_game.child(p1_id).child("isOneExited").setValue(false);
+            mDatabase.child("multiPlay").child(p1_id).setValue(null); // 혹시라도 유령방이 남아있으면 clear
+            mDatabase.child("multiPlay").child(p1_id).child("p1_inputNum").setValue("init");
+            mDatabase.child("multiPlay").child(p1_id).child("p2_inputNum").setValue("init");
+            mDatabase.child("multiPlay").child(p1_id).child("p1_status").setValue("init");
+            mDatabase.child("multiPlay").child(p1_id).child("p2_status").setValue("init");
+            mDatabase.child("multiPlay").child(p1_id).child("p1_solNum").setValue("init");
+            mDatabase.child("multiPlay").child(p1_id).child("p2_solNum").setValue("init");
+            mDatabase.child("multiPlay").child(p1_id).child("isEnd").setValue(false);
+            mDatabase.child("multiPlay").child(p1_id).child("whosTurn").setValue(0);
+            mDatabase.child("multiPlay").child(p1_id).child("isOneExited").setValue(false);
         }
-
+        DB_game = mDatabase.child("multiPlay");
 
         // 플레이어 2명의 정보를 화면에 띄워야 함
-
-
-        // 설정
-        setting();
-
-        //결과를 나타내는 리스트들을 위한 코드
-        // recyclerView로 바꾸자...
-        List<String> data = new ArrayList<>();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                TextView tv = view.findViewById(android.R.id.text1);
-                tv.setTextColor(sp.getInt("btnbgtx", 0xFF000000));
-                return view;
-            }
-        };
-        result_list.setAdapter(adapter);
-
-
+        // winRate DB에서 가져와서 저장하기. 그리고 화면에 띄워야함
+        // winRate는 Room에서 DB에 접근하는걸로 하고, 여기서는 getExtras로 받는걸로 하자.
+        iv_photo1 = findViewById(R.id.iv_profile1);
+        iv_photo2 = findViewById(R.id.iv_profile2);
+        Glide.with(this).load(p1_photoUrl).into(iv_photo1);
+        Glide.with(this).load(p2_photoUrl).into(iv_photo2);
+        tv_nickname1 = findViewById(R.id.tv_nickname1);
+        tv_nickname2 = findViewById(R.id.tv_nickname2);
+        tv_nickname1.setText(p1_nickname);
+        tv_nickname2.setText(p2_nickname);
 
         // 라디오 버튼 갯수 설정
         for(int i = ball_number; i < 5; i++)
@@ -209,6 +317,15 @@ public class MultiplayActivity extends AppCompatActivity{
             });
         }
 
+        if (am_i_p1) {
+            whosInput = "p2_inputNum";
+            whosAns = "p2_solNum";
+        }
+        else{
+            whosInput = "p1_inputNum";
+            whosAns = "p1_solNum";
+        }
+
 
         // 초기 숫자 결정
         // 10초동안 초기 숫자를 선택가능
@@ -219,30 +336,13 @@ public class MultiplayActivity extends AppCompatActivity{
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void run() {
-                // 입력된 초기숫자를 받아서, 중복이 있으면 없도록 처리해줌
-                Integer[] solNumArr = Arrays.stream(input_num).boxed().toArray(Integer[]::new);
-                Set<Integer> solNumSet = new HashSet<>(Arrays.asList(solNumArr));
-                boolean is_dup = false;
-
-                while (solNumSet.size() < ball_number){ // 중복이 없어질때까지
-                    is_dup = true;
-                    int randomNum = random.nextInt(10);
-                    solNumSet.add(randomNum);
-                }
+                // 숫자 3개 중 입력되지 않은 값(-1) 이 있으면 처리해줘야 한다.
+                setInputNumValid();
 
                 String solNum_str = "";
-                if (is_dup){
-                    Iterator<Integer> it = solNumSet.iterator();
-                    while (it.hasNext()){
-                        solNum_str += String.valueOf(it.next());
-                    }
+                for (int i : input_num){
+                    solNum_str += String.valueOf(i);
                 }
-                else{
-                    for (int i : input_num){
-                        solNum_str += String.valueOf(i);
-                    }
-                }
-                // 중복처리 완료
 
                 // DB에 입력한 초기 값 쓰기
                 if (am_i_p1){
@@ -255,15 +355,216 @@ public class MultiplayActivity extends AppCompatActivity{
                 // input_num 초기화시켜야함.
                 resetButton();
 
-                playMultiGame();
+                determineFirstAttack();
             }
         };
-        btn_result.setVisibility(View.INVISIBLE); // 확인(제출) 버튼 사용불가
-        init_timer.schedule(init_task, 10000); // 10초 후에 이 타이머 스레드가 실행된다.
+        init_timer.schedule(init_task, 15000); // 10초 후에 이 타이머 스레드가 실행된다.
         tv_info.setText("당신의 숫자를 입력하세요");
 
 
         // 이 아래는, 그냥 listener 설정만 해주는 것이다.
+
+        // 취소 버튼 눌렀을 때
+        btn_cancel.setOnClickListener(v -> {
+            resetButton();
+        });
+
+
+
+        DB_game.child(p1_id).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                // 여기서의 previousChildName이란... DB에서 '자신 위에 있는' Child의 이름을 말한다...
+
+                // Debug
+                myDebug("myDebug: " + previousChildName);
+                String str = "ans : ";
+                for (int i : ans){
+                    str += String.valueOf(i);
+                    str += " ";
+                }
+                myDebug(str);
+
+                // 상대방의 해답이 입력된 경우
+                // p_solnum위에 p_inputNum이 있으므로 whosAns 대신 whosInput과 비교
+                if (Objects.equals(previousChildName, whosInput)){
+                    opponentInputNum = (String) snapshot.getValue();
+                    // 상대방이 입력한 숫자(해답)을 배열에 저장
+                    for(int i = 0; i < ball_number; i++) {
+                        ans[i] = Integer.parseInt(opponentInputNum.substring(i, i+1));
+                        input_num[i] = -1;
+                    }
+                }
+
+                // 상대방이 뒤로가기 버튼을 눌러 게임을 나간 경우
+                else if (Objects.equals(previousChildName, "isEnd")){ // isOneExited 위에 isEnd가 있으므로
+                    String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
+                    // 확인 메시지 창을 띄움.
+                    AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
+                            .setTitle("상대방이 방을 나가서 게임이 종료됐습니다.")
+                            .setMessage(victoryMsg)
+                            .setPositiveButton("확인", (dialog, which) -> {
+                                // DB에 승률 갱신
+
+                                DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
+
+                                finish();
+                            });
+
+                    AlertDialog msgDialog = msgBuilder.create();
+                    msgDialog.show();
+                }
+
+                // 상대방의 inputNum값이 갱신되는 경우
+                // p1의 경우, p2_inputNum 위에 있는 p1_status와 비교
+                // p2의 경우, p1_inputNum 위에 있는 isOneExited와 비교
+                else if (Objects.equals(previousChildName, "p1_status") && am_i_p1
+                        || Objects.equals(previousChildName, "isOneExited") && !am_i_p1) {
+                    String inputNum = (String) snapshot.getValue();
+                    ir.setInput(inputNum);
+                    inputAndResult.add(inputNum);
+                    if (inputAndResult.size() >= 2) { // input과 status 둘 다 갱신된 경우
+                        InputAndResult new_ir = new InputAndResult(ir);
+                        if (am_i_p1) {
+                            arrayList_result2.add(new_ir);
+                            adapter_result2.notifyDataSetChanged();
+                        } else {
+                            arrayList_result1.add(new_ir);
+                            adapter_result1.notifyDataSetChanged();
+                        }
+                        inputAndResult.clear(); // 초기화
+
+                    }
+                }
+
+                // 상대방의 status(결과)값이 갱신되는 경우
+                // p_status 위에 p_solNum이 있으므로 whosAns와 비교
+                else if (Objects.equals(previousChildName, whosAns)) {
+                    String status = (String) snapshot.getValue();
+                    status += "\t\t\n";
+                    ir.setResult(status);
+                    inputAndResult.add(status);
+                    if (inputAndResult.size() >= 2) { // input과 status 둘 다 갱신된 경우
+                        InputAndResult new_ir = new InputAndResult(ir);
+                        if (am_i_p1) {
+                            arrayList_result2.add(new_ir);
+                            adapter_result2.notifyDataSetChanged();
+                        } else {
+                            arrayList_result1.add(new_ir);
+                            adapter_result1.notifyDataSetChanged();
+                        }
+                        inputAndResult.clear(); // 초기화
+                    }
+                }
+
+                // 턴 정보가 갱신된 경우
+                // whosTurn 위에 p2_status가 있으므로 그것과 비교
+                else if (Objects.equals(previousChildName, "p2_status")) {
+                    Long lVal = (Long) snapshot.getValue();
+                    whosTurn = lVal.intValue();
+                    displayTurnInfo(); // 턴 정보를 화면에 표시
+
+                    if (isMyTurn()) {
+                        Timer play_timer = new Timer();
+                        TimerTask play_task = new TimerTask() {
+                            @Override
+                            public void run() {
+                                if (submit_queue.poll() == null){ // 시간이 경과할 동안 제출 버튼을 누르지 않은 경우, 자동 제출
+                                    getResultAndUpdate();
+                                }
+//
+//                                if (isAlreadySubmit) { // 시간이 경과하기 전에 이미 제출(확인) 버튼을 누른 경우
+//                                    isAlreadySubmit = false; // 값 reset
+//                                    // do nothing
+//                                } else {
+//                                    getResultAndUpdate();
+//                                    isAlreadySubmit = false; // concurrency problem(race condition) 방지
+//                                }
+                            }
+                        };
+
+                        play_timer.schedule(play_task, 10000); // 제한 시간은 10초
+                    }
+                }
+
+                // 게임이 종료된 경우. 단, 패자만이 이 알림을 받도록 설정.
+                // isEnd위엔 아무것도 없으므로 null과 비교
+                else if (Objects.equals(previousChildName, null) && !isMyTurn()) {
+                    boolean is_end = (boolean) snapshot.getValue();
+                    if (is_end) { // 에러 방지... 갱신되지 않았는데 갱신됐다고 뜨는 경우가 존재함
+                        int opponentClearTurn;
+                        if (am_i_p1) {
+                            opponentClearTurn = turn;
+                        } else {
+                            opponentClearTurn = turn + 1;
+                        }
+                        String victoryTitle = "상대방이 " + String.valueOf(opponentClearTurn) + "턴 만에 정답을 맞췄습니다";
+                        String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
+
+                        // 확인 메시지 창을 띄움.
+                        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
+                                .setTitle(victoryTitle)
+                                .setMessage(victoryMsg)
+                                .setPositiveButton("확인", (dialog, which) -> {
+                                    // DB에 승률 갱신
+
+                                    DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
+
+                                    finish();
+                                });
+
+                        AlertDialog msgDialog = msgBuilder.create();
+                        msgDialog.show();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+        setMemoFunc();
+    } // end of onCreate()
+
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void determineFirstAttack(){
+        // 방장이 선공을 결정한다
+        if (am_i_p1) { // 이 코드를 수행하는 것이 방장(p1) 이라면
+            int randomNum = random.nextInt(2) + 1;
+            switch (randomNum){
+                case 1:
+                    whosTurn = 1;
+                    break;
+                case 2:
+                    whosTurn = 2;
+                    break;
+                default:
+                    break;
+            }
+
+            DB_game.child(p1_id).child("whosTurn").setValue(whosTurn); // DB에 선공 데이터 갱신
+        }
+
         //확인(제출) 버튼을 눌렀을때의 동작을 구현하는 코드
         btn_result.setOnClickListener(view -> {
             boolean trigger = true;
@@ -281,232 +582,14 @@ public class MultiplayActivity extends AppCompatActivity{
             }
 
             if (trigger) {
-                isAlreadySubmit = true;
+                // 확인 버튼을 눌러 제출했을 경우, 시간 제한 타이머가 발동하지 않도록 해야함.
+                submit_queue.offer(true);
                 getResultAndUpdate();
             }
         });
 
-        // 취소 버튼 눌렀을 때
-        btn_cancel.setOnClickListener(v -> {
-            resetButton();
-        });
-
-        // 게임 강제종료에 대한 이벤트 리스너 만들어야 함
-        // 상대방이 뒤로가기 버튼을 눌러 나간 경우 실행되는 리스너
-        DB_game.child(p1_id).child("isOneExited").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                // 상대방이 나가서 게임이 종료됐습니다. 승리 처리됩니다.
-                // 상대방의 해답은 xxx였습니다.
-                // 방 청소
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
-
-        setMemoFunc();
-
-    } // end of onCreate()
-
-
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void playMultiGame(){
-        // DB에서 상대방이 입력한 해답을 받아온다
-        DB_game.addListenerForSingleValueEvent(new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot ds : snapshot.getChildren()){
-                    if (Objects.equals(ds.child("p1_id").getValue(), p1_id)){ // 이 snapshot이 현재 게임에 대한 data라면
-                        if (currentUser.getUid().equals(p1_id)) { // 이 코드를 수행하는 것이 방장(p1) 이라면
-                            opponentInputNum = (String) ds.child("p2_solNum").getValue();
-                        }
-                        else{ // 방장이 아니라면
-                            opponentInputNum = (String) ds.child("p1_solNum").getValue();
-                        }
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        // 상대방이 입력한 숫자(해답)을 배열에 저장
-        for(int i = 0; i < ball_number; i++) {
-            ans[i] = Integer.parseInt(opponentInputNum.substring(i, i+1));
-            input_num[i] = -1;
-        }
-
-        btn_result.setVisibility(View.VISIBLE);
-
-        // 상대방의 입력값/상태 를 얻어오기 위한 변수
-        String whosInput, whosStatus;
-        if (am_i_p1) {
-            whosInput = "p2_inputNum";
-            whosStatus = "p2_status";
-        }
-        else{
-            whosInput = "p1_inputNum";
-            whosStatus = "p1_status";
-        }
-
-        // 상대방의 입력값이 갱신되면 자동 감지
-        DB_game.child(p1_id).child(whosInput).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if (Objects.equals(whosInput, "p2_inputNum")){ // 방장이 실행할 코드
-                    String p2_inputNum = (String) snapshot.getValue();
-                    // 이걸 표시해줘야함 이제
-                }
-                else{ // guest가 실행할 코드
-                    String p1_inputNum = (String) snapshot.getValue();
-                }
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
-
-        // 상대방의 상태가 갱신되면 자동 감지
-        DB_game.child(p1_id).child(whosStatus).addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                if (Objects.equals(whosStatus, "p2_status")){ // 방장이 실행할 코드
-                    String p2_status = (String) snapshot.getValue();
-                }
-                else{ // guest가 실행할 코드
-                    String p1_status = (String) snapshot.getValue();
-                }
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
-
-        // 게임이 종료되면 실시간으로 감지. 패자만이 이 코드를 실행하게 된다.
-        DB_game.child(p1_id).child("isEnd").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                int opponentClearTurn;
-                if (am_i_p1){
-                    opponentClearTurn = turn;
-                }
-                else{
-                    opponentClearTurn = turn + 1;
-                }
-                // 상대방이 opponentClearTurn 만에 클리어하셨습니다.
-                // 상대방의 해답은 xxx였습니다.
-                // 방 청소
-                // 룸으로 돌아오게.
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
-
-        // 턴 정보가 변경되면 실시간으로 감지해서 가져온다.
-        DB_game.child(p1_id).child("whosTurn").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                whosTurn = (int) snapshot.getValue();
-                displayTurnInfo(); // 턴 정보를 화면에 표시
-
-                if (isMyTurn()){ // && !isEnd 조건도 넣자. => 게임 끝나면 턴 정보 바꾸지 않는걸로 하면 필요없다.
-                    Timer play_timer = new Timer();
-                    TimerTask play_task = new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (isAlreadySubmit){ // 시간이 경과하기 전에 이미 제출(확인) 버튼을 누른 경우
-                                isAlreadySubmit = false; // 값 reset
-                                // do nothing
-                            }
-                            else{ // 시간이 경과할 동안 제출 버튼을 누르지 않은 경우, 자동 제출
-                                getResultAndUpdate();
-                                isAlreadySubmit = false; // concurrency problem(race condition) 방지
-                            }
-                        }
-                    };
-
-                    play_timer.schedule(play_task, 20000); // 제한 시간은 20초
-                }
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) { }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) { }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) { }
-        });
-
-        // 방장이 선공을 결정한다
-        if (currentUser.getUid().equals(p1_id)) { // 이 코드를 수행하는 것이 방장(p1) 이라면
-            int randomNum = random.nextInt(2) + 1;
-            switch (randomNum){
-                case 1:
-                    whosTurn = 1;
-                    break;
-                case 2:
-                    whosTurn = 2;
-                    break;
-                default:
-                    break;
-            }
-
-            DB_game.child(p1_id).child("whosTurn").setValue(whosTurn); // DB에 선공 데이터 갱신
-        }
-
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private boolean isMyTurn(){
         if (am_i_p1){ // 방장이라면
             return whosTurn == 1;
@@ -523,6 +606,8 @@ public class MultiplayActivity extends AppCompatActivity{
 
         // 소모 turn 1회 증가.
         turn++;
+
+        setInputNumValid();
 
         // 결과를 계산하는 코드
         strike = 0;
@@ -561,43 +646,87 @@ public class MultiplayActivity extends AppCompatActivity{
         DB_game.child(p1_id).child(my_status).setValue(resultForDB);
 
 
-        // 화면에 "내 결과" 표시하는 부분임 => recyclerview 이용하자.
-        myResult += "\n" + resultForDB;
-//        data.add(myResult);
-//        adapter.notifyDataSetChanged();
+        // 화면에 "내 결과" 표시하는 부분
+        resultForDB += "\t\t\n";
+        InputAndResult my_ir = new InputAndResult(inputForDB, resultForDB);
+        if (am_i_p1){
+            arrayList_result1.add(my_ir);
+            // adapter_result1.notifyDataSetChanged();
 
-        // turn 교체
-        if (whosTurn == 1)
-            whosTurn = 2;
-        else
-            whosTurn = 1;
+            Handler mHandler = new Handler(Looper.getMainLooper());
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    adapter_result1.notifyDataSetChanged();
+                }
+            }, 0);
+        }
+        else{
+            arrayList_result2.add(my_ir);
+            // adapter_result2.notifyDataSetChanged();
+
+            Handler mHandler = new Handler(Looper.getMainLooper());
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    adapter_result2.notifyDataSetChanged();
+                }
+            }, 0);
+        }
 
 
         if (ball_number == strike) { // 게임 종료. 승자만이 이 코드를 실행하게 된다.
             DB_game.child(p1_id).child("isEnd").setValue(true); // DB에 값 갱신
-            // 승리하셨습니다! x turn 소모 표시하기.
-            // 승/패수 갱신 후 승률 갱신하기.
-            // 방으로 나가기.
 
+            String victoryTitle = String.valueOf(turn) + "턴 만에 승리하셨습니다!";
+            String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
+
+            Handler mHandler = new Handler(Looper.getMainLooper());
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // 확인 메시지 창을 띄움.
+                    AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
+                            .setTitle(victoryTitle)
+                            .setMessage(victoryMsg)
+                            .setPositiveButton("확인", (dialog, which) -> {
+                                // DB에 승률 갱신
+
+                                finish();
+                            });
+
+                    AlertDialog msgDialog = msgBuilder.create();
+                    msgDialog.show();
+                }
+            }, 0);
         }
         else{
             resetButton();
+
+            // turn 교체
+            if (whosTurn == 1)
+                whosTurn = 2;
+            else
+                whosTurn = 1;
+
             // turn 정보를 DB에 갱신해야함 => isEnd 갱신 후에 갱신하자.
             // 게임이 끝나지 않은 경우에만 턴 갱신. 게임 끝나면 턴을 갱신할 필요가 없다.
             DB_game.child(p1_id).child("whosTurn").setValue(whosTurn);
         }
     } // end of getResultAndUpdate()
 
-    private void resetButton(){
-        rb_select = radio_btn[0];
-        rb_select.setChecked(true);
-        for (int i = 0; i < ball_number; i++) {
-            input_num[i] = -1;
-            radio_btn[i].setText("");
-        }
-        for(int i = 0; i < 10; i++){
-            btn_num[i].setEnabled(true);
-        }
+    public void resetButton(){
+//        rb_select = radio_btn[0];
+//        rb_select.setChecked(true);
+//        for (int i = 0; i < ball_number; i++) {
+//            input_num[i] = -1;
+//            radio_btn[i].setText("");
+//        }
+//        for(int i = 0; i < 10; i++){
+//            btn_num[i].setEnabled(true);
+//        }
+        Message msg = handler.obtainMessage();
+        handler.sendMessage(msg);
     }
 
     private void displayTurnInfo(){
@@ -616,64 +745,30 @@ public class MultiplayActivity extends AppCompatActivity{
         tv_info.setText(info);
     }
 
+    private void setInputNumValid(){
+        // 숫자 3개 중 입력되지 않은 값(-1) 이 있으면 처리해줘야 한다.
+        for (int i = 0; i < 3; ++i){
+            if (input_num[i] == -1){
+                boolean is_dup = true;
+                int randomNum = 0;
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void setting(){
-        // 설정 적용
-        ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
-                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
-                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
-                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
-                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
-                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
-                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
-                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
-        };
-        int radiusChecked = sp.getInt("radius", 0);
-        int cornerRadius = (radiusChecked + 1) * 8;
-//        tv_turn.setTextColor(colors[11]);
-//        tv_turn.getRootView().setBackgroundTintList(colors[5]);
-        for (int i = 0; i < 5; i++) {
-            radio_btn[i].setTextColor(colors[6]);
-        }
-        rg_number.setBackgroundColor(sp.getInt("btn1bg", 0xFFFFEB3B));
-        for (int i = 0; i < 10; i++) {
-            btn_num[i].setTextColor(colors[7]);
-            btn_num[i].setBackgroundTintList(colors[1]);
-            ((MaterialButton)btn_num[i]).setCornerRadius(cornerRadius);
-        }
-        btn_result.setTextColor(colors[8]);
-        btn_result.setBackgroundTintList(colors[2]);
-        ((MaterialButton)btn_result).setCornerRadius(cornerRadius);
-        btn_cancel.setTextColor(colors[9]);
-        btn_cancel.setBackgroundTintList(colors[3]);
-        ((MaterialButton)btn_cancel).setCornerRadius(cornerRadius);
-        btn_memo.setTextColor(colors[10]);
-        btn_memo.setBackgroundTintList(colors[4]);
-        ((MaterialButton)btn_memo).setCornerRadius(cornerRadius);
-        btn_clear.setTextColor(colors[11]);
-        btn_clear.setBackgroundTintList(colors[5]);
-        ((MaterialButton)btn_clear).setCornerRadius(cornerRadius);
-        for (int i = 0; i < 6; i++) {
-            if (i == 5) {
-                memo_color[i].setBackgroundTintList(colors[11]);
+                while (is_dup){
+                    randomNum = random.nextInt(10);
+                    for (int j = 0; j < 3; ++j){
+                        if (input_num[j] == randomNum){
+                            is_dup = true;
+                            break;
+                        }
+                        else{
+                            is_dup = false;
+                        }
+                    }
+                }
+
+                input_num[i] = randomNum;
             }
-            else {
-                memo_color[i].setBackgroundTintList(colors[i]);
-            }
-            ((MaterialButton)memo_color[i]).setCornerRadius(cornerRadius);
         }
-        btn_back.setBackgroundTintList(colors[5]);
-        btn_back.setTextColor(colors[11]);
-        ((MaterialButton)btn_back).setCornerRadius(cornerRadius);
-        guess.setTextColor(colors[11]);
-        color = colors[11].getDefaultColor();
     }
-
 
     //메모 기능을 위한 클래스 2개
     class Point{
@@ -791,7 +886,7 @@ public class MultiplayActivity extends AppCompatActivity{
 
         if (System.currentTimeMillis() > backKeyPressedTime + 2500) {
             backKeyPressedTime = System.currentTimeMillis();
-            toast = Toast.makeText(this, "뒤로 가기 버튼을 한 번 더 누르시면 처음화면으로 돌아갑니다.", Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, "뒤로 가기 버튼을 한 번 더 누르시면 처음화면으로 돌아갑니다.", Toast.LENGTH_LONG);
             toast.show();
             return;
         }
@@ -800,8 +895,14 @@ public class MultiplayActivity extends AppCompatActivity{
         if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
             // DB에 플레이어 한명이 나갔다는 값을 true로 만들어야 함.
             DB_game.child(p1_id).child("isOneExited").setValue(true);
+            // DB에 승률 갱신해야함
             super.onBackPressed();
+            finish();
         }
+    }
+
+    private void myDebug(String str){
+        System.out.println(str);
     }
 
 }
