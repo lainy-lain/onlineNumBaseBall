@@ -1,6 +1,7 @@
 package pnu.termproject.onlinenumbaseball;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -189,15 +190,7 @@ public class MultiRoom extends AppCompatActivity {
         });
         findViewById(R.id.start_btn).setOnClickListener(v -> {
             if (currentRoom.getReady()) { // 준비된 상태면 게임 화면으로
-                Intent multiGameIntent = new Intent(getApplicationContext(), MultiplayActivity.class);
-                multiGameIntent.putExtra("p1_id", currentRoom.getUser1Id());
-                multiGameIntent.putExtra("p1_nickname", currentRoom.getUser1Name());
-                multiGameIntent.putExtra("p1_photoUrl", currentRoom.getUser1Photo());
-                multiGameIntent.putExtra("p2_id", currentRoom.getUser2Id());
-                multiGameIntent.putExtra("p2_nickname", currentRoom.getUser2Name());
-                multiGameIntent.putExtra("p2_photoUrl", currentRoom.getUser2Photo());
-                multiGameIntent.putExtra("ballNumber", ball);
-                startActivity(multiGameIntent);
+                roomRef.child("room" + currentRoom.getRoomId()).child("start").setValue(true);
             }
         });
         // 방, 게임 정보 바꾸기
@@ -256,6 +249,9 @@ public class MultiRoom extends AppCompatActivity {
                             currentRoom.setOwnerChanged(false);
                             updateRoom();
                         }
+                        if (ds.hasChild("start") && ds.child("start").getValue(Boolean.class)) {
+                            startGame();
+                        }
                         break;
                     }
                 }
@@ -284,6 +280,18 @@ public class MultiRoom extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void startGame() {
+        Intent multiGameIntent = new Intent(getApplicationContext(), MultiplayActivity.class);
+        multiGameIntent.putExtra("p1_id", currentRoom.getUser1Id());
+        multiGameIntent.putExtra("p1_nickname", currentRoom.getUser1Name());
+        multiGameIntent.putExtra("p1_photoUrl", currentRoom.getUser1Photo());
+        multiGameIntent.putExtra("p2_id", currentRoom.getUser2Id());
+        multiGameIntent.putExtra("p2_nickname", currentRoom.getUser2Name());
+        multiGameIntent.putExtra("p2_photoUrl", currentRoom.getUser2Photo());
+        multiGameIntent.putExtra("ballNumber", ball);
+        startActivity(multiGameIntent);
     }
 
     private void setVisibilities() {
@@ -355,6 +363,12 @@ public class MultiRoom extends AppCompatActivity {
     }
     private void updateRoomIds(RoomIdManage idManage) {
         roomIdRef.setValue(idManage);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        roomRef.child("room" + currentRoom.getRoomId()).child("start").setValue(false);
     }
 
     @Override
