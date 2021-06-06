@@ -188,17 +188,17 @@ public class MultiRoom extends AppCompatActivity {
             updateRoom();
         });
         findViewById(R.id.start_btn).setOnClickListener(v -> {
-            /*if (currentRoom.getReady()) { // 준비된 상태면 게임 화면으로
-                Intent multiGameIntent = new Intent(getApplicationContext(), MultiPlayActivity.class);
-                multiGameIntent.putExtra("user1id", currentRoom.getUser1Id());
-                multiGameIntent.putExtra("user1name", currentRoom.getUser1Name());
-                multiGameIntent.putExtra("user1photo", currentRoom.getUser1Photo());
-                multiGameIntent.putExtra("user1id", currentRoom.getUser2Id());
-                multiGameIntent.putExtra("user1name", currentRoom.getUser2Name());
-                multiGameIntent.putExtra("user1photo", currentRoom.getUser2Photo());
-                multiGameIntent.putExtra("ball", ball);
+            if (currentRoom.getReady()) { // 준비된 상태면 게임 화면으로
+                Intent multiGameIntent = new Intent(getApplicationContext(), MultiplayActivity.class);
+                multiGameIntent.putExtra("p1_id", currentRoom.getUser1Id());
+                multiGameIntent.putExtra("p1_nickname", currentRoom.getUser1Name());
+                multiGameIntent.putExtra("p1_photoUrl", currentRoom.getUser1Photo());
+                multiGameIntent.putExtra("p2_id", currentRoom.getUser2Id());
+                multiGameIntent.putExtra("p2_nickname", currentRoom.getUser2Name());
+                multiGameIntent.putExtra("p2_photoUrl", currentRoom.getUser2Photo());
+                multiGameIntent.putExtra("ballNumber", ball);
                 startActivity(multiGameIntent);
-            }*/
+            }
         });
         // 방, 게임 정보 바꾸기
         findViewById(R.id.game_set).setOnClickListener(v -> {
