@@ -1,11 +1,15 @@
 package pnu.termproject.onlinenumbaseball;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -38,6 +43,7 @@ public class MultiRoom extends AppCompatActivity {
     private int ball;
     private AlertDialog dialog;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +68,42 @@ public class MultiRoom extends AppCompatActivity {
         nickName = currentUser.getDisplayName();
         String photoUrl = currentUser.getPhotoUrl().toString();
 
+        // 설정 적용
+        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        ColorStateList[] colors = {
+                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
+                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        TextView[] tvs = {
+                findViewById(R.id.room_name), findViewById(R.id.game_info), findViewById(R.id.room_owner),
+                findViewById(R.id.user1_name), findViewById(R.id.user1_info), findViewById(R.id.ready_state1),
+                findViewById(R.id.user2_name), findViewById(R.id.user2_info), findViewById(R.id.ready_state2)
+        };
+        Button[] buttons = {
+                findViewById(R.id.ready_btn), findViewById(R.id.start_btn), findViewById(R.id.game_set)
+        };
+
+        buttons[2].getRootView().setBackgroundTintList(colors[2]);
+        for (int i = 0; i < 9; i++) {
+            tvs[i].setTextColor(colors[5]);
+            if (i < 2) {
+                buttons[i].setBackgroundTintList(colors[0]);
+                buttons[i].setTextColor(colors[3]);
+            }
+        }
+        buttons[2].setBackgroundTintList(colors[1]);
+        buttons[2].setTextColor(colors[4]);
+
+        int radiusChecked = sp.getInt("radius", 0);
+        int cornerRadius = (radiusChecked + 1) * 8;
+        for (int i = 0; i < 3; i++) {
+            ((MaterialButton)buttons[i]).setCornerRadius(cornerRadius);
+        }
+
         final String ballText = "공 개수: " + ball;
         if (isOwner) { // 만들어서 들어온 경우
             owner = 1;
@@ -75,8 +117,7 @@ public class MultiRoom extends AppCompatActivity {
                         roomIdManage = snapshot.getValue(RoomIdManage.class);
                     } // 받아와서 아이디를 받는다
                     roomId = roomIdManage.receiveId();
-                    TextView tv_gameInfo = findViewById(R.id.game_info);
-                    tv_gameInfo.setText(ballText);
+                    tvs[1].setText(ballText);
                     updateRoomIds(roomIdManage); // 받은 아이디로 방 생성
                     currentRoom = new Room(roomName, uid, nickName, photoUrl);
                     currentRoom.setRoomId(roomId);
@@ -120,8 +161,7 @@ public class MultiRoom extends AppCompatActivity {
                         } // 입장 처리(유저 추가), db에 방 정보 업데이트
                         roomOwner.setText(ownerText);
                         ball = currentRoom.getBall();
-                        TextView tv_gameInfo = findViewById(R.id.game_info);
-                        tv_gameInfo.setText(ballText);
+                        tvs[1].setText(ballText);
                         currentRoom.addUser(uid, nickName, photoUrl);
                         updateRoom();
                     }
@@ -134,9 +174,8 @@ public class MultiRoom extends AppCompatActivity {
             });
         }
 
-        TextView tv_roomName = findViewById(R.id.room_name);
         String roomNameText = "방 이름: " + roomName;
-        tv_roomName.setText(roomNameText);
+        tvs[0].setText(roomNameText);
         Button ready_btn = findViewById(R.id.ready_btn);
         ready_btn.setOnClickListener(v -> {
             currentRoom.toggleReady();

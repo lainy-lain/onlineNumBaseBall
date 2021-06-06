@@ -51,8 +51,8 @@
     <string name="btn1guide">게임 - 선택 숫자\n랭킹 - 3B</string>
     <string name="btn2guide">게임 - 숫자 버튼\n랭킹 - 4B</string>
     <string name="btn3guide">게임 - 확인 버튼\n랭킹 - 5B</string>
-    <string name="btn4guide">게임 - 취소 버튼\n</string>
-    <string name="btn5guide">게임 - 메모 버튼\n</string>
+    <string name="btn4guide">게임 - 취소 버튼\n게임방 - 준비하기, 시작하기</string>
+    <string name="btn5guide">게임 - 메모 버튼\n게임방 - 게임설정</string>
     <string name="game_info">방금 플레이한 게임의 정보</string>
     <string name="clear_time">클리어 시간 :</string>
     <string name="clear_turn">클리어 턴 수 :</string>
