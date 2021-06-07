@@ -394,19 +394,21 @@ public class MultiplayActivity extends AppCompatActivity{
                 else if (Objects.equals(previousChildName, "isEnd")){ // isOneExited 위에 isEnd가 있으므로
                     String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
                     // 확인 메시지 창을 띄움.
-                    AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
-                            .setTitle("상대방이 방을 나가서 게임이 종료됐습니다.")
-                            .setMessage(victoryMsg)
-                            .setPositiveButton("확인", (dialog, which) -> {
-                                // DB에 승률 갱신
+                    if (! MultiplayActivity.this.isFinishing()) {
+                        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
+                                .setTitle("상대방이 방을 나가서 게임이 종료됐습니다.")
+                                .setMessage(victoryMsg)
+                                .setPositiveButton("확인", (dialog, which) -> {
+                                    // DB에 승률 갱신
 
-                                DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
+                                    DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
 
-                                finish();
-                            });
+                                    finish();
+                                });
 
-                    AlertDialog msgDialog = msgBuilder.create();
-                    msgDialog.show();
+                        AlertDialog msgDialog = msgBuilder.create();
+                        msgDialog.show();
+                    }
                 }
 
                 // 상대방의 inputNum값이 갱신되는 경우
@@ -480,29 +482,25 @@ public class MultiplayActivity extends AppCompatActivity{
                 else if (Objects.equals(previousChildName, null) && !isMyTurn()) {
                     boolean is_end = (boolean) snapshot.getValue();
                     if (is_end) { // 에러 방지... 갱신되지 않았는데 갱신됐다고 뜨는 경우가 존재함
-                        int opponentClearTurn;
-                        if (am_i_p1) {
-                            opponentClearTurn = turn;
-                        } else {
-                            opponentClearTurn = turn + 1;
-                        }
-                        String victoryTitle = "상대방이 " + String.valueOf(opponentClearTurn) + "턴 만에 정답을 맞췄습니다";
+                        String victoryTitle = "상대방이 " + String.valueOf(turn) + "턴 만에 정답을 맞췄습니다";
                         String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
 
                         // 확인 메시지 창을 띄움.
-                        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
-                                .setTitle(victoryTitle)
-                                .setMessage(victoryMsg)
-                                .setPositiveButton("확인", (dialog, which) -> {
-                                    // DB에 승률 갱신
+                        if (! MultiplayActivity.this.isFinishing()) {
+                            AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
+                                    .setTitle(victoryTitle)
+                                    .setMessage(victoryMsg)
+                                    .setPositiveButton("확인", (dialog, which) -> {
+                                        // DB에 승률 갱신
 
-                                    DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
+                                        DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
 
-                                    finish();
-                                });
+                                        finish();
+                                    });
 
-                        AlertDialog msgDialog = msgBuilder.create();
-                        msgDialog.show();
+                            AlertDialog msgDialog = msgBuilder.create();
+                            msgDialog.show();
+                        }
                     }
                 }
 
@@ -661,7 +659,7 @@ public class MultiplayActivity extends AppCompatActivity{
         if (ball_number == strike) { // 게임 종료. 승자만이 이 코드를 실행하게 된다.
             DB_game.child(p1_id).child("isEnd").setValue(true); // DB에 값 갱신
 
-            String victoryTitle = String.valueOf(turn) + "턴 만에 승리하셨습니다!";
+            String victoryTitle = String.valueOf(turn - 1) + "턴 만에 승리하셨습니다!";
             String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
 
             Handler mHandler = new Handler(Looper.getMainLooper());
@@ -669,17 +667,20 @@ public class MultiplayActivity extends AppCompatActivity{
                 @Override
                 public void run() {
                     // 확인 메시지 창을 띄움.
-                    AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
-                            .setTitle(victoryTitle)
-                            .setMessage(victoryMsg)
-                            .setPositiveButton("확인", (dialog, which) -> {
-                                // DB에 승률 갱신
+                    if (! MultiplayActivity.this.isFinishing()){
+                        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
+                                .setTitle(victoryTitle)
+                                .setMessage(victoryMsg)
+                                .setPositiveButton("확인", (dialog, which) -> {
+                                    // DB에 승률 갱신
 
-                                finish();
-                            });
+                                    finish();
+                                });
 
-                    AlertDialog msgDialog = msgBuilder.create();
-                    msgDialog.show();
+                        AlertDialog msgDialog = msgBuilder.create();
+                        msgDialog.show();
+                    }
+
                 }
             }, 0);
         }
