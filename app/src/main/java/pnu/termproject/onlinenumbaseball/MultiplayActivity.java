@@ -343,6 +343,9 @@ public class MultiplayActivity extends AppCompatActivity{
                     solNum_str += String.valueOf(i);
                 }
 
+                // DEBUG
+                myDebug("init value : " + solNum_str);
+
                 // DB에 입력한 초기 값 쓰기
                 if (am_i_p1){
                     DB_game.child(p1_id).child("p1_solNum").setValue(solNum_str);
@@ -350,6 +353,8 @@ public class MultiplayActivity extends AppCompatActivity{
                 else{
                     DB_game.child(p1_id).child("p2_solNum").setValue(solNum_str);
                 }
+
+
 
                 // input_num 초기화시켜야함.
                 resetButton();
@@ -382,7 +387,6 @@ public class MultiplayActivity extends AppCompatActivity{
                     // 상대방이 입력한 숫자(해답)을 배열에 저장
                     for(int i = 0; i < ball_number; i++) {
                         ans[i] = Integer.parseInt(opponentInputNum.substring(i, i+1));
-                        input_num[i] = -1;
                     }
                 }
 
@@ -456,7 +460,7 @@ public class MultiplayActivity extends AppCompatActivity{
 
                     if (isMyTurn()) {
                         // Toast로 자신의 턴임을 알림
-                        Toast.makeText(MultiplayActivity.this, "Your Turn", Toast.LENGTH_LONG).show(); // 토스트 문자 출력
+                        Toast.makeText(MultiplayActivity.this, "Your Turn", Toast.LENGTH_SHORT).show(); // 토스트 문자 출력
 
                         Timer play_timer = new Timer();
                         TimerTask play_task = new TimerTask() {
