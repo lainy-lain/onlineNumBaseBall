@@ -6,10 +6,11 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +46,7 @@ public class MultiRoom extends AppCompatActivity {
     private int ball;
     private AlertDialog dialog;
 
+    @SuppressLint("NonConstantResourceId")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,11 +202,26 @@ public class MultiRoom extends AppCompatActivity {
             LayoutInflater inflater = getLayoutInflater();
             View view = inflater.inflate(R.layout.game_room_set, null);
             builder.setView(view);
-
-            final EditText nameEditText = view.findViewById(R.id.text_input);
+            final EditText nameEditText = view.findViewById(R.id.room_set_edittext);
             final Button btn_apply = view.findViewById(R.id.btn_apply);
             final Button btn_dismiss = view.findViewById(R.id.btn_dismiss);
             final RadioGroup rg = view.findViewById(R.id.ball_select);
+            // 설정
+            view.setBackgroundColor(sp.getInt("btnbgbg", 0xFFFFFFFF));
+            nameEditText.getBackground().mutate().setColorFilter(sp.getInt("btnbgtx", 0xFF000000), PorterDuff.Mode.SRC_ATOP);
+            nameEditText.setTextColor(colors[5]);
+            ((TextView)view.findViewById(R.id.room_set_name_guide)).setTextColor(colors[5]);
+            ((TextView)view.findViewById(R.id.room_set_ball_guide)).setTextColor(colors[5]);
+            btn_apply.setBackgroundTintList(colors[0]);
+            btn_apply.setTextColor(colors[3]);
+            ((MaterialButton)btn_apply).setCornerRadius(cornerRadius);
+            btn_dismiss.setBackgroundTintList(colors[1]);
+            btn_dismiss.setTextColor(colors[4]);
+            ((MaterialButton)btn_dismiss).setCornerRadius(cornerRadius);
+            RadioButton[] rb = {view.findViewById(R.id.toball3), view.findViewById(R.id.toball4), view.findViewById(R.id.toball5)};
+            for (int i = 0; i < 3; i++) {
+                rb[i].setTextColor(colors[5]);
+            }
             dialog = builder.create();
 
             rg.setOnCheckedChangeListener((radioGroup, i) -> {
