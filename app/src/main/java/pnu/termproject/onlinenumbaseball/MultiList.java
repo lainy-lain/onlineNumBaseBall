@@ -1,22 +1,30 @@
 package pnu.termproject.onlinenumbaseball;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,36 +32,69 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 public class MultiList extends AppCompatActivity {
 
     private ArrayAdapter<String> arrayAdapter;
     private ArrayList<String> arr_roomList = new ArrayList<>();
-    private ListView listView;
-    private Button btn_create, btn_quick;
-    private DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("room");
+    private final DatabaseReference reference = FirebaseDatabase.getInstance().getReference().getRoot().child("room");
     private String str_room;
     private boolean isOwner; //대기방의 생성자인지, 참가자인지 구별하는 변수
-    final String[] ballArr = new String[] {"3개", "4개", "5개"};
-
-    Map<String, Object> map = new HashMap<String, Object>();
     private AlertDialog dialog;
+    private int cornerRadius;
+    private ColorStateList[] colors;
+    private SharedPreferences sp;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.multiplay_list);
 
-        listView = findViewById(R.id.list);
-        btn_create = findViewById(R.id.btn_create);
-        btn_quick = findViewById(R.id.btn_quick);
+        ListView listView = findViewById(R.id.list);
+        Button btn_create = findViewById(R.id.btn_create);
+        Button btn_quick = findViewById(R.id.btn_quick);
 
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arr_roomList);
+        // 설정 적용을 위한 코드 추가
+        sp = getSharedPreferences("setting", MODE_PRIVATE);
+        colors = new ColorStateList[] {
+                ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
+                ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
+                ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
+                ColorStateList.valueOf(sp.getInt("btn4bg", 0xFF00BCD4)),
+                ColorStateList.valueOf(sp.getInt("btn5bg", 0xFF03A9F4)),
+                ColorStateList.valueOf(sp.getInt("btnbgbg", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn1tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn2tx", 0xFF000000)),
+                ColorStateList.valueOf(sp.getInt("btn3tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn4tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btn5tx", 0xFFFFFFFF)),
+                ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000))
+        };
+        int radiusChecked = sp.getInt("radius", 0);
+        cornerRadius = (radiusChecked + 1) * 8;
+
+        TextView room_list = findViewById(R.id.room_list);
+        room_list.getRootView().setBackgroundTintList(colors[5]);
+        room_list.setBackgroundColor(sp.getInt("btn1bg", 0xFFFFEB3B));
+        ((TextView)room_list).setTextColor(colors[6]);
+        btn_create.setBackgroundTintList(colors[1]);
+        btn_create.setTextColor(colors[7]);
+        btn_quick.setBackgroundTintList(colors[2]);
+        btn_quick.setTextColor(colors[8]);
+        ((MaterialButton) btn_create).setCornerRadius(cornerRadius);
+        ((MaterialButton) btn_quick).setCornerRadius(cornerRadius);
+
+        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, arr_roomList) {
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView tv = view.findViewById(android.R.id.text1);
+                tv.setTextColor(colors[11]);
+                return view;
+            }
+        };
         listView.setAdapter(arrayAdapter);
 
         //채팅방을 생성하는 코드입니다
@@ -67,11 +108,9 @@ public class MultiList extends AppCompatActivity {
         reference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                Set<String> set = new HashSet<String>();
-                Iterator i = snapshot.getChildren().iterator();
+                Set<String> set = new HashSet<>();
 
-                while(i.hasNext()){
-                    DataSnapshot tmp1 = (DataSnapshot) i.next();
+                for (DataSnapshot tmp1 : snapshot.getChildren()) {
                     String tmp2 = "방이름: " + (tmp1).child("roomName").getValue().toString()
                             + "\n방번호: " + (tmp1).child("roomId").getValue().toString()
                             + "\n방인원: " + (tmp1).child("numUser").getValue().toString()
@@ -108,7 +147,9 @@ public class MultiList extends AppCompatActivity {
         });
     }
 
-    void show(){
+    @SuppressLint("NonConstantResourceId")
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    void show() {
         final int[] ball = {3};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MultiList.this);
@@ -116,23 +157,39 @@ public class MultiList extends AppCompatActivity {
         View view = inflater.inflate(R.layout.roommake, null);
         builder.setView(view);
 
-        final EditText nameEditText = (EditText) view.findViewById(R.id.name);
-        final Button btn_create1 = (Button) view.findViewById(R.id.btn_create1);
-        final Button btn_dont = (Button) view.findViewById(R.id.btn_dont);
+        final EditText nameEditText = (EditText) view.findViewById(R.id.room_make_edittext);
+        final Button btn_room_create = (Button) view.findViewById(R.id.btn_room_create);
+        final Button btn_make_dont = (Button) view.findViewById(R.id.btn_make_dont);
         final RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg);
+        // 설정
+        view.setBackgroundColor(sp.getInt("btnbgbg", 0xFFFFFFFF));
+        nameEditText.getBackground().mutate().setColorFilter(sp.getInt("btnbgtx", 0xFF000000), PorterDuff.Mode.SRC_ATOP);
+        nameEditText.setTextColor(colors[11]);
+        ((TextView)view.findViewById(R.id.room_make_name_guide)).setTextColor(colors[11]);
+        ((TextView)view.findViewById(R.id.room_make_ball_guide)).setTextColor(colors[11]);
+        btn_room_create.setBackgroundTintList(colors[3]);
+        btn_room_create.setTextColor(colors[9]);
+        ((MaterialButton)btn_room_create).setCornerRadius(cornerRadius);
+        btn_make_dont.setBackgroundTintList(colors[4]);
+        btn_make_dont.setTextColor(colors[10]);
+        ((MaterialButton)btn_make_dont).setCornerRadius(cornerRadius);
+        RadioButton[] rb = {view.findViewById(R.id.make_ball3), view.findViewById(R.id.make_ball4), view.findViewById(R.id.make_ball5)};
+        for (int i = 0; i < 3; i++) {
+            rb[i].setTextColor(colors[11]);
+        }
         dialog = builder.create();
 
         rg.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (i){
-                case R.id.rb_ball3:
+                case R.id.make_ball3:
                     ball[0] = 3; break;
-                case R.id.rb_ball4:
+                case R.id.make_ball4:
                     ball[0] = 4; break;
-                case R.id.rb_ball5:
+                case R.id.make_ball5:
                     ball[0] = 5; break;
             }
         });
-        btn_create1.setOnClickListener(view1 -> {
+        btn_room_create.setOnClickListener(view1 -> {
             str_room = nameEditText.getText().toString();
             if(str_room.isEmpty()) {
                 Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -152,12 +209,14 @@ public class MultiList extends AppCompatActivity {
                 finish();
         }
     });
-        btn_dont.setOnClickListener(view12 -> dialog.dismiss());
+        btn_make_dont.setOnClickListener(view12 -> dialog.dismiss());
 
         dialog.show();
     }
 
-    void quick(){
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @SuppressLint("NonConstantResourceId")
+    void quick() {
         final int[] ball = {3};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MultiList.this);
@@ -166,17 +225,30 @@ public class MultiList extends AppCompatActivity {
         builder.setView(view);
 
         final Button btn_find = (Button) view.findViewById(R.id.btn_find);
-        final Button btn_dont1 = (Button) view.findViewById(R.id.btn_dont1);
+        final Button btn_quick_dont = (Button) view.findViewById(R.id.btn_quick_dont);
         final RadioGroup rg = (RadioGroup) view.findViewById(R.id.rg_quick);
         dialog = builder.create();
+        // 설정
+        view.setBackgroundColor(sp.getInt("btnbgbg", 0xFFFFFFFF));
+        ((TextView)view.findViewById(R.id.condition_guide)).setTextColor(colors[11]);
+        btn_find.setBackgroundTintList(colors[3]);
+        btn_find.setTextColor(colors[9]);
+        ((MaterialButton)btn_find).setCornerRadius(cornerRadius);
+        btn_quick_dont.setBackgroundTintList(colors[4]);
+        btn_quick_dont.setTextColor(colors[10]);
+        ((MaterialButton)btn_quick_dont).setCornerRadius(cornerRadius);
+        RadioButton[] rb = {view.findViewById(R.id.quick_ball3), view.findViewById(R.id.quick_ball4), view.findViewById(R.id.quick_ball5)};
+        for (int i = 0; i < 3; i++) {
+            rb[i].setTextColor(colors[11]);
+        }
 
         rg.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (i){
-                case R.id.rb_ball3:
+                case R.id.make_ball3:
                     ball[0] = 3; break;
-                case R.id.rb_ball4:
+                case R.id.make_ball4:
                     ball[0] = 4; break;
-                case R.id.rb_ball5:
+                case R.id.make_ball5:
                     ball[0] = 5; break;
             }
         });
@@ -200,7 +272,7 @@ public class MultiList extends AppCompatActivity {
             }
              */
         });
-        btn_dont1.setOnClickListener(view12 -> dialog.dismiss());
+        btn_quick_dont.setOnClickListener(view12 -> dialog.dismiss());
 
         dialog.show();
     }

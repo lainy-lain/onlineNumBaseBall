@@ -76,4 +76,10 @@
     <string name="ready">준비하기</string>
     <string name="start">시작하기</string>
     <string name="game_set">게임설정</string>
+    <string name="list">대기방 LIST</string>
+    <string name="room_make">방 만들기</string>
+    <string name="quick">빠른 시작</string>
+    <string name="make">만들기</string>
+    <string name="find">찾기</string>
+    <string name="condition">조건</string>
 </resources>

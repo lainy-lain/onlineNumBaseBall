@@ -10,8 +10,6 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,8 +32,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import org.w3c.dom.Text;
 
 public class MultiRoom extends AppCompatActivity {
     private FirebaseUser currentUser;
@@ -206,16 +202,16 @@ public class MultiRoom extends AppCompatActivity {
             LayoutInflater inflater = getLayoutInflater();
             View view = inflater.inflate(R.layout.game_room_set, null);
             builder.setView(view);
-            // 설정
-            final EditText nameEditText = view.findViewById(R.id.text_input);
+            final EditText nameEditText = view.findViewById(R.id.room_set_edittext);
             final Button btn_apply = view.findViewById(R.id.btn_apply);
             final Button btn_dismiss = view.findViewById(R.id.btn_dismiss);
             final RadioGroup rg = view.findViewById(R.id.ball_select);
+            // 설정
             view.setBackgroundColor(sp.getInt("btnbgbg", 0xFFFFFFFF));
             nameEditText.getBackground().mutate().setColorFilter(sp.getInt("btnbgtx", 0xFF000000), PorterDuff.Mode.SRC_ATOP);
-            ((TextView)view.findViewById(R.id.room_name_guide)).setTextColor(colors[5]);
-            ((TextView)view.findViewById(R.id.ball_num_guide)).setTextColor(colors[5]);
             nameEditText.setTextColor(colors[5]);
+            ((TextView)view.findViewById(R.id.room_set_name_guide)).setTextColor(colors[5]);
+            ((TextView)view.findViewById(R.id.room_set_ball_guide)).setTextColor(colors[5]);
             btn_apply.setBackgroundTintList(colors[0]);
             btn_apply.setTextColor(colors[3]);
             ((MaterialButton)btn_apply).setCornerRadius(cornerRadius);

@@ -14,10 +14,11 @@
         android:layout_marginBottom="10dp">
 
         <TextView
+            android:id="@+id/condition_guide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="조건" />
+            android:text="@string/condition" />
 
         <RadioGroup
             android:id="@+id/rg_quick"
@@ -27,23 +28,31 @@
             android:orientation="horizontal">
 
             <RadioButton
-                android:id="@+id/rb_ball33"
+                android:id="@+id/quick_ball3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
                 android:checked="true"
-                android:text="3개    " />
+                android:text="@string/b3" />
 
             <RadioButton
-                android:id="@+id/rb_ball44"
+                android:id="@+id/quick_ball4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="4개    " />
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:text="@string/b4" />
 
             <RadioButton
-                android:id="@+id/rb_ball55"
+                android:id="@+id/quick_ball5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="5개    " />
+                android:layout_marginStart="8dp"
+                android:layout_marginLeft="8dp"
+                android:text="@string/b5" />
         </RadioGroup>
 
     </LinearLayout>
@@ -59,16 +68,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="찾기"
-            android:layout_marginRight="10dp"/>
+            android:text="@string/find"
+            android:layout_marginRight="10dp"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_marginEnd="10dp" />
 
         <Button
-            android:id="@+id/btn_dont1"
+            android:id="@+id/btn_quick_dont"
+            style="?android:attr/buttonBarButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
             android:layout_weight="1"
-            android:text="취소"
-            android:layout_marginLeft="10dp"/>
+            android:text="@string/cancel_short"
+            android:layout_marginStart="10dp" />
     </LinearLayout>
 
 </LinearLayout>
