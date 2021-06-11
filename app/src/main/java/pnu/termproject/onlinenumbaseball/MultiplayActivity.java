@@ -90,13 +90,16 @@ public class MultiplayActivity extends AppCompatActivity{
     private InputAndResult ir = new InputAndResult();
 
     // 게임 진행에 필요한 정보들
+    private int sec = 0;
     private TextView tv_info;
     private int[] ans; //맞춰야 할 정답
     private int[] input_num; //사용자가 선택한 정답
     private int whosTurn; // 1이면 방장, 2면 게스트의 차례
     private String opponentInputNum; // 상대가 입력한 숫자
     private boolean am_i_p1; // 내가 플레이어 1인지 아닌지를 나타내는 변수
-    Queue<Boolean> submit_queue = new LinkedList<>();
+    private Queue<Boolean> submit_queue = new LinkedList<>();
+    private boolean is_game_end = false;
+    private boolean is_firstSol_submit = false;
 
     private String whosInput, whosAns;
     private ArrayList<String> inputAndResult = new ArrayList<>();
@@ -115,9 +118,8 @@ public class MultiplayActivity extends AppCompatActivity{
     private long backKeyPressedTime = 0;
     private Handler handler;
 
-    // 추가한 변수
-    private boolean isGameStart = false;
-
+    private final int SOL_TIME_LIMIT = 10;
+    private final int TURN_TIME_LIMIT = 5;
 
     @SuppressLint("HandlerLeak")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -256,6 +258,7 @@ public class MultiplayActivity extends AppCompatActivity{
             }
         };
 
+        resetButton();
 
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
         // DB에 게임 방 생성 (방장(p1)이 생성)
@@ -330,47 +333,59 @@ public class MultiplayActivity extends AppCompatActivity{
             whosAns = "p1_solNum";
         }
 
-
-        // 초기 숫자 결정
-        // 10초동안 초기 숫자를 선택가능
-        // 10초 후에 체크박스에 입력되어있는 숫자가 해답이 됨.
-        // 만약 숫자가 중복된다면, 중복되지 않게 숫자를 바꿈.
+        // 초기 숫자 입력 제한시간 : 10초
+        sec = 0;
         Timer init_timer = new Timer();
-        /*
         TimerTask init_task = new TimerTask() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void run() {
-                // 숫자 3개 중 입력되지 않은 값(-1) 이 있으면 처리해줘야 한다.
-                setInputNumValid();
-
-                String solNum_str = "";
-                for (int i : input_num){
-                    solNum_str += String.valueOf(i);
+                if (sec < SOL_TIME_LIMIT){
+                    if (is_game_end){
+                        init_timer.cancel();
+                    }
+                    else{
+                        String str = String.format("해답 입력: %d초 남음", SOL_TIME_LIMIT - sec);
+                        Handler mHandler = new Handler(Looper.getMainLooper());
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                tv_info.setText(str);
+                            }
+                        }, 0);
+                        sec++;
+                    }
                 }
+                else{ // 시간이 지난 경우 해답 입력
+                    // 숫자 3개 중 입력되지 않은 값(-1) 이 있으면 처리해줘야 한다.
+                    setInputNumValid();
 
-                // DEBUG
-                myDebug("init value : " + solNum_str);
+                    String solNum_str = "";
+                    for (int i : input_num){
+                        solNum_str += String.valueOf(i);
+                    }
 
-                // DB에 입력한 초기 값 쓰기
-                if (am_i_p1){
-                    DB_game.child(p1_id).child("p1_solNum").setValue(solNum_str);
+                    myDebug("solNum_str : " + solNum_str);
+
+                    // DB에 입력한 초기 값 쓰기
+                    if (am_i_p1){
+                        DB_game.child(p1_id).child("p1_solNum").setValue(solNum_str);
+                    }
+                    else{
+                        DB_game.child(p1_id).child("p2_solNum").setValue(solNum_str);
+                    }
+
+                    // input_num 초기화시켜야함.
+                    resetButton();
+                    determineFirstAttack();
+
+                    is_firstSol_submit = true;
+                    myDebug("in First, is_firstsol_submit : " + String.valueOf(is_firstSol_submit));
+                    init_timer.cancel();
                 }
-                else{
-                    DB_game.child(p1_id).child("p2_solNum").setValue(solNum_str);
-                }
-
-
-
-                // input_num 초기화시켜야함.
-                resetButton();
-
-                determineFirstAttack();
             }
         };
-        init_timer.schedule(init_task, 15000); // 10초 후에 이 타이머 스레드가 실행된다.
-         */
-        tv_info.setText("당신의 숫자를 입력하세요");
+        init_timer.schedule(init_task, 0, 1000);
 
         // 취소 버튼 눌렀을 때
         btn_cancel.setOnClickListener(v -> {
@@ -397,8 +412,9 @@ public class MultiplayActivity extends AppCompatActivity{
                     }
                 }
 
-                // 상대방이 뒤로가기 버튼을 눌러 게임을 나간 경우
+                // 상대방이 뒤로가기 버튼 / 강제종료를 눌러 게임을 나간 경우
                 else if (Objects.equals(previousChildName, "isEnd")){ // isOneExited 위에 isEnd가 있으므로
+                    is_game_end = true;
                     String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
                     // 확인 메시지 창을 띄움.
                     if (! MultiplayActivity.this.isFinishing()) {
@@ -406,10 +422,7 @@ public class MultiplayActivity extends AppCompatActivity{
                                 .setTitle("상대방이 방을 나가서 게임이 종료됐습니다.")
                                 .setMessage(victoryMsg)
                                 .setPositiveButton("확인", (dialog, which) -> {
-                                    // DB에 승률 갱신
-
                                     DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
-
                                     finish();
                                 });
 
@@ -465,22 +478,75 @@ public class MultiplayActivity extends AppCompatActivity{
                 else if (Objects.equals(previousChildName, "p2_status")) {
                     Long lVal = (Long) snapshot.getValue();
                     whosTurn = lVal.intValue();
-                    displayTurnInfo(); // 턴 정보를 화면에 표시
+
+                    while (true){
+                        boolean isOk = is_firstSol_submit;
+                        myDebug("in while loop");
+                        if (isOk)
+                            break;
+                    }
 
                     if (isMyTurn()) {
                         // Toast로 자신의 턴임을 알림
-                        Toast.makeText(MultiplayActivity.this, "Your Turn", Toast.LENGTH_SHORT).show(); // 토스트 문자 출력
+                        // Toast.makeText(MultiplayActivity.this, "Your Turn", Toast.LENGTH_SHORT).show(); // 토스트 문자 출력
 
+                        sec = 0;
                         Timer play_timer = new Timer();
                         TimerTask play_task = new TimerTask() {
                             @Override
                             public void run() {
-                                if (submit_queue.poll() == null){ // 시간이 경과할 동안 제출 버튼을 누르지 않은 경우, 자동 제출
-                                    getResultAndUpdate();
+                                if (sec < TURN_TIME_LIMIT){
+                                    if (is_game_end) {
+                                        play_timer.cancel();
+                                    }
+                                    if (submit_queue.poll() != null){
+                                        Handler mHandler = new Handler(Looper.getMainLooper());
+                                        mHandler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                tv_info.setText("상대방의 턴");
+                                            }
+                                        }, 0);
+                                        play_timer.cancel();
+                                    }
+                                    else{
+                                        String str = String.format("나의 턴: %d초 남음", TURN_TIME_LIMIT - sec);
+                                        Handler mHandler = new Handler(Looper.getMainLooper());
+                                        mHandler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                tv_info.setText(str);
+                                            }
+                                        }, 0);
+                                        sec++;
+                                    }
+                                }
+                                else{
+                                    // 시간 지났는데 제출 안된경우 자동제출
+                                    if (submit_queue.poll() == null){
+                                        getResultAndUpdate();
+                                        Handler mHandler = new Handler(Looper.getMainLooper());
+                                        mHandler.postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                tv_info.setText("상대방의 턴");
+                                            }
+                                        }, 0);
+                                    }
+                                    play_timer.cancel();
                                 }
                             }
                         };
-                        play_timer.schedule(play_task, 15000); // 제한 시간은 15초
+                        play_timer.schedule(play_task, 0, 1000);
+                    }
+                    else{
+                        Handler mHandler = new Handler(Looper.getMainLooper());
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                tv_info.setText("상대방의 턴");
+                            }
+                        }, 0);
                     }
                 }
 
@@ -489,6 +555,7 @@ public class MultiplayActivity extends AppCompatActivity{
                 else if (Objects.equals(previousChildName, null) && !isMyTurn()) {
                     boolean is_end = (boolean) snapshot.getValue();
                     if (is_end) { // 에러 방지... 갱신되지 않았는데 갱신됐다고 뜨는 경우가 존재함
+                        is_game_end = true;
                         String victoryTitle = "상대방이 " + String.valueOf(turn) + "턴 만에 정답을 맞췄습니다";
                         String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
 
@@ -531,52 +598,24 @@ public class MultiplayActivity extends AppCompatActivity{
 
         //확인(제출) 버튼을 눌렀을때의 동작을 구현하는 코드
         btn_result.setOnClickListener(view -> {
-            if(isGameStart == false){
-                Toast.makeText(MultiplayActivity.this, "입력 되었습니다", Toast.LENGTH_SHORT);
-                setInputNumValid();
+            boolean trigger = true;
 
-                String solNum_str = "";
-                for (int i : input_num){
-                    solNum_str += String.valueOf(i);
-                }
-
-                // DEBUG
-                myDebug("init value : " + solNum_str);
-
-                // DB에 입력한 초기 값 쓰기
-                if (am_i_p1){
-                    DB_game.child(p1_id).child("p1_solNum").setValue(solNum_str);
-                }
-                else{
-                    DB_game.child(p1_id).child("p2_solNum").setValue(solNum_str);
-                }
-
-
-                isGameStart = true;
-                // input_num 초기화시켜야함.
-                resetButton();
-                determineFirstAttack();
+            if (!isMyTurn()){
+                trigger = false;
             }
             else{
-                boolean trigger = true;
-
-                if (!isMyTurn()){
-                    trigger = false;
-                }
-                else{
-                    for(int i = 0; i < ball_number; i++){
-                        if(input_num[i] == -1 ){
-                            trigger = false;
-                            break;
-                        }
+                for(int i = 0; i < ball_number; i++){
+                    if(input_num[i] == -1 ){
+                        trigger = false;
+                        break;
                     }
                 }
+            }
 
-                if (trigger) {
-                    // 확인 버튼을 눌러 제출했을 경우, 시간 제한 타이머가 발동하지 않도록 해야함.
-                    submit_queue.offer(true);
-                    getResultAndUpdate();
-                }
+            if (trigger) {
+                // 확인 버튼을 눌러 제출했을 경우, 시간 제한 타이머가 발동하지 않도록 해야함.
+                submit_queue.offer(true);
+                getResultAndUpdate();
             }
         });
 
@@ -692,6 +731,7 @@ public class MultiplayActivity extends AppCompatActivity{
 
         if (ball_number == strike) { // 게임 종료. 승자만이 이 코드를 실행하게 된다.
             DB_game.child(p1_id).child("isEnd").setValue(true); // DB에 값 갱신
+            is_game_end = true;
 
             String victoryTitle = String.valueOf(turn - 1) + "턴 만에 승리하셨습니다!";
             String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
@@ -706,8 +746,6 @@ public class MultiplayActivity extends AppCompatActivity{
                                 .setTitle(victoryTitle)
                                 .setMessage(victoryMsg)
                                 .setPositiveButton("확인", (dialog, which) -> {
-                                    // DB에 승률 갱신
-
                                     finish();
                                 });
 
@@ -764,15 +802,15 @@ public class MultiplayActivity extends AppCompatActivity{
     }
 
     private void setInputNumValid(){
-        // 숫자 3개 중 입력되지 않은 값(-1) 이 있으면 처리해줘야 한다.
-        for (int i = 0; i < 3; ++i){
+        // 숫자 n개 중 입력되지 않은 값(-1) 이 있으면 처리해줘야 한다.
+        for (int i = 0; i < ball_number; ++i){
             if (input_num[i] == -1){
                 boolean is_dup = true;
                 int randomNum = 0;
 
                 while (is_dup){
                     randomNum = random.nextInt(10);
-                    for (int j = 0; j < 3; ++j){
+                    for (int j = 0; j < ball_number; ++j){
                         if (input_num[j] == randomNum){
                             is_dup = true;
                             break;
@@ -784,6 +822,7 @@ public class MultiplayActivity extends AppCompatActivity{
                 }
 
                 input_num[i] = randomNum;
+                myDebug("randomNum : " + String.valueOf(randomNum));
             }
         }
     }
@@ -914,10 +953,19 @@ public class MultiplayActivity extends AppCompatActivity{
         if (System.currentTimeMillis() <= backKeyPressedTime + 2500) {
             // DB에 플레이어 한명이 나갔다는 값을 true로 만들어야 함.
             DB_game.child(p1_id).child("isOneExited").setValue(true);
-            // DB에 승률 갱신해야함
+            is_game_end = true;
             super.onBackPressed();
             finish();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (!is_game_end){
+            DB_game.child(p1_id).child("isOneExited").setValue(true);
+            is_game_end = true;
+        }
+        super.onDestroy();
     }
 
     private void myDebug(String str){
