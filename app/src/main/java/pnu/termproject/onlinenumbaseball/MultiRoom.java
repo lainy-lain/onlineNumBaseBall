@@ -387,6 +387,10 @@ public class MultiRoom extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         roomRef.child("room" + currentRoom.getRoomId()).child("start").setValue(false);
+        currentRoom.toggleReady();
+        updateRoom();
+        ((TextView)findViewById(R.id.ready_state1)).setText("준비되지 않음");
+        ((TextView)findViewById(R.id.ready_btn)).setText("준비하기");
     }
 
     @Override
