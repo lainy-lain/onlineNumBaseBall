@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -43,29 +44,20 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static java.lang.Thread.sleep;
-
 public class MultiplayActivity extends AppCompatActivity{
-    // 버튼 관련 전역변수
-    private RadioGroup rg_number;
     private RadioButton rb_select;
     private RadioButton[] radio_btn = new RadioButton[5];
     private Button[] btn_num = new Button[10];
-    private Button btn_result, btn_cancel, btn_memo;
+    private Button btn_memo;
     private Random random = new Random();
-    private int strike, ball, turn;
-    private ListView result_list;
+    private int turn;
     private Button[] memo_color = new Button[6];
     private Button btn_back;
     private Button btn_clear;
@@ -73,19 +65,10 @@ public class MultiplayActivity extends AppCompatActivity{
 
     // 이전 activity로부터 전달받을 정보들
     private String p1_nickname, p2_nickname;
-    private String p1_photoUrl, p2_photoUrl;
-    private String p1_id, p2_id;
+    private String p1_id;
     private int ball_number;
 
-    // 플레이어 2명의 정보를 나타내기 위한 View들
-    private ImageView iv_photo1, iv_photo2;
-    private TextView tv_nickname1, tv_nickname2;
-    private TextView tv_winRate1, tv_winRate2;
-
-    // RecyclerView관련 전역변수
-    private RecyclerView recyclerView_result1, recyclerView_result2;
     private RecyclerView.Adapter adapter_result1, adapter_result2;
-    private RecyclerView.LayoutManager layoutManager_result1, layoutManager_result2;
     private ArrayList<InputAndResult> arrayList_result1, arrayList_result2;
     private InputAndResult ir = new InputAndResult();
 
@@ -109,17 +92,20 @@ public class MultiplayActivity extends AppCompatActivity{
     private DatabaseReference DB_game;
 
     // 메모 관련 변수
-    ArrayList<Point> points = new ArrayList<Point>();
+    ArrayList<Point> points = new ArrayList<>();
     LinearLayout drawLinear, resultLinear, drawBtnLinear;
     TableLayout inputTable;
     int color;
-    ArrayList<Integer> lastDraw = new ArrayList<Integer>();
+    ArrayList<Integer> lastDraw = new ArrayList<>();
 
     private long backKeyPressedTime = 0;
     private Handler handler;
 
     private final int SOL_TIME_LIMIT = 10;
     private final int TURN_TIME_LIMIT = 5;
+
+    private View dialogView;
+    private SharedPreferences sp;
 
     @SuppressLint("HandlerLeak")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -133,10 +119,10 @@ public class MultiplayActivity extends AppCompatActivity{
         ball_number = intent.getExtras().getInt("ballNumber");
         p1_nickname = intent.getExtras().getString("p1_nickname");
         p2_nickname = intent.getExtras().getString("p2_nickname");
-        p1_photoUrl = intent.getExtras().getString("p1_photoUrl");
-        p2_photoUrl = intent.getExtras().getString("p2_photoUrl");
+        String p1_photoUrl = intent.getExtras().getString("p1_photoUrl");
+        String p2_photoUrl = intent.getExtras().getString("p2_photoUrl");
         p1_id = intent.getExtras().getString("p1_id");
-        p2_id = intent.getExtras().getString("p2_id");
+        String p2_id = intent.getExtras().getString("p2_id");
 
         // 데이터 초기화, findViewById
         int[] radio_Id = {R.id.radioButton1, R.id.radioButton2, R.id.radioButton3, R.id.radioButton4, R.id.radioButton5};
@@ -145,14 +131,14 @@ public class MultiplayActivity extends AppCompatActivity{
             radio_btn[i] = findViewById(radio_Id[i]);
         for(int i = 0; i < 10; i++)
             btn_num[i] = findViewById(btn_Id[i]);
-        rg_number = findViewById(R.id.rg_number);
-        btn_result = findViewById(R.id.btn_result);
-        btn_cancel = findViewById(R.id.btn_cancel);
+        // 버튼 관련 전역변수
+        RadioGroup rg_number = findViewById(R.id.rg_number);
+        Button btn_result = findViewById(R.id.btn_result);
+        Button btn_cancel = findViewById(R.id.btn_cancel);
         btn_memo = findViewById(R.id.btn_memo);
         btn_clear = findViewById(R.id.btn_clear);
         // tv_turn = findViewById(R.id.turn_text);
         tv_info = findViewById(R.id.text_info);
-        result_list = findViewById(R.id.result_ListView);
         int[] memo_color_Id = {R.id.button1, R.id.button2, R.id.button3, R.id.button4, R.id.button5, R.id.button6};
         for (int i = 0; i < 6; i++) {
             memo_color[i] = findViewById(memo_color_Id[i]);
@@ -163,7 +149,7 @@ public class MultiplayActivity extends AppCompatActivity{
         radio_btn[0].setChecked(true);
 
         // 설정 적용
-        SharedPreferences sp = getSharedPreferences("setting", MODE_PRIVATE);
+        sp = getSharedPreferences("setting", MODE_PRIVATE);
         ColorStateList[] colors = {ColorStateList.valueOf(sp.getInt("btn1bg", 0xFFFFEB3B)),
                 ColorStateList.valueOf(sp.getInt("btn2bg", 0xFFCDDC39)),
                 ColorStateList.valueOf(sp.getInt("btn3bg", 0xFF8BC34A)),
@@ -192,10 +178,10 @@ public class MultiplayActivity extends AppCompatActivity{
         }
         btn_result.setTextColor(colors[8]);
         btn_result.setBackgroundTintList(colors[2]);
-        ((MaterialButton)btn_result).setCornerRadius(cornerRadius);
+        ((MaterialButton) btn_result).setCornerRadius(cornerRadius);
         btn_cancel.setTextColor(colors[9]);
         btn_cancel.setBackgroundTintList(colors[3]);
-        ((MaterialButton)btn_cancel).setCornerRadius(cornerRadius);
+        ((MaterialButton) btn_cancel).setCornerRadius(cornerRadius);
         btn_memo.setTextColor(colors[10]);
         btn_memo.setBackgroundTintList(colors[4]);
         ((MaterialButton)btn_memo).setCornerRadius(cornerRadius);
@@ -220,18 +206,14 @@ public class MultiplayActivity extends AppCompatActivity{
         //
         ans       = new int[ball_number]; // 맞춰야 할 정답
         input_num = new int[ball_number]; // 사용자가 선택한 정답
-        if (Objects.equals(currentUser.getUid(), p1_id)){
-            am_i_p1 = true;
-        }
-        else{
-            am_i_p1 = false;
-        }
-        recyclerView_result1 = findViewById(R.id.recyclerView_result1);
-        recyclerView_result2 = findViewById(R.id.recyclerView_result2);
+        am_i_p1 = Objects.equals(currentUser.getUid(), p1_id);
+        // RecyclerView관련 전역변수
+        RecyclerView recyclerView_result1 = findViewById(R.id.recyclerView_result1);
+        RecyclerView recyclerView_result2 = findViewById(R.id.recyclerView_result2);
         recyclerView_result1.setHasFixedSize(true);
         recyclerView_result2.setHasFixedSize(true);
-        layoutManager_result1 = new LinearLayoutManager(this);
-        layoutManager_result2 = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager layoutManager_result1 = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager layoutManager_result2 = new LinearLayoutManager(this);
         recyclerView_result1.setLayoutManager(layoutManager_result1);
         recyclerView_result2.setLayoutManager(layoutManager_result2);
         arrayList_result1 = new ArrayList<>();
@@ -258,6 +240,9 @@ public class MultiplayActivity extends AppCompatActivity{
             }
         };
 
+        LayoutInflater inflater = getLayoutInflater();
+        dialogView = inflater.inflate(R.layout.game_finish, null);
+
         resetButton();
 
         DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -281,12 +266,13 @@ public class MultiplayActivity extends AppCompatActivity{
         // 플레이어 2명의 정보를 화면에 띄워야 함
         // winRate DB에서 가져와서 저장하기. 그리고 화면에 띄워야함
         // winRate는 Room에서 DB에 접근하는걸로 하고, 여기서는 getExtras로 받는걸로 하자.
-        iv_photo1 = findViewById(R.id.iv_profile1);
-        iv_photo2 = findViewById(R.id.iv_profile2);
+        // 플레이어 2명의 정보를 나타내기 위한 View들
+        ImageView iv_photo1 = findViewById(R.id.iv_profile1);
+        ImageView iv_photo2 = findViewById(R.id.iv_profile2);
         Glide.with(this).load(p1_photoUrl).into(iv_photo1);
         Glide.with(this).load(p2_photoUrl).into(iv_photo2);
-        tv_nickname1 = findViewById(R.id.tv_nickname1);
-        tv_nickname2 = findViewById(R.id.tv_nickname2);
+        TextView tv_nickname1 = findViewById(R.id.tv_nickname1);
+        TextView tv_nickname2 = findViewById(R.id.tv_nickname2);
         tv_nickname1.setTextColor(colors[11]);
         tv_nickname2.setTextColor(colors[11]);
         tv_nickname1.setText(p1_nickname);
@@ -345,14 +331,9 @@ public class MultiplayActivity extends AppCompatActivity{
                         init_timer.cancel();
                     }
                     else{
-                        String str = String.format("해답 입력: %d초 남음", SOL_TIME_LIMIT - sec);
+                        @SuppressLint("DefaultLocale") String str = String.format("해답 입력: %d초 남음", SOL_TIME_LIMIT - sec);
                         Handler mHandler = new Handler(Looper.getMainLooper());
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                tv_info.setText(str);
-                            }
-                        }, 0);
+                        mHandler.postDelayed(() -> tv_info.setText(str), 0);
                         sec++;
                     }
                 }
@@ -380,7 +361,7 @@ public class MultiplayActivity extends AppCompatActivity{
                     determineFirstAttack();
 
                     is_firstSol_submit = true;
-                    myDebug("in First, is_firstsol_submit : " + String.valueOf(is_firstSol_submit));
+                    myDebug("in First, is_firstsol_submit : " + is_firstSol_submit);
                     init_timer.cancel();
                 }
             }
@@ -388,9 +369,7 @@ public class MultiplayActivity extends AppCompatActivity{
         init_timer.schedule(init_task, 0, 1000);
 
         // 취소 버튼 눌렀을 때
-        btn_cancel.setOnClickListener(v -> {
-            resetButton();
-        });
+        btn_cancel.setOnClickListener(v -> resetButton());
 
         DB_game.child(p1_id).addChildEventListener(new ChildEventListener() {
             @Override
@@ -418,13 +397,22 @@ public class MultiplayActivity extends AppCompatActivity{
                     String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
                     // 확인 메시지 창을 띄움.
                     if (! MultiplayActivity.this.isFinishing()) {
-                        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
-                                .setTitle("상대방이 방을 나가서 게임이 종료됐습니다.")
-                                .setMessage(victoryMsg)
-                                .setPositiveButton("확인", (dialog, which) -> {
-                                    DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
-                                    finish();
-                                });
+                        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this);
+                        msgBuilder.setView(dialogView).setCancelable(false);
+                        dialogView.setBackgroundColor(sp.getInt("btnbgbg", 0xFFFFFFFF));
+                        TextView title = dialogView.findViewById(R.id.tv_title);
+                        title.setTextColor(colors[11]);
+                        title.setText("상대방이 방을 나가서 게임이 종료됐습니다.");
+                        TextView message = dialogView.findViewById(R.id.tv_message);
+                        message.setTextColor(colors[11]);
+                        message.setText(victoryMsg);
+                        Button positive = dialogView.findViewById(R.id.positive);
+                        positive.setBackgroundTintList(colors[5]);
+                        positive.setTextColor(colors[11]);
+                        positive.setOnClickListener(v -> {
+                            DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
+                            finish();
+                        });
 
                         AlertDialog msgDialog = msgBuilder.create();
                         msgDialog.show();
@@ -501,23 +489,13 @@ public class MultiplayActivity extends AppCompatActivity{
                                     }
                                     if (submit_queue.poll() != null){
                                         Handler mHandler = new Handler(Looper.getMainLooper());
-                                        mHandler.postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                tv_info.setText("상대방의 턴");
-                                            }
-                                        }, 0);
+                                        mHandler.postDelayed(() -> tv_info.setText("상대방의 턴"), 0);
                                         play_timer.cancel();
                                     }
                                     else{
-                                        String str = String.format("나의 턴: %d초 남음", TURN_TIME_LIMIT - sec);
+                                        @SuppressLint("DefaultLocale") String str = String.format("나의 턴: %d초 남음", TURN_TIME_LIMIT - sec);
                                         Handler mHandler = new Handler(Looper.getMainLooper());
-                                        mHandler.postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                tv_info.setText(str);
-                                            }
-                                        }, 0);
+                                        mHandler.postDelayed(() -> tv_info.setText(str), 0);
                                         sec++;
                                     }
                                 }
@@ -526,12 +504,7 @@ public class MultiplayActivity extends AppCompatActivity{
                                     if (submit_queue.poll() == null){
                                         getResultAndUpdate();
                                         Handler mHandler = new Handler(Looper.getMainLooper());
-                                        mHandler.postDelayed(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                tv_info.setText("상대방의 턴");
-                                            }
-                                        }, 0);
+                                        mHandler.postDelayed(() -> tv_info.setText("상대방의 턴"), 0);
                                     }
                                     play_timer.cancel();
                                 }
@@ -541,12 +514,7 @@ public class MultiplayActivity extends AppCompatActivity{
                     }
                     else{
                         Handler mHandler = new Handler(Looper.getMainLooper());
-                        mHandler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                tv_info.setText("상대방의 턴");
-                            }
-                        }, 0);
+                        mHandler.postDelayed(() -> tv_info.setText("상대방의 턴"), 0);
                     }
                 }
 
@@ -556,21 +524,27 @@ public class MultiplayActivity extends AppCompatActivity{
                     boolean is_end = (boolean) snapshot.getValue();
                     if (is_end) { // 에러 방지... 갱신되지 않았는데 갱신됐다고 뜨는 경우가 존재함
                         is_game_end = true;
-                        String victoryTitle = "상대방이 " + String.valueOf(turn) + "턴 만에 정답을 맞췄습니다";
+                        String victoryTitle = "상대방이 " + turn + "턴 만에 정답을 맞췄습니다";
                         String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
 
                         // 확인 메시지 창을 띄움.
                         if (! MultiplayActivity.this.isFinishing()) {
-                            AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
-                                    .setTitle(victoryTitle)
-                                    .setMessage(victoryMsg)
-                                    .setPositiveButton("확인", (dialog, which) -> {
-                                        // DB에 승률 갱신
-
-                                        DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
-
-                                        finish();
-                                    });
+                            AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this);
+                            msgBuilder.setView(dialogView).setCancelable(false);
+                            dialogView.setBackgroundColor(sp.getInt("btnbgbg", 0xFFFFFFFF));
+                            TextView title = dialogView.findViewById(R.id.tv_title);
+                            title.setTextColor(colors[11]);
+                            title.setText(victoryTitle);
+                            TextView message = dialogView.findViewById(R.id.tv_message);
+                            message.setTextColor(colors[11]);
+                            message.setText(victoryMsg);
+                            Button positive = dialogView.findViewById(R.id.positive);
+                            positive.setBackgroundTintList(colors[5]);
+                            positive.setTextColor(colors[11]);
+                            positive.setOnClickListener(v -> {
+                                DB_game.child(p1_id).setValue(null); // DB에서 게임 데이터 삭제.
+                                finish();
+                            });
 
                             AlertDialog msgDialog = msgBuilder.create();
                             msgDialog.show();
@@ -653,7 +627,7 @@ public class MultiplayActivity extends AppCompatActivity{
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void getResultAndUpdate(){
         // 이 밑은 '함수'로 만들어야 할듯
         // 왜냐? 버튼을 누르거나, 시간 제한이 다되거나 했을때 둘다 작동해야 하므로!
@@ -664,8 +638,8 @@ public class MultiplayActivity extends AppCompatActivity{
         setInputNumValid();
 
         // 결과를 계산하는 코드
-        strike = 0;
-        ball = 0;
+        int strike = 0;
+        int ball = 0;
         for (int i = 0; i < ball_number; i++) {
             if (ans[i] == input_num[i])
                 strike++;
@@ -708,24 +682,14 @@ public class MultiplayActivity extends AppCompatActivity{
             // adapter_result1.notifyDataSetChanged();
 
             Handler mHandler = new Handler(Looper.getMainLooper());
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    adapter_result1.notifyDataSetChanged();
-                }
-            }, 0);
+            mHandler.postDelayed(() -> adapter_result1.notifyDataSetChanged(), 0);
         }
         else{
             arrayList_result2.add(my_ir);
             // adapter_result2.notifyDataSetChanged();
 
             Handler mHandler = new Handler(Looper.getMainLooper());
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    adapter_result2.notifyDataSetChanged();
-                }
-            }, 0);
+            mHandler.postDelayed(() -> adapter_result2.notifyDataSetChanged(), 0);
         }
 
 
@@ -733,27 +697,33 @@ public class MultiplayActivity extends AppCompatActivity{
             DB_game.child(p1_id).child("isEnd").setValue(true); // DB에 값 갱신
             is_game_end = true;
 
-            String victoryTitle = String.valueOf(turn - 1) + "턴 만에 승리하셨습니다!";
+            String victoryTitle = (turn - 1) + "턴 만에 승리하셨습니다!";
             String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
 
             Handler mHandler = new Handler(Looper.getMainLooper());
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    // 확인 메시지 창을 띄움.
-                    if (! MultiplayActivity.this.isFinishing()){
-                        AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this)
-                                .setTitle(victoryTitle)
-                                .setMessage(victoryMsg)
-                                .setPositiveButton("확인", (dialog, which) -> {
-                                    finish();
-                                });
+            mHandler.postDelayed(() -> {
+                // 확인 메시지 창을 띄움.
+                if (! MultiplayActivity.this.isFinishing()){
+                    AlertDialog.Builder msgBuilder = new AlertDialog.Builder(MultiplayActivity.this);
+                    msgBuilder.setView(dialogView).setCancelable(false);
+                    int bgColor = sp.getInt("btnbgbg", 0xFFFFFFFF);
+                    int textColor = sp.getInt("btnbgtx", 0xFF000000);
+                    dialogView.setBackgroundColor(bgColor);
+                    TextView title = dialogView.findViewById(R.id.tv_title);
+                    title.setTextColor(textColor);
+                    title.setText(victoryTitle);
+                    TextView message = dialogView.findViewById(R.id.tv_message);
+                    message.setTextColor(textColor);
+                    message.setText(victoryMsg);
+                    Button positive = dialogView.findViewById(R.id.positive);
+                    positive.setBackgroundTintList(ColorStateList.valueOf(bgColor));
+                    positive.setTextColor(textColor);
+                    positive.setOnClickListener(v -> finish());
 
-                        AlertDialog msgDialog = msgBuilder.create();
-                        msgDialog.show();
-                    }
-
+                    AlertDialog msgDialog = msgBuilder.create();
+                    msgDialog.show();
                 }
+
             }, 0);
         }
         else{
@@ -822,7 +792,7 @@ public class MultiplayActivity extends AppCompatActivity{
                 }
 
                 input_num[i] = randomNum;
-                myDebug("randomNum : " + String.valueOf(randomNum));
+                myDebug("randomNum : " + randomNum);
             }
         }
     }
