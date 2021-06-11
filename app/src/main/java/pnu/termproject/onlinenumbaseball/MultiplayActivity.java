@@ -115,6 +115,9 @@ public class MultiplayActivity extends AppCompatActivity{
     private long backKeyPressedTime = 0;
     private Handler handler;
 
+    // 추가한 변수
+    private boolean isGameStart = false;
+
 
     @SuppressLint("HandlerLeak")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -333,6 +336,7 @@ public class MultiplayActivity extends AppCompatActivity{
         // 10초 후에 체크박스에 입력되어있는 숫자가 해답이 됨.
         // 만약 숫자가 중복된다면, 중복되지 않게 숫자를 바꿈.
         Timer init_timer = new Timer();
+        /*
         TimerTask init_task = new TimerTask() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
@@ -365,6 +369,7 @@ public class MultiplayActivity extends AppCompatActivity{
             }
         };
         init_timer.schedule(init_task, 15000); // 10초 후에 이 타이머 스레드가 실행된다.
+         */
         tv_info.setText("당신의 숫자를 입력하세요");
 
         // 취소 버튼 눌렀을 때
@@ -524,6 +529,57 @@ public class MultiplayActivity extends AppCompatActivity{
             }
         });
 
+        //확인(제출) 버튼을 눌렀을때의 동작을 구현하는 코드
+        btn_result.setOnClickListener(view -> {
+            if(isGameStart == false){
+                Toast.makeText(MultiplayActivity.this, "입력 되었습니다", Toast.LENGTH_SHORT);
+                setInputNumValid();
+
+                String solNum_str = "";
+                for (int i : input_num){
+                    solNum_str += String.valueOf(i);
+                }
+
+                // DEBUG
+                myDebug("init value : " + solNum_str);
+
+                // DB에 입력한 초기 값 쓰기
+                if (am_i_p1){
+                    DB_game.child(p1_id).child("p1_solNum").setValue(solNum_str);
+                }
+                else{
+                    DB_game.child(p1_id).child("p2_solNum").setValue(solNum_str);
+                }
+
+
+                isGameStart = true;
+                // input_num 초기화시켜야함.
+                resetButton();
+                determineFirstAttack();
+            }
+            else{
+                boolean trigger = true;
+
+                if (!isMyTurn()){
+                    trigger = false;
+                }
+                else{
+                    for(int i = 0; i < ball_number; i++){
+                        if(input_num[i] == -1 ){
+                            trigger = false;
+                            break;
+                        }
+                    }
+                }
+
+                if (trigger) {
+                    // 확인 버튼을 눌러 제출했을 경우, 시간 제한 타이머가 발동하지 않도록 해야함.
+                    submit_queue.offer(true);
+                    getResultAndUpdate();
+                }
+            }
+        });
+
 
         setMemoFunc();
     } // end of onCreate()
@@ -547,30 +603,6 @@ public class MultiplayActivity extends AppCompatActivity{
 
             DB_game.child(p1_id).child("whosTurn").setValue(whosTurn); // DB에 선공 데이터 갱신
         }
-
-        //확인(제출) 버튼을 눌렀을때의 동작을 구현하는 코드
-        btn_result.setOnClickListener(view -> {
-            boolean trigger = true;
-
-            if (!isMyTurn()){
-                trigger = false;
-            }
-            else{
-                for(int i = 0; i < ball_number; i++){
-                    if(input_num[i] == -1 ){
-                        trigger = false;
-                        break;
-                    }
-                }
-            }
-
-            if (trigger) {
-                // 확인 버튼을 눌러 제출했을 경우, 시간 제한 타이머가 발동하지 않도록 해야함.
-                submit_queue.offer(true);
-                getResultAndUpdate();
-            }
-        });
-
     }
 
     private boolean isMyTurn(){
