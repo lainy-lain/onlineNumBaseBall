@@ -92,7 +92,7 @@ public class MultiRoom extends AppCompatActivity {
         };
 
         buttons[2].getRootView().setBackgroundTintList(colors[2]);
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 7; i++) {
             tvs[i].setTextColor(colors[5]);
             if (i < 2) {
                 buttons[i].setBackgroundTintList(colors[0]);
