@@ -231,7 +231,7 @@ public class MultiplayActivity extends AppCompatActivity{
         recyclerView_result2.setLayoutManager(layoutManager_result2);
         arrayList_result1 = new ArrayList<>();
         arrayList_result2 = new ArrayList<>();
-        ColorStateList tx = ColorStateList.valueOf(sp.getInt("btnbgtx", 0xFF000000));
+        ColorStateList tx = colors[11];
         // 어댑터 설정
         adapter_result1 = new ResultAdapter(arrayList_result1, this, tx);
         adapter_result2 = new ResultAdapter(arrayList_result2, this, tx);
@@ -281,6 +281,8 @@ public class MultiplayActivity extends AppCompatActivity{
         Glide.with(this).load(p2_photoUrl).into(iv_photo2);
         tv_nickname1 = findViewById(R.id.tv_nickname1);
         tv_nickname2 = findViewById(R.id.tv_nickname2);
+        tv_nickname1.setTextColor(colors[11]);
+        tv_nickname2.setTextColor(colors[11]);
         tv_nickname1.setText(p1_nickname);
         tv_nickname2.setText(p2_nickname);
 
@@ -854,6 +856,7 @@ public class MultiplayActivity extends AppCompatActivity{
                 btn_memo.setText("메모");
                 inputTable.setVisibility(View.VISIBLE);
                 drawBtnLinear.setVisibility(View.INVISIBLE);
+                drawLinear.setVisibility(View.INVISIBLE);
                 memoStatus[0] = false;
             }
         });

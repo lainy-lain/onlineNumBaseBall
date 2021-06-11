@@ -84,8 +84,8 @@ public class MultiRoom extends AppCompatActivity {
         };
         TextView[] tvs = {
                 findViewById(R.id.room_name), findViewById(R.id.game_info), findViewById(R.id.room_owner),
-                findViewById(R.id.user1_name), findViewById(R.id.user1_info), findViewById(R.id.ready_state1),
-                findViewById(R.id.user2_name), findViewById(R.id.user2_info), findViewById(R.id.ready_state2)
+                findViewById(R.id.user1_name), findViewById(R.id.ready_state1),
+                findViewById(R.id.user2_name), findViewById(R.id.ready_state2)
         };
         Button[] buttons = {
                 findViewById(R.id.ready_btn), findViewById(R.id.start_btn), findViewById(R.id.game_set)

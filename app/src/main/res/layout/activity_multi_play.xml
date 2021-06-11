@@ -106,7 +106,7 @@
         android:id="@+id/guess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="105dp"
         android:layout_marginEnd="15dp"
         android:layout_marginRight="15dp"
         android:text="@string/guess"
@@ -249,22 +249,20 @@
         android:id="@+id/recyclerView_result1"
         android:layout_width="70dp"
         android:layout_height="380dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@+id/input_Table"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/player_info">
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintTop_toBottomOf="@+id/player_info"></androidx.recyclerview.widget.RecyclerView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView_result2"
-        android:layout_width="60dp"
+        android:layout_width="70dp"
         android:layout_height="380dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintBottom_toTopOf="@+id/input_Table"
         app:layout_constraintLeft_toRightOf="@id/recyclerView_result1"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/player_info">
-    </androidx.recyclerview.widget.RecyclerView>
+        app:layout_constraintTop_toBottomOf="@+id/player_info"></androidx.recyclerview.widget.RecyclerView>
 
 <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
 <!--        android:id="@+id/layout_result"-->
@@ -283,12 +281,13 @@
 
     <LinearLayout
         android:id="@+id/draw_linear"
-        android:layout_width="300dp"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/memo_colors"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
     </LinearLayout>

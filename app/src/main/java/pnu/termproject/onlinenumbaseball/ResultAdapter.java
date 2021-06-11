@@ -41,6 +41,8 @@ public class ResultAdapter extends RecyclerView.Adapter<ResultAdapter.CustomView
 
         holder.tv_input.setText(str_input);
         holder.tv_result.setText(str_result);
+        holder.tv_input.setTextColor(tx);
+        holder.tv_result.setTextColor(tx);
     }
 
     @Override
