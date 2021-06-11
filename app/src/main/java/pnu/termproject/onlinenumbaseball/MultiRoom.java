@@ -309,7 +309,7 @@ public class MultiRoom extends AppCompatActivity {
         multiGameIntent.putExtra("p2_nickname", currentRoom.getUser2Name());
         multiGameIntent.putExtra("p2_photoUrl", currentRoom.getUser2Photo());
         multiGameIntent.putExtra("ballNumber", ball);
-        startActivity(multiGameIntent);
+        startActivityForResult(multiGameIntent, 0);
     }
 
     private void setVisibilities() {
@@ -387,6 +387,8 @@ public class MultiRoom extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         roomRef.child("room" + currentRoom.getRoomId()).child("start").setValue(false);
+        currentRoom.setReady(false);
+        updateRoom();
     }
 
     @Override
