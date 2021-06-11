@@ -72,6 +72,10 @@ public class Room {
         ready = !ready;
     }
 
+    public void setReady(boolean state) {
+        ready = state;
+    }
+
     public boolean getReady() {
         return ready;
     }
