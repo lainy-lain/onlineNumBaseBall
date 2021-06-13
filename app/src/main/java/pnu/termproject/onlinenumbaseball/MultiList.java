@@ -46,6 +46,7 @@ public class MultiList extends AppCompatActivity {
     private int cornerRadius;
     private ColorStateList[] colors;
     private SharedPreferences sp;
+    private ArrayList<roomInfo> rooms = new ArrayList<roomInfo>();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -109,13 +110,17 @@ public class MultiList extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Set<String> set = new HashSet<>();
-
+                rooms.clear();
                 for (DataSnapshot tmp1 : snapshot.getChildren()) {
                     String tmp2 = "방이름: " + (tmp1).child("roomName").getValue().toString()
                             + "\n방번호: " + (tmp1).child("roomId").getValue().toString()
                             + "\n방인원: " + (tmp1).child("numUser").getValue().toString()
                             + "\n공개수: " + (tmp1).child("ball").getValue().toString();
                     set.add(tmp2);
+                    rooms.add(new roomInfo((tmp1).child("roomName").getValue().toString(),
+                            (tmp1).child("roomId").getValue().toString(),
+                            Integer.parseInt((tmp1).child("ball").getValue().toString()),
+                            Integer.parseInt((tmp1).child("numUser").getValue().toString())));
                 }
 
                 arr_roomList.clear();
@@ -199,7 +204,6 @@ public class MultiList extends AppCompatActivity {
             }
             else {
                 isOwner = true;
-
                 Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
                 intent.putExtra("room name", str_room);
                 intent.putExtra("owner", isOwner);
@@ -244,36 +248,49 @@ public class MultiList extends AppCompatActivity {
 
         rg.setOnCheckedChangeListener((radioGroup, i) -> {
             switch (i){
-                case R.id.make_ball3:
+                case R.id.quick_ball3:
                     ball[0] = 3; break;
-                case R.id.make_ball4:
+                case R.id.quick_ball4:
                     ball[0] = 4; break;
-                case R.id.make_ball5:
+                case R.id.quick_ball5:
                     ball[0] = 5; break;
             }
         });
-        btn_find.setOnClickListener(view1 -> {
-            /*
-            if(str_room.isEmpty()) {
-                Toast.makeText(getApplicationContext(), "방 제목은 공란이 될 수 없습니다.", Toast.LENGTH_SHORT).show();
-            }
-            else if(str_room.indexOf(":") != -1 || str_room.indexOf("\\n") != -1){
-                Toast.makeText(getApplicationContext(), "방 제목으로 :와 \\n은 사용할 수 없습니다.", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                isOwner = true;
 
-                Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
-                intent.putExtra("room name", str_room);
-                intent.putExtra("owner", isOwner);
-                intent.putExtra("ball", ball[0]);
-                startActivity(intent);
-                finish();
+        btn_find.setOnClickListener(view1 -> {
+            boolean isFind = false;
+            for(roomInfo room : rooms){
+                if(room.ball == ball[0] && room.numUser < 2){
+                    isFind = true;
+                    isOwner = false;
+                    Intent intent = new Intent(getApplicationContext(), MultiRoom.class);
+                    intent.putExtra("room name", room.name);
+                    intent.putExtra("owner", isOwner);
+                    intent.putExtra("room id", room.ID);
+                    startActivity(intent);
+                    finish();
+                }
             }
-             */
+            if(isFind == false)
+                Toast.makeText(getApplicationContext(), "조건에 맞는 방을 찾지 못했습니다.", Toast.LENGTH_SHORT).show();
         });
+
         btn_quick_dont.setOnClickListener(view12 -> dialog.dismiss());
 
         dialog.show();
+    }
+}
+
+class roomInfo{
+    String name;
+    String ID;
+    int ball;
+    int numUser;
+
+    roomInfo(String name, String ID, int ball, int numUser){
+        this.name = name;
+        this.ID = ID;
+        this.ball = ball;
+        this.numUser = numUser;
     }
 }
