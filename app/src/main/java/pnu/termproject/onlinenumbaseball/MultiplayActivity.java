@@ -281,7 +281,7 @@ public class MultiplayActivity extends AppCompatActivity{
         // 라디오 버튼 갯수 설정
         for(int i = ball_number; i < 5; i++)
             radio_btn[i].setVisibility(View.INVISIBLE);
-        turn = 1;
+        turn = 0;
 
         //라디오 버튼(몇번째 공을 선택했는지 구별)을 눌렀을때의 동작을 구현하는 코드
         rg_number.setOnCheckedChangeListener((radioGroup, i) -> rb_select = findViewById(i));
@@ -524,6 +524,7 @@ public class MultiplayActivity extends AppCompatActivity{
                     boolean is_end = (boolean) snapshot.getValue();
                     if (is_end) { // 에러 방지... 갱신되지 않았는데 갱신됐다고 뜨는 경우가 존재함
                         is_game_end = true;
+                        if (!am_i_p1) turn++;
                         String victoryTitle = "상대방이 " + turn + "턴 만에 정답을 맞췄습니다";
                         String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
 
@@ -697,7 +698,7 @@ public class MultiplayActivity extends AppCompatActivity{
             DB_game.child(p1_id).child("isEnd").setValue(true); // DB에 값 갱신
             is_game_end = true;
 
-            String victoryTitle = (turn - 1) + "턴 만에 승리하셨습니다!";
+            String victoryTitle = String.valueOf(turn) + "턴 만에 승리하셨습니다!";
             String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
 
             Handler mHandler = new Handler(Looper.getMainLooper());
