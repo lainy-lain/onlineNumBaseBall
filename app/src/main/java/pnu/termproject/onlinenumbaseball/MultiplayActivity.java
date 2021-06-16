@@ -42,6 +42,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -84,7 +85,7 @@ public class MultiplayActivity extends AppCompatActivity{
     private boolean is_game_end = false;
     private boolean is_firstSol_submit = false;
 
-    private String whosInput, whosAns;
+    private String whosInput, whosStatus, whosAns;
     private ArrayList<String> inputAndResult = new ArrayList<>();
 
     // Firebase DB 관련 전역변수
@@ -251,6 +252,7 @@ public class MultiplayActivity extends AppCompatActivity{
             // 게임이 진행되기 전에, 이 child에 대한 listener가 설정돼야 하므로
             // 여기서 미리 초기화시켜두는 것이다.
             mDatabase.child("multiPlay").child(p1_id).setValue(null); // 혹시라도 유령방이 남아있으면 clear
+            mDatabase.child("multiPlay").child(p1_id).child("game_id").setValue(p1_id);
             mDatabase.child("multiPlay").child(p1_id).child("p1_inputNum").setValue("init");
             mDatabase.child("multiPlay").child(p1_id).child("p2_inputNum").setValue("init");
             mDatabase.child("multiPlay").child(p1_id).child("p1_status").setValue("init");
@@ -312,10 +314,12 @@ public class MultiplayActivity extends AppCompatActivity{
 
         if (am_i_p1) {
             whosInput = "p2_inputNum";
+            whosStatus = "p2_status";
             whosAns = "p2_solNum";
         }
         else{
             whosInput = "p1_inputNum";
+            whosStatus = "p1_status";
             whosAns = "p1_solNum";
         }
 
@@ -419,47 +423,49 @@ public class MultiplayActivity extends AppCompatActivity{
                     }
                 }
 
+                /*
                 // 상대방의 inputNum값이 갱신되는 경우
-                // p1의 경우, p2_inputNum 위에 있는 p1_status와 비교
-                // p2의 경우, p1_inputNum 위에 있는 isOneExited와 비교
                 else if (Objects.equals(previousChildName, "p1_status") && am_i_p1
                         || Objects.equals(previousChildName, "isOneExited") && !am_i_p1) {
                     String inputNum = (String) snapshot.getValue();
                     ir.setInput(inputNum);
                     inputAndResult.add(inputNum);
-                    if (inputAndResult.size() >= 2) { // input과 status 둘 다 갱신된 경우
-                        InputAndResult new_ir = new InputAndResult(ir);
-                        if (am_i_p1) {
-                            arrayList_result2.add(new_ir);
-                            adapter_result2.notifyDataSetChanged();
-                        } else {
-                            arrayList_result1.add(new_ir);
-                            adapter_result1.notifyDataSetChanged();
-                        }
-                        inputAndResult.clear(); // 초기화
 
-                    }
+                    Timer wait_timer = new Timer();
+                    TimerTask wait_task = new TimerTask() {
+                        @Override
+                        public void run() {
+                            if (is_game_end) {
+                                wait_timer.cancel();
+                            }
+
+                            InputAndResult new_ir = new InputAndResult(ir);
+                            Handler mHandler = new Handler(Looper.getMainLooper());
+                            if (am_i_p1) {
+                                mHandler.postDelayed(() -> {
+                                    arrayList_result2.add(new_ir);
+                                    adapter_result2.notifyDataSetChanged();
+                                }, 0);
+                            } else {
+                                mHandler.postDelayed(() -> {
+                                    arrayList_result1.add(new_ir);
+                                    adapter_result1.notifyDataSetChanged();
+                                }, 0);
+                            }
+                            inputAndResult.clear(); // 초기화
+                        }
+                    };
+                    wait_timer.schedule(wait_task, 500);
                 }
 
                 // 상대방의 status(결과)값이 갱신되는 경우
-                // p_status 위에 p_solNum이 있으므로 whosAns와 비교
                 else if (Objects.equals(previousChildName, whosAns)) {
                     String status = (String) snapshot.getValue();
                     status += "\t\t\n";
                     ir.setResult(status);
                     inputAndResult.add(status);
-                    if (inputAndResult.size() >= 2) { // input과 status 둘 다 갱신된 경우
-                        InputAndResult new_ir = new InputAndResult(ir);
-                        if (am_i_p1) {
-                            arrayList_result2.add(new_ir);
-                            adapter_result2.notifyDataSetChanged();
-                        } else {
-                            arrayList_result1.add(new_ir);
-                            adapter_result1.notifyDataSetChanged();
-                        }
-                        inputAndResult.clear(); // 초기화
-                    }
                 }
+                */
 
                 // 턴 정보가 갱신된 경우
                 // whosTurn 위에 p2_status가 있으므로 그것과 비교
@@ -475,8 +481,14 @@ public class MultiplayActivity extends AppCompatActivity{
                     }
 
                     if (isMyTurn()) {
-                        // Toast로 자신의 턴임을 알림
-                        // Toast.makeText(MultiplayActivity.this, "Your Turn", Toast.LENGTH_SHORT).show(); // 토스트 문자 출력
+                        Timer wait_timer = new Timer();
+                        TimerTask wait_task = new TimerTask() {
+                            @Override
+                            public void run() {
+                                getInputAndResultFromDB();
+                            }
+                        };
+                        wait_timer.schedule(wait_task, 200);
 
                         sec = 0;
                         Timer play_timer = new Timer();
@@ -741,6 +753,47 @@ public class MultiplayActivity extends AppCompatActivity{
             DB_game.child(p1_id).child("whosTurn").setValue(whosTurn);
         }
     } // end of getResultAndUpdate()
+
+    public void getInputAndResultFromDB(){
+        DB_game.addListenerForSingleValueEvent(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()){
+                    if (ds.hasChild("game_id") && p1_id.equals(ds.child("game_id").getValue())){
+                        String inputNum = (String) ds.child(whosInput).getValue();
+                        String status = (String) ds.child(whosStatus).getValue();
+                        if (Objects.equals("init", inputNum)){
+                            break;
+                        }
+                        status += "\t\t\n";
+                        ir.setInput(inputNum);
+                        ir.setResult(status);
+
+                        InputAndResult new_ir = new InputAndResult(ir);
+                        Handler mHandler = new Handler(Looper.getMainLooper());
+                        if (am_i_p1) {
+                            mHandler.postDelayed(() -> {
+                                arrayList_result2.add(new_ir);
+                                adapter_result2.notifyDataSetChanged();
+                            }, 0);
+                        } else {
+                            mHandler.postDelayed(() -> {
+                                arrayList_result1.add(new_ir);
+                                adapter_result1.notifyDataSetChanged();
+                            }, 0);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 
     public void resetButton(){
 //        rb_select = radio_btn[0];
