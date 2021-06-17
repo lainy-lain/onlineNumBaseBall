@@ -70,6 +70,7 @@ public class MultiplayActivity extends AppCompatActivity{
     private int ball_number;
 
     private RecyclerView.Adapter adapter_result1, adapter_result2;
+    private RecyclerView.LayoutManager layoutManager_result1, layoutManager_result2;
     private ArrayList<InputAndResult> arrayList_result1, arrayList_result2;
     private InputAndResult ir = new InputAndResult();
 
@@ -107,6 +108,9 @@ public class MultiplayActivity extends AppCompatActivity{
 
     private View dialogView;
     private SharedPreferences sp;
+
+    private boolean is_first = true;
+    private int firstAttacker;
 
     @SuppressLint("HandlerLeak")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -213,8 +217,8 @@ public class MultiplayActivity extends AppCompatActivity{
         RecyclerView recyclerView_result2 = findViewById(R.id.recyclerView_result2);
         recyclerView_result1.setHasFixedSize(true);
         recyclerView_result2.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager_result1 = new LinearLayoutManager(this);
-        RecyclerView.LayoutManager layoutManager_result2 = new LinearLayoutManager(this);
+        layoutManager_result1 = new LinearLayoutManager(this);
+        layoutManager_result2 = new LinearLayoutManager(this);
         recyclerView_result1.setLayoutManager(layoutManager_result1);
         recyclerView_result2.setLayoutManager(layoutManager_result2);
         arrayList_result1 = new ArrayList<>();
@@ -473,6 +477,12 @@ public class MultiplayActivity extends AppCompatActivity{
                     Long lVal = (Long) snapshot.getValue();
                     whosTurn = lVal.intValue();
 
+                    // 0617에 추가
+                    if (is_first){
+                        firstAttacker = whosTurn;
+                        is_first = false;
+                    }
+
                     while (true){
                         boolean isOk = is_firstSol_submit;
                         myDebug("in while loop");
@@ -488,7 +498,7 @@ public class MultiplayActivity extends AppCompatActivity{
                                 getInputAndResultFromDB();
                             }
                         };
-                        wait_timer.schedule(wait_task, 200);
+                        wait_timer.schedule(wait_task, 50); // original : 200ms
 
                         sec = 0;
                         Timer play_timer = new Timer();
@@ -536,7 +546,7 @@ public class MultiplayActivity extends AppCompatActivity{
                     boolean is_end = (boolean) snapshot.getValue();
                     if (is_end) { // 에러 방지... 갱신되지 않았는데 갱신됐다고 뜨는 경우가 존재함
                         is_game_end = true;
-                        if (!am_i_p1) turn++;
+                        if ((am_i_p1 && firstAttacker == 2) || (!am_i_p1 && firstAttacker == 1)) turn++;
                         String victoryTitle = "상대방이 " + turn + "턴 만에 정답을 맞췄습니다";
                         String victoryMsg = "상대방이 입력한 숫자는 " + opponentInputNum + " 였습니다.";
 
@@ -695,14 +705,20 @@ public class MultiplayActivity extends AppCompatActivity{
             // adapter_result1.notifyDataSetChanged();
 
             Handler mHandler = new Handler(Looper.getMainLooper());
-            mHandler.postDelayed(() -> adapter_result1.notifyDataSetChanged(), 0);
+            mHandler.postDelayed(() -> {
+                adapter_result1.notifyDataSetChanged();
+                layoutManager_result1.scrollToPosition(arrayList_result1.size() - 1);
+            }, 0);
         }
         else{
             arrayList_result2.add(my_ir);
             // adapter_result2.notifyDataSetChanged();
 
             Handler mHandler = new Handler(Looper.getMainLooper());
-            mHandler.postDelayed(() -> adapter_result2.notifyDataSetChanged(), 0);
+            mHandler.postDelayed(() -> {
+                adapter_result2.notifyDataSetChanged();
+                layoutManager_result2.scrollToPosition(arrayList_result2.size() - 1);
+            }, 0);
         }
 
 
@@ -776,11 +792,13 @@ public class MultiplayActivity extends AppCompatActivity{
                             mHandler.postDelayed(() -> {
                                 arrayList_result2.add(new_ir);
                                 adapter_result2.notifyDataSetChanged();
+                                layoutManager_result2.scrollToPosition(arrayList_result2.size() - 1);
                             }, 0);
                         } else {
                             mHandler.postDelayed(() -> {
                                 arrayList_result1.add(new_ir);
                                 adapter_result1.notifyDataSetChanged();
+                                layoutManager_result1.scrollToPosition(arrayList_result1.size() - 1);
                             }, 0);
                         }
                         break;
