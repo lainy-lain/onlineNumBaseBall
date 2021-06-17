@@ -532,7 +532,7 @@ public class MultiplayActivity extends AppCompatActivity{
 
                 // 게임이 종료된 경우. 단, 패자만이 이 알림을 받도록 설정.
                 // isEnd위엔 아무것도 없으므로 null과 비교
-                else if (Objects.equals(previousChildName, null) && !isMyTurn()) {
+                else if (Objects.equals(previousChildName, "game_id") && !isMyTurn()) {
                     boolean is_end = (boolean) snapshot.getValue();
                     if (is_end) { // 에러 방지... 갱신되지 않았는데 갱신됐다고 뜨는 경우가 존재함
                         is_game_end = true;
